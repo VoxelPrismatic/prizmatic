@@ -1,14 +1,6 @@
 import aiohttp
 import asyncio
 
-def get_cycle():
-    cycle = asyncio.new_event_loop()
-    return cycle
-
-def get_client():
-    client = aiohttp.ClientSession()
-    return client
-
 gate_codes = {
     "4000": "An unknown error occured, trying to reconnect",
     "4001": "Woops, the library sent an invalid opcode",
