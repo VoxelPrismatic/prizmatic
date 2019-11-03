@@ -49,4 +49,4 @@ tp -- Most likely a `tuple`
 ```
 I use them frequently for small bits of code that aren't too significant
 
-# WAIT FOR OTHER THINGS
+# WAIT FOR OTHER THINGS TO COME
