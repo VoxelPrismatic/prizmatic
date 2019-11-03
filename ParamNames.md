@@ -16,11 +16,13 @@ vc ----- Voice Channel
 cat ---- Catagory Channel
 gld ---- Guild
 emj ---- Emoji
-mbr ---- Member
+plr ---- Player
+mbr ---- Player
 msg ---- Message
 usr ---- User
 rol ---- Role
 rct ---- Reaction
+web ---- Webhook
 ```
 
 ### IDs
@@ -29,8 +31,10 @@ cID --- Channel ID
 gID --- Guild ID
 tID --- Message ID
 uID --- User ID
-mID --- Member ID
+pID --- Player ID
+mID --- Player ID
 rID --- Role ID
 vID --- Voice Channel ID
 eID --- Emoji ID
+wID --- Webhook ID
 ```
