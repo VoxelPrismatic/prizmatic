@@ -29,7 +29,7 @@ gate_ops = {
     "ack":      11
 }
 
-async def payload(self, data, opcode, seq = None, event = None):
+async def payload(self, data, opcode, seq = None, event = None, route = ""):
     payload = {
         "op": opcode,
         "d": data
@@ -38,7 +38,7 @@ async def payload(self, data, opcode, seq = None, event = None):
         payload["s"] = seq
     if event:
         payload["t"] = event
-    async with self.client.get(self.uri, data = payload) as r:
+    async with self.client.get(self.uri+route, data = payload) as r:
         if r.status != 200:
             raise Exception(r)
         try:
@@ -47,14 +47,3 @@ async def payload(self, data, opcode, seq = None, event = None):
             j = await r.text()
         print(j)
         return j
-
-async def ws(self, data, opcode, seq = None, event = None):
-    payload = {
-        "op": opcode,
-        "d": data
-    }
-    if seq:
-        payload["s"] = seq
-    if event:
-        payload["t"] = event
-    await self.ws.send_json(payload)

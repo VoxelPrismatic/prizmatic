@@ -34,3 +34,10 @@ rID --- Role ID
 vID --- Voice Channel ID
 eID --- Emoji ID
 ```
+
+### OTHER
+```
+ws ---- WebSocket
+m ----- WebSocket Message
+j ----- WebSocket Message as JSON
+```
