@@ -35,18 +35,13 @@ I don't know how to document stuff... so the best I can say is just look at the 
 
 When I do document stuff, it will generally follow this syntax:
 ```
->> DESCRIPTION FOR CLASS/FUNCTION
-variable_name [type] - description
+Description of class or function
+var_name [type] - desc of variable
+                - possibly extra info if needed
+    var2 [type] - other desc
 ```
+Just note that classes or methods that shouldn't be directly touched will NOT be 
+documented [for now]. I am lazy, and I want this ready ASAP, so this will have to do
 
-Also, note these common variable name things:
-```
-st -- Most likely a `str`
-num - Most likely an `int` or `float`
-dic - Most likely a `dict`
-ls -- Most likely a `list`
-tp -- Most likely a `tuple`
-```
-I use them frequently for small bits of code that aren't too significant
-
-# WAIT FOR OTHER THINGS TO COME
+# CODE
+To see how I name stuff for little bits of code, go to `ParamNames.md`
