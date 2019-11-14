@@ -1,91 +1,92 @@
-from .PrizmCls import *
+from .PrizmCls import PrizmList, PrizmDict
+global permissions
+permissions = {
+    "MANAGE_EMOJIS":         0x40000000,
+    "MANAGE_WEBHOOKS":       0x20000000,
+    "MANAGE_ROLES":          0x10000000,
+    "MANAGE_NICKNAMES":      0x08000000,
+    "CHANGE_NICKNAME":       0x04000000,
+    "USE_VAD":               0x02000000,
+    "MOVE_MEMBERS":          0x01000000,
+    "DEAFEN_MEMBERS":        0x00800000,
+    "MUTE_MEMBERS":          0x00400000,
+    "SPEAK":                 0x00200000,
+    "CONNECT":               0x00100000,
+    "USE_EXTERNAL_EMOJIS":   0x00040000,
+    "MENTION_EVERYONE":      0x00020000,
+    "READ_MESSAGE_HISTORY":  0x00010000,
+    "ATTACH_FILES":          0x00008000,
+    "EMBED_LINKS":           0x00004000,
+    "MANAGE_MESSAGES":       0x00002000,
+    "SEND_TTS_MESSAGES":     0x00001000,
+    "SEND_MESSAGES":         0x00000800,
+    "VIEW_CHANNEL":          0x00000400,
+    "STREAM":                0x00000200,
+    "PRIORITY_SPEAKER":      0x00000100,
+    "VIEW_AUDIT_LOG":        0x00000080,
+    "ADD_REACTIONS":         0x00000040,
+    "MANAGE_GUILD":          0x00000020,
+    "MANAGE_CHANNELS":       0x00000010,
+    "ADMINISTRATOR":         0x00000008,
+    "BAN_MEMBERS":           0x00000004,
+    "KICK_MEMBERS":          0x00000002,
+    "CREATE_INSTANT_INVITE": 0x00000001
+}
 
 def decode(num: int):
-    st = [int(h, 16) for h in hex(num)[2:].zfill(8)]
     ls = PrizmList([])
-    dic = {
-        "MANAGE_EMOJIS":         (lambda a: [a[0] - 4] + a[1:] if a[0] - 4 >= 0 else a),
-        "MANAGE_WEBHOOKS":       (lambda a: [a[0] - 2] + a[1:] if a[0] - 2 >= 0 else a),
-        "MANAGE_ROLES":          (lambda a: [a[0] - 1] + a[1:] if a[0] - 1 >= 0 else a),
-        "MANAGE_NICKNAMES":      (lambda a: a[:1]+[a[1] - 8]+a[2:] if a[1]-8 >= 0 else a),
-        "CHANGE_NICKNAME":       (lambda a: a[:1]+[a[1] - 4]+a[2:] if a[1]-4 >= 0 else a),
-        "USE_VAD":               (lambda a: a[:1]+[a[1] - 2]+a[2:] if a[1]-2 >= 0 else a),
-        "MOVE_MEMBERS":          (lambda a: a[:1]+[a[1] - 1]+a[2:] if a[1]-1 >= 0 else a),
-        "DEAFEN_MEMBERS":        (lambda a: a[:2]+[a[2] - 8]+a[3:] if a[2]-8 >= 0 else a),
-        "MUTE_MEMBERS":          (lambda a: a[:2]+[a[2] - 4]+a[3:] if a[2]-4 >= 0 else a),
-        "SPEAK":                 (lambda a: a[:2]+[a[2] - 2]+a[3:] if a[2]-2 >= 0 else a),
-        "CONNECT":               (lambda a: a[:2]+[a[2] - 1]+a[3:] if a[2]-1 >= 0 else a),
-        "USE_EXTERNAL_EMOJIS":   (lambda a: a[:3]+[a[3] - 4]+a[4:] if a[3]-4 >= 0 else a),
-        "MENTION_EVERYONE":      (lambda a: a[:3]+[a[3] - 2]+a[4:] if a[3]-2 >= 0 else a),
-        "READ_MESSAGE_HISTORY":  (lambda a: a[:3]+[a[3] - 1]+a[4:] if a[3]-1 >= 0 else a),
-        "ATTACH_FILES":          (lambda a: a[:4]+[a[4] - 8]+a[5:] if a[4]-8 >= 0 else a),
-        "EMBED_LINKS":           (lambda a: a[:4]+[a[4] - 4]+a[5:] if a[4]-4 >= 0 else a),
-        "MANAGE_MESSAGES":       (lambda a: a[:4]+[a[4] - 2]+a[5:] if a[4]-2 >= 0 else a),
-        "SEND_TTS_MESSAGES":     (lambda a: a[:4]+[a[4] - 1]+a[5:] if a[4]-1 >= 0 else a),
-        "SEND_MESSAGES":         (lambda a: a[:5]+[a[5] - 8]+a[6:] if a[5]-8 >= 0 else a),
-        "VIEW_CHANNEL":          (lambda a: a[:5]+[a[5] - 4]+a[6:] if a[5]-4 >= 0 else a),
-        "STREAM":                (lambda a: a[:5]+[a[5] - 2]+a[6:] if a[5]-2 >= 0 else a),
-        "PRIORITY_SPEAKER":      (lambda a: a[:5]+[a[5] - 1]+a[6:] if a[5]-1 >= 0 else a),
-        "VIEW_AUDIT_LOG":        (lambda a: a[:6]+[a[6] - 8]+a[7:] if a[6]-8 >= 0 else a),
-        "ADD_REACTIONS":         (lambda a: a[:6]+[a[6] - 4]+a[7:] if a[6]-4 >= 0 else a),
-        "MANAGE_GUILD":          (lambda a: a[:6]+[a[6] - 2]+a[7:] if a[6]-2 >= 0 else a),
-        "MANAGE_CHANNELS":       (lambda a: a[:6]+[a[6] - 1]+a[7:] if a[6]-1 >= 0 else a),
-        "ADMINISTRATOR":         (lambda a: a[:7] + [a[7] - 8] if a[7] - 8 >= 0 else a),
-        "BAN_MEMBERS":           (lambda a: a[:7] + [a[7] - 4] if a[7] - 4 >= 0 else a),
-        "KICK_MEMBERS":          (lambda a: a[:7] + [a[7] - 2] if a[7] - 2 >= 0 else a),
-        "CREATE_INSTANT_INVITE": (lambda a: a[:7] + [a[7] - 1] if a[7] - 1 >= 0 else a)
-    }
-    for perm in dic:
-        sta = dic[perm](st)
-        if sta != st:
+    global permissions
+    for perm in permissions:
+        val = permissions[perm]
+        if (val & num) == val:
             ls << perm
-            st = sta
-    return ls
+    return list(ls)
 
 def encode(ls: list):
-    st = [0, 0, 0, 0, 0, 0, 0, 0]
-    dic = {
-        "MANAGE_EMOJIS":         (lambda a: [a[0] + 4] + a[1:]),
-        "MANAGE_WEBHOOKS":       (lambda a: [a[0] + 2] + a[1:]),
-        "MANAGE_ROLES":          (lambda a: [a[0] + 1] + a[1:]),
-        "MANAGE_NICKNAMES":      (lambda a: a[:1]+[a[1] + 8]+a[2:]),
-        "CHANGE_NICKNAME":       (lambda a: a[:1]+[a[1] + 4]+a[2:]),
-        "USE_VAD":               (lambda a: a[:1]+[a[1] + 2]+a[2:]),
-        "MOVE_MEMBERS":          (lambda a: a[:1]+[a[1] + 1]+a[2:]),
-        "DEAFEN_MEMBERS":        (lambda a: a[:2]+[a[2] + 8]+a[3:]),
-        "MUTE_MEMBERS":          (lambda a: a[:2]+[a[2] + 4]+a[3:]),
-        "SPEAK":                 (lambda a: a[:2]+[a[2] + 2]+a[3:]),
-        "CONNECT":               (lambda a: a[:2]+[a[2] + 1]+a[3:]),
-        "USE_EXTERNAL_EMOJIS":   (lambda a: a[:3]+[a[3] + 4]+a[4:]),
-        "MENTION_EVERYONE":      (lambda a: a[:3]+[a[3] + 2]+a[4:]),
-        "READ_MESSAGE_HISTORY":  (lambda a: a[:3]+[a[3] + 1]+a[4:]),
-        "ATTACH_FILES":          (lambda a: a[:4]+[a[4] + 8]+a[5:]),
-        "EMBED_LINKS":           (lambda a: a[:4]+[a[4] + 4]+a[5:]),
-        "MANAGE_MESSAGES":       (lambda a: a[:4]+[a[4] + 2]+a[5:]),
-        "SEND_TTS_MESSAGES":     (lambda a: a[:4]+[a[4] + 1]+a[5:]),
-        "SEND_MESSAGES":         (lambda a: a[:5]+[a[5] + 8]+a[6:]),
-        "VIEW_CHANNEL":          (lambda a: a[:5]+[a[5] + 4]+a[6:]),
-        "STREAM":                (lambda a: a[:5]+[a[5] + 2]+a[6:]),
-        "PRIORITY_SPEAKER":      (lambda a: a[:5]+[a[5] + 1]+a[6:]),
-        "VIEW_AUDIT_LOG":        (lambda a: a[:6]+[a[6] + 8]+a[7:]),
-        "ADD_REACTIONS":         (lambda a: a[:6]+[a[6] + 4]+a[7:]),
-        "MANAGE_GUILD":          (lambda a: a[:6]+[a[6] + 2]+a[7:]),
-        "MANAGE_CHANNELS":       (lambda a: a[:6]+[a[6] + 1]+a[7:]),
-        "ADMINISTRATOR":         (lambda a: a[:7] + [a[7] + 8]),
-        "BAN_MEMBERS":           (lambda a: a[:7] + [a[7] + 4]),
-        "KICK_MEMBERS":          (lambda a: a[:7] + [a[7] + 2]),
-        "CREATE_INSTANT_INVITE": (lambda a: a[:7] + [a[7] + 1])
-    }
-    for perm in dic:
-        if perm in ls:
-            st = dic[perm](st)
-    return int("".join(hex(num) for num in st).replace("0x", ""), 16)
+    perms = 0
+    global permissions
+    for perm in ls:
+        perms |= permissions[perm.replace(" ", "_").upper()]
+    return perms
 
 class Perms:
     """
-    Represents the permission overwrites of a channel
-    **You shouldn't have to initialize this class, so no documentation for
-      initializing this class will be given
+    DESCRIPTION ---
+        Represents the permissions of a member, user, or overwrite
+    
+    PARAMS
+        allow [int]
+        - The allowed things, as an int
+        
+        deny [int]
+        - The denied things, as an int
+        
+        none [int]
+        - The inherited things, as an int
+        
+        *Use the encode method to create an int from a list of perms
+        
+    FUNCTIONS ---
+        perms = Perms(allow, deny, none)
+        - Creates a Perms object
+        
+        dict(perms)
+        - Creates a dict object and returns it
+        
+        perms.update(other_dict)
+        - Updates `perms' with the values of other_dict
+        
+        perms.update_int(?allow, ?deny, ?none)
+        - Updates `perms' with the specified ints
+        
+        perms.is_empty()
+        - Returns `True' if the perms do absolutely nothing
+        
+        perms[perm]
+        - Returns the value of that perm
+        
+        perms[perm] = val
+        - Updates perm to be True [allow], False [deny], or None [none]
     """
     def __init__(self, allow = 0, deny = 0, none = 0):
         self.override_type = type
@@ -107,10 +108,11 @@ class Perms:
             dic[perm] = False
         for perm in self.none:
             dic[perm] = None
+        return dic
 
     def update(self, other: dict):
         for key in other:
-            key2 = key.upper.replace(" ", "_") #because humans are humans, they will most likely
+            key2 = key.upper().replace(" ", "_")
             if other[key] == True:
                 if key2 in self.deny:
                     self.deny >> key2
@@ -150,3 +152,10 @@ class Perms:
            and all(i == None for i in self.allow):
                return True
         return False
+    
+    def __getitem__(self, key):
+        return dict(self)[key.upper().replace(" ", "_")]
+        
+    def __setitem__(self, key, val):
+        self.set({key: val})
+    

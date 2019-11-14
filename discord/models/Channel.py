@@ -33,7 +33,7 @@ class Channel:
         j = self.__html(m = "=", u = f"/guilds/{self.guild_id}")
 
 class VC:
-        """
+    """
     Represents a text channel
     **You shouldn't have to initialize this class, so no documentation for
       initializing this class will be given
@@ -53,23 +53,14 @@ class VC:
 
 
 
-
-
-class AnyChannel:
-    """
-    Will return the correct channel object
-    **You shouldn't have to initialize this class, so no documentation for
-      initializing this class will be given
-    """
-    def __init__(self, **kw, guild_id):
-        channels = {
-            "0": (lambda kw: Channel(**kw)),
-            "1": (lambda kw: DM(**kw)),
-            "2": (lambda kw: VC(**kw)),
-            "3": (lambda kw: GroupDM(**kw)),
-            "4": (lambda kw: Catagory(**kw)),
-            "5": (lambda kw: NewsChannel(**kw)),
-            "6": (lambda kw: StoreChannel(**kw)),
-        }
-        kw["guild_id"] = guild_id
-        return channels[kw["type"]](guild_id)
+def AnyChannel(self, **kw):
+    channels = {
+        "0": (lambda kw: Channel(**kw)),
+        "1": (lambda kw: DM(**kw)),
+        "2": (lambda kw: VC(**kw)),
+        "3": (lambda kw: GroupDM(**kw)),
+        "4": (lambda kw: Catagory(**kw)),
+        "5": (lambda kw: NewsChannel(**kw)),
+        "6": (lambda kw: StoreChannel(**kw)),
+    }
+    return channels[kw["type"]](kw)

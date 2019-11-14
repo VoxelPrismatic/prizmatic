@@ -1,4 +1,6 @@
 class PrizmList(list):
+    def __init__(self, *args):
+        self = list(args)
     def __lshift__(self, item):
         "list << item  ||  list.append(item)"
         self.append(item)
@@ -29,6 +31,8 @@ class PrizmList(list):
         return self.pop(index)
 
 class PrizmDict(dict):
+    def __init__(self, arg = {}, **kw):
+        self = kw or dict(arg)
     def __lshift__(self, other_dict):
         "dict << other  ||  dict.update(other)"
         self.update(other_dict)
@@ -45,8 +49,17 @@ class PrizmDict(dict):
     def __invert__(self):
         "~dict  ||  [(key, dict[key]) for key in dict]"
         return [(key, self[key]) for key in self]
+    def __floordiv__(self, typ):
+        dic = {}
+        for key in self:
+            dic[key] = typ(dic[key])
+        return dic
+    def __ifloordiv__(self, typ):
+        return self // typ
 
 def PrizmStr(str):
+    def __init__(self, arg = ""):
+        self = str(arg)
     def __ge__(self, string):
         "str >=  other  ||  str = other + str"
         self = self+str(string)
@@ -92,6 +105,8 @@ def PrizmStr(str):
         self = PrizmStr("".join(ls))
 
 class PrizmFloat(float):
+    def __init__(self, arg = 0.0):
+        self = float(arg)
     def __xor__(self, num):
         "float ^ exponent  ||  float ** exponent"
         return self ** num
@@ -106,6 +121,8 @@ class PrizmFloat(float):
         return str(self)[index]
 
 class PrizmInt(int):
+    def __init__(self, arg = 0):
+        self = int(arg)
     def __xor__(self, num):
         "int ^ exponent  ||  int ** exponent"
         return self ** num
@@ -115,3 +132,59 @@ class PrizmInt(int):
     def __getitem__(self, index: int):
         "int[digit]  ||  str(int)[digit]"
         return str(self)[index]
+
+class PrizmSet(set):
+    def __init__(self, *args):
+        self = set(args)
+    def __rshift__(self, num: int):
+        return self[num:]+self[:num]
+    def __irshift__(self, num: int):
+        return self[num:]+self[:num]
+    def __lshift__(self, num: int):
+        return self[:num]+self[num:]
+    def __ilshift__(self, num: int):
+        return self[:num]+self[num:]
+        
+class PrizmBool:
+    def __init__(self, val):
+        self = bool(val)
+        self.val = bool(val)
+    def __bool__(self):
+        return bool(self.val)
+    def __int__(self):
+        return int(self.val)
+    def __str__(self):
+        return str(self.val)
+    def __xor__(self, other):
+        return bool(self) != bool(other)
+    def __invert__(self):
+        return not bool(self)
+    def __mul__(self, other):
+        return bool(self) and bool(other)
+    def __add__(self, other):
+        return bool(self) or bool(other)
+    def __and__(self, other):
+        return self * other
+    def __or__(self, other):
+        return self + other
+    def __sub__(self, other):
+        return not(self + other)
+    def __div__(self, other):
+        return not(self * other)
+    def __mod__(self, other):
+        return not(self ^ other)
+    def __rmul__(self, other):
+        return self and other
+    def __radd__(self, other):
+        return bool(self) or bool(other)
+    def __rand__(self, other):
+        return self * other
+    def __ror__(self, other):
+        return self + other
+    def __rsub__(self, other):
+        return not(self + other)
+    def __rdiv__(self, other):
+        return not(self * other)
+    def __rmod__(self, other):
+        return not(self ^ other)
+    

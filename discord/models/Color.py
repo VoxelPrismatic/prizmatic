@@ -2,16 +2,33 @@ import re
 
 class Color:
     """
-    Represents a color... yes thats it
+    DESCRIPTION ---
+        Represents a color... yes thats it
+        
     PARAMS---
-    num [int  ] - The integer representation of the hexadecimal color
-    rgb [tuple] - The (r, g, b) values of the color
-      r [int  ] - The r value of the color
-      g [int  ] - The g value of the color
-      b [int  ] - The b value of the color
-     hx [str  ] - The hexadecimal representation of the color
-    **You should only pass one type of param [(r, g, b), rgb, num, hex] or
-      you may not get the desired output
+        ?num [int]
+        - The integer representation of the hexadecimal color
+        
+        ?rgb [tuple]
+        - The (r, g, b) values of the color
+        
+        ?r [int]
+        - The r value of the color
+        
+        ?g [int]
+        - The g value of the color
+        
+        ?b [int]
+        - The b value of the color
+        
+        ?hx [str] 
+        - The hexadecimal representation of the color
+        **You should only pass one type of param [(r, g, b), rgb, num, hex] or
+          you may not get the desired output
+          
+    FUNCTIONS ---
+        color = Color(some_color)
+        - Creates a Color object
     """
 
     def __init__(self, num: int = 0):

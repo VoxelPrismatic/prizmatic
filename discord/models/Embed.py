@@ -14,7 +14,8 @@ def typed(thing):
 
 class Embed:
     """
-    Represents a Discord Embed
+    DESCRIPTION ---
+        Represents a Discord Embed
     
     PARAMS ---
         title [str]
@@ -53,6 +54,7 @@ class Embed:
         time [datetime.datetime, str]
         - The Datetime object of the time you wish to put
         - Placing "now" will give you the current time in UTC
+        - Placing a VALID ISO8601 timestamp will also work
         
         color [Color, int, str, tuple]
         - The color of the embed
@@ -134,9 +136,6 @@ class Embed:
         repr(Embed) -> str
         - The repr thing
         
-        Embed.__aliases()
-        - Sets up aliased parameter names
-        
         Embed.set(**kwargs_from_above)
         - Just like creating a new Embed object, but with the
           old params too
@@ -155,6 +154,15 @@ class Embed:
         
         Embed.set_field(index, field)
         - Sets field number index to field
+        
+        Embed.fromdict(dict_object)
+        - Sets fields and things from the output template of `dict(embed)`
+        
+        Embed[param] -> Parameter
+        - An alias for Embed.param if you want that
+        
+        Embed[param] = value
+        - Shortcut for Embed.set(param = value), 
     """
     
     def __repr__(self):
@@ -171,7 +179,7 @@ class Embed:
         self.description = self.desc
     
     def __init__(self, *, title = "", type = "rich", desc = "", description = "",
-                 fields = [], foot = "", footer = "", foot_icon = "",
+                 fields = [], foot = "", footer = "", foot_icon = "", timestamp = None
                  footer_icon = "", foot_proxy_icon = "", footer_proxy_icon = "",
                  url = "", time = None, color = None, image = "", image_proxy = "",
                  image_width = 0, image_height = 0, thumb = "", thumbnail = "",
@@ -193,6 +201,8 @@ class Embed:
             self.time = time
         elif time.lower() == "now":
             self.time = datetime.datetime.utcnow()
+        elif re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}+\d{2}:\d{2}"):
+            self.time = datetime.datetime.fromisoformat(time)
         if type(color) == Color:
             self.color = Color
         elif color:
@@ -261,13 +271,13 @@ class Embed:
                 emb["image"]["height"] = self.image_height
         if self.thumb or self.thumb_proxy or self.thumb_width or self.thumb_height:
             emb["thumbnail"] = {}
-            if self.image:
+            if self.thumb:
                 emb["thumbnail"]["url"] = self.thumb
-            if self.image_proxy:
+            if self.thumb_proxy:
                 emb["thumbnail"]["proxy_url"] = self.thumb_proxy
-            if self.image_width:
+            if self.thumb_width:
                 emb["thumbnail"]["width"] = self.thumb_width
-            if self.image_height:
+            if self.thumb_height:
                 emb["thumbnail"]["height"] = self.thumb_height
         if self.video or self.video_width or self.video_height:
             emb["video"] = {}
@@ -291,8 +301,8 @@ class Embed:
                 emb["author"]["url"] = self.author_url
             if self.author_icon:
                 emb["author"]["icon_url"] = self.author_icon
-            if self.provider_url:
-                emb["author"]["proxy_icon_url"] = self.author_proxy_url
+            if self.author_proxy_url:
+                emb["author"]["proxy_icon_url"] = self.author_proxy_icon
         if self.fields:
             emb["fields"] = []
             for field in self.fields:
@@ -367,9 +377,7 @@ class Embed:
                 self.fields << field[:-1]+[bool(field[-1])]
             elif typed(field) == [str, str]:
                 self.fields << field + [False]
-            else:
-                pass
-                #Invalid fields will silently be discarded
+            #Invalid fields will silently be discarded
     
     def remove_field(self, index: int):
         del self.fields[index-1] #Humans don't count from 0
@@ -381,21 +389,84 @@ class Embed:
             self.fields[index-1] = field[:-1]+[bool(field[-1])]
         elif typed(field) == [str, str]:
             self.fields[index-1] = field + [False]
-        else:
-            pass
-            #Invalid fields will silently be discarded
+        #Invalid fields will silently be discarded
     
     def add_field(self, index: int, field):
+        if len(self.fields) > 25:
+            return
         if typed(field) == [str, str, bool]:
             self.fields << field
         elif typed(field) == [str, str, int]:
             self.fields << field[:-1]+[bool(field[-1])]
         elif typed(field) == [str, str]:
             self.fields << field + [False]
-        else:
-            pass
-            #Invalid fields will silently be discarded
+        #Invalid fields will silently be discarded
             
     def remove_fields(self, indexes):
         for index in indexes:
             del self.fields[int(index)-1]
+    
+    def fromdict(self, emb):
+        "Converts a dict to an Embed object"
+        if "footer" in emb:
+            if "text" in emb["footer"]:
+                emb["foot"] = emb["footer"]["text"]
+            if "icon_url" in emb["footer"]:
+                emb["foot_icon"] = emb["footer"]["icon_url"]
+            if "proxy_icon_url" in emb["footer"]:
+                emb["foot_proxy_icon"] = emb["footer"]["proxy_icon_url"]
+            del emb["footer"]
+        if "image" in emb:
+            emb["img"] = emb["image"]
+            if "url" in emb["img"]:
+                 emd["image"] = emb["img"]["url"]
+            if "proxy_url" in emb["img"]:
+                emb["image_proxy"] = emb["img"]["proxy_url"]
+            if "width" in emb["img"]:
+                emb["image_width"] = emb["img"]["width"]
+            if "height" in emb["img"]:
+                emb["image_height"] = emb["img"]["height"]
+            del emb["img"]
+        if "thumbnail" in emb:
+            if "url" in emb["thumbnail"]:
+                emb["thumb"] = emb["thumbnail"]["url"]
+            if "proxy" in emb["thumbnial"]:
+                emb["thumb_proxy"] = emb["thumbnail"]["proxy_url"]
+            if "width" in emb["thumbnail"]:
+                emb["thumb_width"] = emb["thumbnail"]["width"]
+            if "height" in emb["thumbnail"]:
+                emb["thumb_height"] = emb["thumbnail"]["height"]
+            del emb["thumbnail"]
+        if "video" in emb:
+            emb["vid"] = emb["video"]
+            if "url" in emb["vid"]:
+                emb["video"] = emb["vid"]["url"]
+            if "height" in emb["vid"]:
+                emb["video_height"] = emb["vid"]["height"]
+            if width in emb["vid"]:
+                emb["video_width"] = emb["video"]["width"]
+            del emb["vid"]
+        if "provider" in emb:
+            if "url" in emb["provider"]:
+                emb["provider_url"] = emb["provider"]["name"]
+            if "name" in emd["provider"]:
+                emb["provider"] = emb["provider"]["name"]
+        if "author" in emb:
+            emb["auth"] = emb["author"]
+            if "name" in emb["auth"]:
+                emb["author"] = emb["auth"]["name"]
+            if "url" in emb["auth"]:
+                emb["author_url"] = emb["auth"]["url"]
+            if "icon_url" in emb["auth"]:
+                emb["author_icon"] = emb["auth"]["icon_url"]
+            if "proxy_icon_url" in 
+                emb["author_proxy_icon"] = emb["auth"]["proxy_icon_url"]
+        if self.fields:
+            emb["fields"] = [(d["name"], d["value"], d["inline"]) for d in emb["fields"]]
+        self.set(**emb) #Provides checks too :D
+            
+    def __getitem__(self, key):
+        return self.__getattribute__(key)
+    
+    def __setitem__(self, key, val):
+        self.set(**{key: val})
