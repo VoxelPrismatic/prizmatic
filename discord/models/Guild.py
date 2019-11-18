@@ -9,16 +9,16 @@ import datetime
 class Guild:
     """
     DESCRIPTION ---
-        Represents a message
+        Represents a Guild
+        
     PARAMS ---
-        You shouldn't have to initialize this class by hand,
-        so no documentation on how to create a Guild with
-        this class will be created.
+        This class shouldn't be initialized by hand. Don't do that.
+        
     FUNCTIONS ---
         None yet
     """
 
-    def __init__(self, id, name, icon, splash, owner = False, owner_id, 
+    def __init__(self, *, id, name, icon, splash, owner = False, owner_id, 
                  permissions = 0, region, afk_channel_id, afk_timeout, 
                  embed_enabled = False, embed_channel_id = 0, verification_level,
                  default_message_notifications, explicit_content_filter, roles = [], 

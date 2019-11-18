@@ -145,46 +145,39 @@ class PrizmSet(set):
     def __ilshift__(self, num: int):
         return self[:num]+self[num:]
         
-class PrizmBool:
-    def __init__(self, val):
-        self = bool(val)
-        self.val = bool(val)
-    def __bool__(self):
-        return bool(self.val)
-    def __int__(self):
-        return int(self.val)
-    def __str__(self):
-        return str(self.val)
-    def __xor__(self, other):
-        return bool(self) != bool(other)
-    def __invert__(self):
-        return not bool(self)
-    def __mul__(self, other):
-        return bool(self) and bool(other)
+class PrizmBool(int)
     def __add__(self, other):
         return bool(self) or bool(other)
-    def __and__(self, other):
-        return self * other
-    def __or__(self, other):
-        return self + other
     def __sub__(self, other):
         return not(self + other)
+    def __mul__(self, other):
+        return bool(self) and bool(other)
     def __div__(self, other):
         return not(self * other)
+    def __or__(self, other):
+        return self + other
+    def __and__(self, other):
+        return self * other
+    def __xor__(self, other):
+        return bool(self) != bool(other)
     def __mod__(self, other):
         return not(self ^ other)
-    def __rmul__(self, other):
-        return self and other
+    def __invert__(self):
+        return not bool(self)
     def __radd__(self, other):
         return bool(self) or bool(other)
-    def __rand__(self, other):
-        return self * other
-    def __ror__(self, other):
-        return self + other
     def __rsub__(self, other):
         return not(self + other)
+    def __rmul__(self, other):
+        return bool(self) and bool(other)
     def __rdiv__(self, other):
         return not(self * other)
+    def __ror__(self, other):
+        return self + other
+    def __rand__(self, other):
+        return self * other
+    def __rxor__(self, other):
+        return bool(self) != bool(other)
     def __rmod__(self, other):
         return not(self ^ other)
     

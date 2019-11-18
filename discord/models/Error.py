@@ -1,15 +1,62 @@
-class PrizmaticError(Exception):
-    def __init__(self, name, attempts = "None", typ = "PrizmaticError", *args, **kwargs):
-        self.name = name
-        self.attempts = attempts
+from pprint import pformat as fmt
+
+def typed(thing):
+    if type(thing) == type:
+        return str(thing).split("'")[1]
+    return str(type(thing)).split("'")[1]
+
+class Error(Exception):
+    """
+    Base class for all exceptions
+    """
+    def __init__(self, name = "UnknownError", attempts = "None", typ = "PrizmaticError",
+                 *args, **kwargs):
+        self.name = name.strip()
+        self.attempts = attempts.strip()
         self.other_info = args
         self.specific_info = kwargs
-        self.typ = typ
+        self.typ = typ.strip() + " "
         
     def __str__(self):
         return f"""\
-{self.typ}: {self.name}
-Attempts taken to prevent exception: {self.attempts}
-Other info given: {self.other_info}
-Specific info: {self.specific_info}
+{self.typ:-<20}-----
+{self.name}
+
+ATTEMPTS TAKEN ----------
+{self.attempts}
+
+OTHER INFO --------------
+{fmt(self.other_info)}
+
+SPECIFIC INFO -----------
+{fmt(self.specific_info)}
 """
+
+class ClassError(Error):
+    def __init__(self, clsA, clsB, ls):
+        super.__init__(
+            name = f"Type '{typed(clsA)}' cannot be converted into type '{typed(clsB)}'",
+            attempts = f"Tried converting from '{'\', \''.join(typed(t) for t in ls)}'",
+            typ = "ClassError",
+            given_class = clsA,
+            target_class = clsB,
+            allowed_classes = ls
+        )
+
+class URLError(Error):
+    def __init__(self, url):
+        super.__init__(
+            name = "Bad url given",
+            typ = "URLError",
+            url = url
+        )
+
+class SnowDecodeError(Error):
+    def __init__(self, snowflake):
+        super.__init__(
+            name = "Bad snowflake given",
+            typ = "SnowDecodeError",
+            attempts = "Tried converting from str, hex, and binary",
+            snowflake = snowflake
+        )
+

@@ -9,12 +9,19 @@ class Snow:
         Represents a snowflake... wonderfully named btw
         000000000000000000000000000000000000000000 00000 00000 000000000000
         ----------------TIME STAMP---------------- -wID- -PID- --INCREMENT--
+        
     PARAMS ---
-        You shouldn't have to initialize this class by hand,
-        so no documentation on how to create a Message with
-        this class will be created.
+        snowflake [int, str]
+        - Represents a Discord snowflake
+        - Can be encoded in hex, binary, or an int all as strings
+        - Can also be a raw int
+        
     FUNCTIONS ---
-        None
+        snow = Snow(snowflake)
+        - Creates a Snow object
+        
+        str(snow)
+        - Prepares the snowflake to send
     """
     def __init__(self, snowflake):
         if type(snowflake) == str:
@@ -42,3 +49,6 @@ class Snow:
         self.raw = f"{self.id:b}".zfill(64)
         self.hex = f"{self.id:h}".upper().zfill(16)
         self.dt = datetime.datetime.fromisoformat(time.gmtime(self.timestamp).strftime("%Y-%m-%dT%H:%M:%S%z"))
+    
+    def __str__(self):
+        return str(self.id)

@@ -4,7 +4,9 @@ import asyncio
 import aiohttp
 import zlib
 from pprint import pprint as prinf
-from .PrizmCls import PrizmList, PrizmDict, PrizmInt, 
+from .Url import Url
+from .PrizmCls import PrizmList, PrizmDict, PrizmInt
+from .Listener import Listener
 
 def new_cycle():
     cycle = asyncio.new_event_loop()
@@ -27,61 +29,75 @@ def get_json(data):
         except:
             j = None #Some other thing that cannot be decoded
     return j
-
 class Bot:
-    def __init__(self, prefix = ";]", token = None, thresh = 150):
+    """
+    DESCRIPTION ---
+        Your Bot!
+        
+    PARAMS ---
+        prefix [str]
+        - The bot prefix, default is ';]'
+        - This is the default prefix for everything
+        
+        custom_prefix [str, dict, function]
+        - Custom prefix, overwrites the prefix when available
+        - If str, then it just overwrites the prefix all the time
+        - If dict, then it must be in {server_id: prefix} format,
+          and will overwrite the prefix if the server id is in that
+          dict
+        - If function, then it will be called. If it raises an error,
+          then it will use the default prefix and raise the error 
+          after invoking the command
+
+        token [str]
+        - Your token
+        
+    FUNCTIONS ---
+        bot = Bot(prefix, token)
+        - Creates a new Bot object
+        
+        @bot.listen()
+        async def listener(...)
+        - Make a listener
+        
+        @bot.on(listener_name)
+        async def unnamed_listener(...)
+        - Make a listener
+        
+        bot.listen_for(listener_function, ?listener_name)
+        - Make a listener
+        
+        bot.stop_listening(listener_function, ?listener_name)
+        - Remove a listener
+        
+        bot.wait(
+    """
+    def __init__(self, prefix = ";]", custom_prefix = ";]", token: str = None, thresh: int = 150):
         self.prefix = prefix
-        self.commands = PrizmList([])
-        self.channels = PrizmList([])
-        self.guilds = PrizmList([])
-        self.shards = PrizmList([])
-        self.emojis = PrizmList([])
-        self.members = PrizmList([])
-        self.token = token
+        self.custom_prefix = custom_prefix
+        self.commands = PrizmDict()
+        self.shards = PrizmDict()
+        self.token = token.strip()
         self.cycle = new_cycle()
         self.heart_cycle = new_cycle()
         self.client = get_client()
         self.thresh = thresh
         self.heartbeat = None
-        self.uri = "https://discordapp.com/api/gateway"
-        self.http_uri = "https://discordapp.com/api/v7"
+        self.uri = url.gateway
+        self.http_uri = url.api
         self.ack = 5
         self.connected = False
         self.keepalive = None
         self.__version__ = "0.6.3"
-        self.listeners = {
-            "text": PrizmList([]),
-            "text_edit": PrizmList([]),
-            "text_delete": PrizmList([]),
-            
-            "channel_edit": PrizmList([]),
-            "channel_make": PrizmList([]),
-            "channel_delete": PrizmList([]),
-            
-            "guild_join": PrizmList([]),
-            "guild_leave": PrizmList([]),
-            "guild_offline": PrizmList([]),
-            "guild_online": PrizmList([]),
-            "guild_edit": PrizmList([]),
-            
-            "player_join": PrizmList([]),
-            "player_edit": PrizmList([]),
-            "player_leave": PrizmList([]),
-            "player_ban": PrizmList([]),
-            "player_unban": PrizmList([]),
-            
-            "emoji_make": PrizmList([]),
-            "emoji_edit": PrizmList([]),
-            "emoji_delete": PrizmList([]),
-            
-            "role_make": PrizmList([]),
-            "role_edit": PrizmList([]),
-            "role_delete": PrizmList([]),
-            
-            "reaction_add": PrizmList([]),
-            "reaction_delete": PrizmList([]),
-            "reactions_clear": PrizmList([])
-        }
+        self.listener = Listener()
+        self.voices = PrizmDict()
+    
+    def run(self, token = self.token):
+        if token is None:
+            raise TypeError("No token was provided")
+        self.token = token
+        asyncio.ensure_future(self.login)
+    
     async def send_beat(self):
         while self.connected:
             print(".")
@@ -92,24 +108,6 @@ class Bot:
         await self.ws.send_json(payload)
         m = await self.ws.receive()
         return get_json(m)
-
-    async def _http(self, m = "GET", u = "", **data):
-        m = m.upper()
-        if m in ["EDIT", "UPDATE", "MERGE", "EDT", "/"]: m = "PATCH"
-        elif m in ["REMOVE", "DEL", "DESTROY", "DUMP", "-"]: m = "DELETE"
-        elif m in ["CREATE", "NEW", "ADD", "SEND", "+"]: m = "POST"
-        elif m in ["OBTAIN", "FIND", "PULL", "GRAB", "="]: m = "GET"
-        elif m in ["PLACE", "PUSH", ">"]: m = "PUT"
-        payload = {
-            "headers": {
-                "Authorization": f"Bot {self.token}",
-                "User-Agent": f"DiscordBot (https://github.com/VoxelPrismatic/prizmatic, {self.__version__})"
-            },
-            "data": data
-        }
-        payload.update(data)
-        async with self.client.request(self.http_uri + u, method = m, **payload) as m:
-            return get_json(m)
 
     async def login(self):
         print("LOGGING IN")
@@ -137,6 +135,5 @@ class Bot:
                     print("Got Heartbeat")
                     self.heartbeat = j["d"]["heartbeat_interval"]
                     asyncio.ensure_future(self.send_beat())
-                if j["op"] == 0 and j["t"] == "GUILD_CREATE":
-                    
-                self.ack = j["s"]
+                if j["op"] == 0:
+                    self.listener.act(j)

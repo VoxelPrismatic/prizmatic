@@ -4,9 +4,14 @@ from .Perms import Perms
 
 class Role:
     """
-    Represents a role
-    **You shouldn't have to initialize this class, so no documentation for
-      initializing this class will be given
+    DESCRIPTION ---
+        Represents a role
+        
+    PARAMS ---
+        This class shouldn't be initialized by hand. Don't do that.
+        
+    FUNCTIONS ---
+        None yet
     """
     def __init__(self, id, name, color, hoist,
                  position, permissions, managed,
