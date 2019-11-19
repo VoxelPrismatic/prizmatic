@@ -98,7 +98,7 @@ def PrizmStr(str):
         ls = self
         del ls[index]
         self = PrizmStr("".join(ls))
-    def __setitem__(self, index: int, char: c):
+    def __setitem__(self, index: int, char):
         "str[x] = y  ||  impossible"
         ls = PrizmList(self)
         ls[index] = char

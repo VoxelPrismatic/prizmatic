@@ -68,4 +68,4 @@ class Guild:
         self.voice_states = voice_states
         self.members = RawObjs(Player, members, bot_obj = bot_obj)
         self.channels = RawObjs(AnyChannel, channels, bot_obj = bot_obj)
-        self.presences = 
+        self.presences = None

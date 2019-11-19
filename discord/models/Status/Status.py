@@ -13,7 +13,7 @@ class Status:
     FUNCTIONS ---
         None yet
     """
-    def __init__(self, user, roles, game = None, guild_id, status,
+    def __init__(self, user, roles, game, guild_id, status,
                  activities, client_status, bot_obj):
         self.user = User(**user)
         self.roles = RawObjs(Role, roles, bot_obj = bot_obj)

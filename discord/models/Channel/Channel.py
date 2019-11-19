@@ -24,7 +24,7 @@ class Channel:
                  last_message_id, parent_id = None, bot):
         self.id = id
         self.latest_message_id = int(last_message_id)
-        self.latest_pin_time = fromtimestamp(last_pin_timestamp)
+        self.latest_pin_time = from_ts(last_pin_timestamp)
         self.latest_message = Raw(Message, last_message_id, 
                                   "/channels/{cID}/messages/{id}", cID = id)
         self.name = name

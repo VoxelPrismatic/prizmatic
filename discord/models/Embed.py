@@ -459,7 +459,7 @@ class Embed:
                 emb["author_url"] = emb["auth"]["url"]
             if "icon_url" in emb["auth"]:
                 emb["author_icon"] = emb["auth"]["icon_url"]
-            if "proxy_icon_url" in 
+            if "proxy_icon_url" in emb["auth"]:
                 emb["author_proxy_icon"] = emb["auth"]["proxy_icon_url"]
         if self.fields:
             emb["fields"] = [(d["name"], d["value"], d["inline"]) for d in emb["fields"]]

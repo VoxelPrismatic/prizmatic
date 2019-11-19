@@ -1,4 +1,4 @@
-import datetime
+from datetime.datetime import fromtimestamp as from_ts
 from ..Perms import Perms
 from ..Guild import Guild
 from ..User import User
@@ -23,7 +23,7 @@ class NewsChannel:
                  last_message_id, parent_id = None, bot):
         self.id = id
         self.latest_message_id = last_message_id
-        self.latest_pin_time = datetime.fromtimestamp(last_pin_timestamp)
+        self.latest_pin_time = from_ts(last_pin_timestamp)
         self.name = name
         self.overwrites = Overwrites(**permission_overwrites)
         self.pos = position
