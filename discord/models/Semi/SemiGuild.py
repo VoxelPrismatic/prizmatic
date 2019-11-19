@@ -1,5 +1,5 @@
 from ..Guild import Guild
-class OfflineGuild(guild):
+class OfflineGuild(Guild):
     """
     DESCRIPTION ---
         Represents a guild, thats offline

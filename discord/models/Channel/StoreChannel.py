@@ -1,5 +1,5 @@
 import datetime
-from ..Perms import Perms
+from ..Perms import Perms, Overwrites
 from ..Guild import Guild
 from ..User import User
 from ..PrizmCls import PrizmList
@@ -26,7 +26,7 @@ class StoreChannel:
         self.name = name
         self.position = position
         self.nsfw = nsfw
-        self.overwrites = [Overwrite(**kw) for kw permission_overwrites]
+        self.overwrites = Overwrites(**permission_overwrites)
         self.catagory_id = parent_id
         self.bot_obj = bot_obj
     

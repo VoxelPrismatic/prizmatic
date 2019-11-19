@@ -60,7 +60,7 @@ class User:
             self.nitro = "Nitro"
             
             
-    async def edit(self, name = self.name, pfp = self.pfp_):
+    async def edit(self, name = None, pfp = None):
         if type(pfp) == str:
             if re.search(r"^https?\://.*\.(png|jpeg|jpg|gif)$", pfp):
                 pfp = await (RawFile(pfp)).get()

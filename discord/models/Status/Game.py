@@ -15,8 +15,8 @@ class Game:
         None yet
     """
     def __init__(self, name, type, url, timestamps, application_id, details,
-                 state, party = None, assets = None, secrets = None, instance,
-                 flags):
+                 state, party = None, assets = None, secrets = None, instance = None,
+                 flags = 0, bot_obj = None):
         self.name = name
         if str(type).lower() in ["0", "game", "playing"]:
             self.type = 0
@@ -32,3 +32,4 @@ class Game:
         self.party = Party(**party)
         self.assets = Assets(**assets)
         self.secrets = Secrets(**secrets)
+        self.bot_obj = bot_obj

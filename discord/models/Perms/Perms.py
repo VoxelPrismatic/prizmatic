@@ -90,15 +90,15 @@ class Perms:
     """
     def __init__(self, allow = 0, deny = 0, none = 0):
         self.override_type = type
-        self.allow = decode(allow)
+        self.allow = decode_perms(allow)
         self.allow_int = allow
-        self.deny = decode(deny)
+        self.deny = decode_perms(deny)
         self.deny_int = deny
         self.none = PrizmList([])
-        for perm in decode(int(0xffffffff)):
+        for perm in decode_perms(int(0xffffffff)):
             if perm not in self.allow and perm not in self.deny:
                 self.none <= perm
-        self.none_int = encode(self.none)
+        self.none_int = encode_perms(self.none)
 
     def __dict__(self):
         dic = {}
@@ -134,9 +134,9 @@ class Perms:
                     self.none >> key2
                 if key2 in self.allow:
                     self.allow >> key2
-        self.none_int = encode(self.none)
-        self.allow_int = encode(self.allow)
-        self.deny_int = encode(self.deny)
+        self.none_int = encode_perms(self.none)
+        self.allow_int = encode_perms(self.allow)
+        self.deny_int = encode_perms(self.deny)
 
     def update_int(self, allow = None, deny = None, none = None):
         self.allow_int = allow if allow is not None else self.allow_int

@@ -32,7 +32,7 @@ class NewsChannel:
         self.guild_id = guild_id
         self.guild = Raw(Guild, guild_id, "/guilds/{id}")
         self.catagory_id = parent_id
-        self.bot = bot
+        self.bot_obj = bot_obj
 
     def __str__(self):
         return "#"+self.name
