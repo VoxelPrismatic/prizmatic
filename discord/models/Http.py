@@ -67,7 +67,7 @@ class Http:
             "data": d
         }
         async with self.client.request(self.http_uri + u, method = m, **payload) as m:
-            return await get_json(m)
+            return await self.get_json(m)
     
     async def get_audit(self, id, user = None, action = None, before = None, 
                         limit:int = 50):
@@ -208,7 +208,7 @@ class Http:
         await self.req(m = "+", u = f"/channels/{cID}/typing")
         
     def get_pins(self, cID):
-        return RawList(Message, f"/channels/{cID}/pins", {}, self.bot)
+        return RawList(Text, f"/channels/{cID}/pins", {}, self.bot)
     async def delete_pin(self, cID, tID):
         await self.req(m = "-", u = f"/channels/{cID}/pins/{tID}")
     async def add_pin(self, cID, tID):
