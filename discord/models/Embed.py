@@ -166,7 +166,7 @@ class Embed:
     """
     
     def __repr__(self):
-        return f"<Embed object - '{self.title or '[no title]']}'>"
+        return f"<Embed object - '{self.title or '[no title]'}'>"
         
     def __aliases(self):
         self.thumbnail = self.thumb
