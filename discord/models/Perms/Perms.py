@@ -142,9 +142,9 @@ class Perms:
         self.allow_int = allow if allow is not None else self.allow_int
         self.deny_int = deny if deny is not None else self.deny_int
         self.none_int = none if none is not None else self.none_int
-        self.none = decode(none)
-        self.deny = decode(deny)
-        self.allow = decode(allow)
+        self.none = decode_perms(none)
+        self.deny = decode_perms(deny)
+        self.allow = decode_perms(allow)
 
     def is_empty(self):
         if all(i == None for i in self.none) \

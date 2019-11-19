@@ -1,4 +1,4 @@
-import datetime
+from datetime.datetime import fromtimestamp as from_ts
 from .Snow import Snow
 from .Player import Player
 from .Member import Member
@@ -32,13 +32,15 @@ class Text:
             self.guild_id = Raw(guild_id, "/guilds/{id}", bot)
         self.author = member or author
         self.text = content
-        self.time = datetime.datetime.fromisoformat(timestamp)
+        self.time = from_ts(timestamp)
         self.edited = bool(edited_timestamp)
-        self.edited_at = datetime.datetime.fromisoformat(edited_timestamp) if edited_timestamp else None
+        self.edited_at = None
+        if self.edited:
+            self.edited_at = from_ts(edited_timestamp)
         self.tts = tts
         self.at_everyone = mention_everyone
         self.mentions = [int(mID) for mID in mentions]
         self.pinned = pinned
-        self.role_mentions = [
+        self.role_mentions = []
         self.channel_mentions = [int(cID) for cID in mention_channels]
         #self.reactions = [Reaction(

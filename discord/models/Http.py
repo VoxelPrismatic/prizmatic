@@ -199,7 +199,7 @@ class Http:
     async def get_invite(self, cID):
         return RawList(Invite, f"/channels/{cID}/invites", {}, self.bot)
     async def make_invite(self, cID, data):
-        await self.req(m = "+", f"/channels/{cID}/invites", d = data)
+        await self.req(m = "+", u = f"/channels/{cID}/invites", d = data)
         
     async def trigger_typing(self, cID):
         await self.req(m = "+", f"/channels/{cID}/typing")

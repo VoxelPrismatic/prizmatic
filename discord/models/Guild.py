@@ -23,7 +23,7 @@ class Guild:
                  permissions = 0, region, afk_channel_id, afk_timeout, 
                  embed_enabled = False, embed_channel_id = 0, verification_level,
                  default_message_notifications, explicit_content_filter, roles = [], 
-                 emojis = [], features = [], mfa_level, appliction_id = None, 
+                 emojis = [], features = [], mfa_level, application_id = None, 
                  widget_enabled = False, widget_channel_id = 0, system_channel_id, 
                  joined_at = "1970-01-01T00:00:00+00:00", large = False, unavailable,
                  member_count, voice_states, members, channels, presences, 
