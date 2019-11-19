@@ -41,4 +41,4 @@ class Text:
         self.pinned = pinned
         self.role_mentions = [
         self.channel_mentions = [int(cID) for cID in mention_channels]
-        self.reactions = [Reaction(
+        #self.reactions = [Reaction(

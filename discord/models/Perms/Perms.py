@@ -138,10 +138,10 @@ class Perms:
         self.allow_int = encode(self.allow)
         self.deny_int = encode(self.deny)
 
-    def update_int(self, allow = self.allow_int deny = self.deny_int, none = self.none_int):
-        self.allow_int = allow
-        self.deny_int = deny
-        self.none_int = none
+    def update_int(self, allow = None, deny = None, none = None):
+        self.allow_int = allow if allow is not None else self.allow_int
+        self.deny_int = deny if deny is not None else self.deny_int
+        self.none_int = none if none is not None else self.none_int
         self.none = decode(none)
         self.deny = decode(deny)
         self.allow = decode(allow)

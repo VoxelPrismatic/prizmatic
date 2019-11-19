@@ -21,7 +21,7 @@ class Channel:
     """
     def __init__(self, *, id, guild_id, name, type, position,
                  permission_overwrites, rate_limit_per_user, nsfw, topic,
-                 last_message_id, parent_id = None, bot):
+                 last_message_id, parent_id, last_pin_timestamp, bot_obj):
         self.id = id
         self.latest_message_id = int(last_message_id)
         self.latest_pin_time = from_ts(last_pin_timestamp)
@@ -35,7 +35,7 @@ class Channel:
         self.guild_id = guild_id
         self.guild = Raw(Guild, guild_id, "/guilds/{id}")
         self.catagory_id = parent_id
-        self.bot = bot
+        self.bot_obj = bot_obj
 
     def __str__(self):
         return "#"+self.name

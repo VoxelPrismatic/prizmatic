@@ -43,9 +43,6 @@ class RawFile:
     def __repr__(self):
         return f"<RawFile of {self.url} // Has{' not' if not self.downloaded else ''} been downloaded>"
     
-    def update(self):
-        async with aiohttp.ClientSession() as c:
-            async with c.get(self.url) as r:
-                self.data = io.BytesIO(await r.read())
-        self.downloaded = True
-        return self.data
+    async def update(self):
+        self.downloaded = False
+        return await self.get()

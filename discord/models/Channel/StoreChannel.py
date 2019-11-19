@@ -30,4 +30,4 @@ class StoreChannel:
         self.catagory_id = parent_id
         self.bot_obj = bot_obj
     
-    async def edit(self, *, id, catagory,: Catagory, overwrites,  
+    #async def edit(self, *, id, catagory,: Catagory, overwrites, 

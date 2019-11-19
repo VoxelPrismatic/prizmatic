@@ -171,7 +171,7 @@ class Http:
     async def delete_text(self, cID, tID):
         await self.req(m = "-", u = f"/channels/{cID}/messages/{tID}")
     async def bulk_delete_texts(self, cID, texts):
-        await self.req(m = "+", u = f"/channels/{cID}/messages", d = {"messages": texts}
+        await self.req(m = "+", u = f"/channels/{cID}/messages", d = {"messages": texts})
         
     async def reaction_add(self, cID, tID, emoji):
         await self.req(m = ">", u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/@me")

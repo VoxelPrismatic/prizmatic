@@ -20,7 +20,7 @@ class NewsChannel:
     """
     def __init__(self, *, id, guild_id, name, type, position,
                  permission_overwrites, rate_limit_per_user, nsfw, topic,
-                 last_message_id, parent_id = None, bot):
+                 last_message_id, parent_id = None, last_pin_timestamp, bot_obj):
         self.id = id
         self.latest_message_id = last_message_id
         self.latest_pin_time = from_ts(last_pin_timestamp)

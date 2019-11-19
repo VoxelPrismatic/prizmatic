@@ -1,9 +1,10 @@
-from .Raw import RawFile, RawObj, RawObjs
+from .Raw import RawFile, RawObj, RawObjs, Raw
 from .Role import Role
 from .Channel import VC, Channel, AnyChannel
 from .Emoji import Emoji
 from .Url import Url
 from .Player import Player
+from .Perms import Perms
 import datetime
 
 class Guild:
@@ -53,7 +54,7 @@ class Guild:
         self.emojis = RawObjs(Emoji, emojis, bot_obj = bot_obj)
         self.features = features
         self.mfa_level = mfa_level
-        self.app_id = app_id
+        self.app_id = application_id
         self.has_widget = widget_enabled
         self.widget_channel_id = int(widget_channel_id)
         self.widget_channel = Raw(AnyChannel, widget_channel_id, "/channels/{id}", 

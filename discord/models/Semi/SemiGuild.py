@@ -17,6 +17,6 @@ class OfflineGuild(guild):
           for anything to be useful
     """
     def __init__(self, id, unavailable, bot_obj):
-        super.__init__(id, 
+        pass#super.__init__(id)
         
         

@@ -72,7 +72,7 @@ class User:
         elif type(pfp) == RawFile:
             pfp = pfp.get()
         elif type(pfp) not in [bytes, io.BytesIO]:
-            raise TypeError("The PFP param must lead to a bytes like object, either through URL, file, or raw"
+            raise TypeError("The PFP param must lead to a bytes like object, either through URL, file, or raw")
         user = await self.bot_obj._http(m = "/", d = {"username": name, "avatar": b64e(bytes(pfp))})
         self.__init__(user)
         

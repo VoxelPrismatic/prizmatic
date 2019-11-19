@@ -4,7 +4,9 @@ from .Color import Color
 from .PrizmCls import *
 
 def https(thing):
-    return thing if re.search(r"^(https?|attachment)://", thing) else ""
+    if re.search(r"^(https?|attachment)\:\/\/", thing):
+        return thing
+    return ""
     
 def typed(thing):
     ls = []
@@ -166,7 +168,7 @@ class Embed:
     """
     
     def __repr__(self):
-        return f"<Embed object - '{self.title or '[no title]']}'>"
+        return f"<Embed object - '{self.title or '[no title]'}'>"
         
     def __aliases(self):
         self.thumbnail = self.thumb
