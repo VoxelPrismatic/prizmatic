@@ -1,11 +1,11 @@
 from datetime.datetime import fromtimestamp as from_ts
-from .Snow import Snow
-from .Player import Player
-from .Member import Member
-from .Reaction import Reaction
-from .Raw import Raw
-from .Guild import Guild
-from .Channel import Channel, VoiceChannel, Catagory,
+from ..Snow import Snow
+from ..Player import Player
+from ..Member import Member
+from ..Reaction import Reaction
+from ..Raw import Raw
+from ..Guild import Guild
+from ..Channel import AnyChannel
 
 class Text:
     """

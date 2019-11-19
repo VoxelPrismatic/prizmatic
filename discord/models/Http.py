@@ -202,7 +202,7 @@ class Http:
         await self.req(m = "+", u = f"/channels/{cID}/invites", d = data)
         
     async def trigger_typing(self, cID):
-        await self.req(m = "+", f"/channels/{cID}/typing")
+        await self.req(m = "+", u = f"/channels/{cID}/typing")
         
     def get_pins(self, cID):
         return RawList(Message, f"/channels/{cID}/pins", {}, self.bot)
