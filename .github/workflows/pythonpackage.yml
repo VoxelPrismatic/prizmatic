@@ -17,23 +17,33 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    
+    #Install dependencies
     - name: Inst
       run: |
         python -m pip install --upgrade pip
         pip install -r req.txt
-    - name: Py
-      continue-on-error: true
-      run: |
-        python -c "import discord"
-      
+    
+    #Test with Flake8, continues on error
+    #because it cares about formatting when I
+    #only care about if it actually works  
     - name: Flake 8
+      continue-on-error: true
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    #Test with pytest, ignore issues in case
     - name: Pytest
+      continue-on-error: true
       run: |
         pip install pytest
         pytest
+    
+    #Test with python alone, this is the catch all
+    - name: Py
+      run: |
+        python -c "import discord"
