@@ -1,4 +1,6 @@
 import re
+import json
+import zlib
 from .Channel import Channel, NewsChannel, StoreChannel
 from .Channel import Catagory, VC, DM, GroupDM, AnyChannel
 from .Text import Text, Crosspost
@@ -13,6 +15,7 @@ from .Audit import AuditLog
 from .Member import Player, User
 from .Error import ClassError
 from .Invite import Invite
+from .Raw import RawList, Raw, RawObj, RawObjs, RawFile
 
 class Http:
     """
@@ -80,7 +83,7 @@ class Http:
         elif type(user) == Snow:
             d["user_id"] = user.id
         else:
-            raise ClassError(user, int, [str, int, User, Player, snow])
+            raise ClassError(user, int, [str, int, User, Player, Snow])
         actions = {
             "guild_edit": 1,
             "channel_make": 10, 
@@ -130,7 +133,7 @@ class Http:
         
     async def make_guild(self, data):
         await self.req(m = "+", u = "/guilds", d = dict(data))
-    async def get_guild(id):
+    async def get_guild(self, id):
         d = await self.req(u = f"/guilds/{id}")
         return Guild(**d)
     async def edit_guild(self, id, data):
@@ -163,7 +166,7 @@ class Http:
         return RawList(Text, f"/channels/{id}/messages", d, self.bot)
     async def get_text(self, cID, tID):
         j = await self.req(u = f"/channels/{cID}/messages/{tID}")
-        return Message(**j)
+        return Text(**j)
     async def send_text(self, id, data):
         await self.req(m = "+", u = f"/channels/{id}/messages", d = dict(data))
     async def edit_text(self, cID, tID, data):
@@ -186,7 +189,7 @@ class Http:
             d["before"] = str(Snow(before))
         if after:
             d["after"] = str(Snow(after))
-        return RawList(user, f"/channels/{cID}/messages/{tID}/reactions/{emoji}", d, self.bot)
+        return RawList(User, f"/channels/{cID}/messages/{tID}/reactions/{emoji}", d, self.bot)
     async def delete_all_reactions(self, cID, tID):
         await self.req(m = "-", u = f"/channels/{cID}/messages/{tID}/reactions")
     
