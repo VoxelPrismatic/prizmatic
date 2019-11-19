@@ -46,4 +46,5 @@ jobs:
     #Test with python alone, this is the catch all
     - name: Py
       run: |
+        python syntax.py
         python -c "import discord"
