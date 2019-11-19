@@ -19,4 +19,4 @@ class DM:
         None yet
     """
     def __init__(self, *, last_message_id, type, id, recipients):
-        self.
+        pass

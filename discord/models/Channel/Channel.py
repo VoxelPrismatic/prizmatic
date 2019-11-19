@@ -28,7 +28,7 @@ class Channel:
         self.latest_message = Raw(Message, last_message_id, 
                                   "/channels/{cID}/messages/{id}", cID = id)
         self.name = name
-        self.overwrites = Overwrites(**permission_overwrites)[Perms(**kw) for kw on permission_overwrites]
+        self.overwrites = Overwrites(**permission_overwrites)
         self.pos = position
         self.slowmode = rate_limit_per_user
         self.topic = topic

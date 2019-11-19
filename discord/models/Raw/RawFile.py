@@ -1,3 +1,6 @@
+import io
+import aiohttp
+
 class RawFile:
     """
     DESCRIPTION ---
@@ -28,7 +31,7 @@ class RawFile:
     
     async def get(self):
         if not self.downloaded:
-            async with asyncio.ClientSession() as c:
+            async with aiohttp.ClientSession() as c:
                 async with c.get(self.url) as r:
                     self.data = io.BytesIO(await r.read())
             self.downloaded = True
@@ -41,7 +44,7 @@ class RawFile:
         return f"<RawFile of {self.url} // Has{' not' if not self.downloaded else ''} been downloaded>"
     
     def update(self):
-        async with asyncio.ClientSession() as c:
+        async with aiohttp.ClientSession() as c:
             async with c.get(self.url) as r:
                 self.data = io.BytesIO(await r.read())
         self.downloaded = True

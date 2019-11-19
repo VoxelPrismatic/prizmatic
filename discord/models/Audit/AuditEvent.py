@@ -11,8 +11,8 @@ class AuditEvent:
     FUNCTIONS ---
         None
     """
-    def __init__(self, target_id, changes = [], user_id, id, action_type,
-                 options = {}, reason = ""):
+    def __init__(self, target_id, changes = [], user_id = 0, id = 0, 
+                 action_type = 0, options = {}, reason = ""):
         self.target_id = int(target_id)
         self.event_id = int(id)
         self.changes = [AuditChange(**d) for d in changes]

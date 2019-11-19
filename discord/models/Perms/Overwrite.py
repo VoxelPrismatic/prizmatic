@@ -24,7 +24,11 @@ class Overwrite:
         self.type = type
         self.perms = Perms(allow = allow_int, deny = deny_int)
         
-    def update(self, allow_int = self.perms.allow_int, deny_int = self.perms.deny_int):
+    def update(self, allow_int = None, deny_int = None):
+        if allow_int is None:
+            allow_int = self.perms.allow_int
+        if deny_int is None:
+            deny_int = self.perms.deny_int
         self.perms.update_int(allow = allow_int, deny = deny_int)
     
     def __dict__(self):

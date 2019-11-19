@@ -5,7 +5,7 @@ from ..User import User
 from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
-from ..Overwrite import Overwrite
+from ..Perms import Overwrites
 
 class NewsChannel:
     """
@@ -25,7 +25,7 @@ class NewsChannel:
         self.latest_message_id = last_message_id
         self.latest_pin_time = datetime.fromtimestamp(last_pin_timestamp)
         self.name = name
-        self.overrides = [Perms(**kw) for kw on permission_overwrites]
+        self.overwrites = Overwrites(**permission_overwrites)
         self.pos = position
         self.slowmode = rate_limit_per_user
         self.topic = topic

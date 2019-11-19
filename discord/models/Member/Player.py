@@ -1,5 +1,7 @@
-from .Member import Member
-from .PrizmCls import *
+from .User import User
+from ..PrizmCls import *
+from ..Raw import RawObjs
+from ..Role import Role
 
 class Player(Member):
     """
@@ -16,4 +18,4 @@ class Player(Member):
         self.nick = nick
         self.boosted_at: premium_since
 
-        self.roles =
+        self.roles = RawObjs(Role, roles)

@@ -1,5 +1,6 @@
 from models.Error import ClassError
 import typing
+import re
 
 class _AllOf:
     """

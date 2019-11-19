@@ -1,5 +1,6 @@
 import re
 from ..Error import ClassError
+from ..Member import User
 
 class AuditSearch:
     """

@@ -1,3 +1,5 @@
+import datetime as dt
+
 class Timestamps:
     """
     DESCRIPTION ---
@@ -9,4 +11,9 @@ class Timestamps:
     FUNCTIONS ---
         None yet
     """
-    pass
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+    
+    def __dict__(self):
+        return {"start": self.start, "end": self.end}

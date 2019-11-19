@@ -83,8 +83,8 @@ class Bot:
         self.client = get_client()
         self.thresh = thresh
         self.heartbeat = None
-        self.uri = url.gateway
-        self.http_uri = url.api
+        self.uri = Url.gateway
+        self.http_uri = Url.api
         self.ack = 5
         self.connected = False
         self.keepalive = None
@@ -92,7 +92,8 @@ class Bot:
         self.listener = Listener()
         self.voices = PrizmDict()
     
-    def run(self, token = self.token):
+    def run(self, token = None):
+        token = token or self.token
         if token is None:
             raise TypeError("No token was provided")
         self.token = token

@@ -48,7 +48,7 @@ class AuditLog:
         else:
             raise ClassError(i, str, [int, str])
     
-    def load(self)
+    def load(self):
         self.events.make()
         self.webhooks.make()
         self.users.make()

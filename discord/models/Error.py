@@ -34,9 +34,10 @@ SPECIFIC INFO -----------
 
 class ClassError(Error):
     def __init__(self, clsA, clsB, ls):
+        tmp = "', '".join(typed(t) for t in ls)
         super.__init__(
             name = f"Type '{typed(clsA)}' cannot be converted into type '{typed(clsB)}'",
-            attempts = f"Tried converting from '{'\', \''.join(typed(t) for t in ls)}'",
+            attempts = f"Tried converting from '{tmp}'",
             typ = "ClassError",
             given_class = clsA,
             target_class = clsB,

@@ -15,8 +15,8 @@ class Emoji:
         emoji = Emoji(id, name, roles, user, colons, managed, animated)
         - Creates an Emoji object
     """
-    def __init__(self, id, name, roles = [], user, require_colons = False,
-                 managed = False, animated = False, bot_obj):
+    def __init__(self, id, name, roles, user, require_colons = False,
+                 managed = False, animated = False, bot_obj = None):
         self.id = id
         self.name = name
         self.roles = RawObjs(Role, roles)

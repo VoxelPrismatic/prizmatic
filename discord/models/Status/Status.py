@@ -1,3 +1,7 @@
+from ..Member import User
+from ..Role import Role
+from ..Raw import RawObjs
+
 class Status:
     """
     DESCRIPTION ---
@@ -9,4 +13,8 @@ class Status:
     FUNCTIONS ---
         None yet
     """
-    pass
+    def __init__(self, user, roles, game = None, guild_id, status,
+                 activities, client_status, bot_obj):
+        self.user = User(**user)
+        self.roles = RawObjs(Role, roles, bot_obj = bot_obj)
+        

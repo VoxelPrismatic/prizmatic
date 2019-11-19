@@ -6,6 +6,13 @@ from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
 from ..Overwrite import Overwrite
+from .Channel import Channel
+from .VC import VC
+from .DM import DM
+from .StoreChannel import StoreChannel
+from .Catagory import Catagory
+from .NewsChannel import NewsChannel
+from .GroupDM import GroupDM
 
 def AnyChannel(**kw):
     channels = {

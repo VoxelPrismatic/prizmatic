@@ -49,7 +49,7 @@ class Raw:
         self.url = url.format(**fmt)
         self.obj = None
     async def get(self):
-        if not obj:
+        if not self.obj:
             kw = await self.bot._http(u = self.url)
             self.obj = self.typ(**kw)
         return self.obj

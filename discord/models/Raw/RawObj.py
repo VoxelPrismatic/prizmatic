@@ -31,7 +31,7 @@ class RawObj:
     
     def make(self):
         if not self.obj:
-            self.obj = self.typ(*args, **kwargs)
+            self.obj = self.typ(*self.args, **self.kw)
         return self.obj
     
     def __call__(self):

@@ -166,7 +166,7 @@ class Embed:
     """
     
     def __repr__(self):
-        return f"<Embed object - '{self.title or '[no title]'}'>"
+        return f"<Embed object - '{self.title or '[no title]']}'>"
         
     def __aliases(self):
         self.thumbnail = self.thumb
@@ -179,7 +179,7 @@ class Embed:
         self.description = self.desc
     
     def __init__(self, *, title = "", type = "rich", desc = "", description = "",
-                 fields = [], foot = "", footer = "", foot_icon = "", timestamp = None
+                 fields = [], foot = "", footer = "", foot_icon = "", timestamp = None,
                  footer_icon = "", foot_proxy_icon = "", footer_proxy_icon = "",
                  url = "", time = None, color = None, image = "", image_proxy = "",
                  image_width = 0, image_height = 0, thumb = "", thumbnail = "",

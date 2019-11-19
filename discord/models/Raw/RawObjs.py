@@ -13,6 +13,9 @@ class RawObjs:
         ls [list(obj)]
         - The params of the objects
         
+        *args, **kwargs
+        - Universal parameters
+        
     FUNCTIONS ---
         raw_objs = RawObjs(typ, ls)
         - Create a RawObjs object
@@ -35,16 +38,19 @@ class RawObjs:
         del raw_objs[index]
         - Delete that item, effects everything
     """
-    def __init__(self, typ, ls):
+    def __init__(self, typ, ls, *args, **kwargs):
+        for i in range(len(ls)):
+            ls[i].update(kwargs)
         self.ls = ls
         self.typ = typ
         self.data = []
+        self.arg = args
         self.raw_data = []
         self.is_raw = None
     
     def make(self):
         if self.raw == None:
-            self.data = [self.typ(**kw) for kw in self.ls]
+            self.data = [self.typ(*self.arg, **kw) for kw in self.ls]
             self.raw()
         elif self.raw == True:
             self.data = [thing.make() for thing in self.raw_data]
@@ -53,7 +59,7 @@ class RawObjs:
     
     def raw(self):
         if self.raw == None:
-            self.raw_data = [RawObj(self.typ, **kw) for kw in self.ls]
+            self.raw_data = [RawObj(self.typ, *self.args, **kw) for kw in self.ls]
             self.data = self.raw_data
             self.is_raw = True
         return self.raw_data

@@ -1,3 +1,8 @@
+from .Timestamps import Timestamps
+from .Party import Party
+from .Secrets import Secrets
+from .Assets import Assets
+
 class Game:
     """
     DESCRIPTION ---
@@ -9,4 +14,21 @@ class Game:
     FUNCTIONS ---
         None yet
     """
-    pass
+    def __init__(self, name, type, url, timestamps, application_id, details,
+                 state, party = None, assets = None, secrets = None, instance,
+                 flags):
+        self.name = name
+        if str(type).lower() in ["0", "game", "playing"]:
+            self.type = 0
+        elif str(type).lower() in ["1", "stream", "streaming", "twitch"]:
+            self.type = 1
+        elif str(type).lower() in ["2", "listening to", "music", "listen"]:
+            self.type = 2
+        self.url = url
+        self.timestamps = Timestamps(**timestamps)
+        self.app_id = application_id
+        self.details = details
+        self.state = state
+        self.party = Party(**party)
+        self.assets = Assets(**assets)
+        self.secrets = Secrets(**secrets)

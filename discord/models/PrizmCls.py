@@ -145,7 +145,7 @@ class PrizmSet(set):
     def __ilshift__(self, num: int):
         return self[:num]+self[num:]
         
-class PrizmBool(int)
+class PrizmBool(int):
     def __add__(self, other):
         return bool(self) or bool(other)
     def __sub__(self, other):

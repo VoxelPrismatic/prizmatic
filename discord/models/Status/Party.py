@@ -9,4 +9,8 @@ class Party:
     FUNCTIONS ---
         None yet
     """
-    pass
+    def __init__(self, id, size):
+        self.id = id
+        self.size = size
+    def __dict__(self):
+        return {"id": self.id, "size": self.size}
