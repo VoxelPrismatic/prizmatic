@@ -21,7 +21,6 @@ setuptools.setup(
     install_requires = req,
     license = "Don't call it your own",
     classifiers = [
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "License :: None",
@@ -31,5 +30,5 @@ setuptools.setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
     ],
-    python_requires = '>=3.5.3'
+    python_requires = '>=3.6'
 )
