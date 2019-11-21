@@ -1,4 +1,4 @@
-import datetime
+from ..ClsUtil import from_ts
 from ..Perms import Perms
 from ..Guild import Guild
 from ..User import User
@@ -19,8 +19,8 @@ class VC:
         None yet
     """
     def __init__(self, id, name, permission_overwrites, position,
-                 type, user_limit, guild_id, bot):
+                 type, user_limit, guild_id, bot_obj):
         self.id = id
         self.name = name
         self.overrides = PrizmList([])
-        self.bot = bot
+        self.bot_obj = bot_obj

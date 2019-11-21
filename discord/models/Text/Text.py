@@ -1,4 +1,4 @@
-from datetime.datetime import fromtimestamp as from_ts
+from ..ClsUtil import from_ts
 from ..Snow import Snow
 from ..Player import Player
 from ..Member import Member

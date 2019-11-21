@@ -1,4 +1,4 @@
-from datetime.datetime import fromtimestamp as from_ts
+from ..ClsUtil import from_ts
 from ..Perms import Perms
 from ..Guild import Guild
 from ..User import User

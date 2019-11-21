@@ -1,4 +1,4 @@
-import datetime as dt
+from ..ClsUtil import from_ts
 
 class Timestamps:
     """

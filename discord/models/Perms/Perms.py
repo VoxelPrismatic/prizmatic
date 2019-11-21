@@ -1,5 +1,6 @@
 from ..PrizmCls import PrizmList, PrizmDict
 global permissions
+
 permissions = {
     "MANAGE_EMOJIS":         0x40000000,
     "MANAGE_WEBHOOKS":       0x20000000,

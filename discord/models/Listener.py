@@ -1,4 +1,4 @@
-from datetime.datetime import fromtimestamp as from_ts
+from ..ClsUtil import from_ts
 from .Channel import AnyChannel
 from .Text import Text, Crosspost
 from .Emoji import Emoji
