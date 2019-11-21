@@ -1,4 +1,4 @@
-import ..Url
+from .. import Url
 from ..Raw import RawFile
 from ..PrizmCls import PrizmList
 from base64 import b64encode as b64e
@@ -19,12 +19,11 @@ class User:
     def __init__(self, *, id, username, discriminator, avatar, bot = False,
                  mfa_enabled = False, locale, verified = None, email = None,
                  flags, premium_type, bot_obj):
-        url = Url()
         self.id = id
         self.name = username
         self.number = discriminator
         self.pfp_hash = avatar
-        self.pfp = url.pfp(id, avatar)
+        self.pfp = Url.pfp(id, avatar)
         self.pfp_file = RawFile(self.pfp)
         self.bot = bot
         self.mfa = mfa_enabled
