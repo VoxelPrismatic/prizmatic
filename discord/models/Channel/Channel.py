@@ -71,4 +71,4 @@ class Channel:
         d = await self.bot_obj.http.req(m = "/", u = f"/channels/{self.id}", d = dic)
         self.__init__(**d)
     async def send(self, text, *, tts = False, embed: Embed = {}, file: Union[File, Files]):
-        d = await self.bot_obj.http.req(m = "+", 
+        d = await self.bot_obj.http.req(m = "+", u = "what")
