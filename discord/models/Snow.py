@@ -1,5 +1,5 @@
 import re
-from .Error import PrizmaticError
+from .Error import SnowDecodeError
 import datetime
 import time
 
@@ -33,14 +33,10 @@ class Snow:
             elif re.search(r"^[A-Fa-f0-9]{16}$", snowflake):
                 snowflake = int(snowflake, 16)
             else:
-                PrizmaticError(f"Snowflake '{snowflake}' is invalid or cannot be decoded",
-                               "Attempted to decode `hex`, `int`, and `binary` integers", 
-                               snowflake = snowflake, typ = "SnowDecodeError")
+                raise SnowDecodeError(snowflake)
         if type(snowflake) != int or len(str(snowflake)) != 20:
             #If the snowflake is broken
-            raise PrizmaticError(f"Snowflake '{snowflake}' is invalid or cannot be decoded",
-                                 "It isn't an integer or an knteger of valid length",
-                                 snowflake = snowflake, typ = "SnowFormatError")
+            raise SnowDecodeError(snowflake)
         self.timestamp = (snowflake >> 22) + 1420070400000
         self.worker = (snowflake & 0x3e0000) >> 17
         self.process = (snowflake & 0x1f000) >> 12
