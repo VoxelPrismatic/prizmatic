@@ -1,4 +1,4 @@
-from .PrizmCls import PrizmList, PrizmDict
+from ..PrizmCls import PrizmList, PrizmDict
 global permissions
 permissions = {
     "MANAGE_EMOJIS":         0x40000000,

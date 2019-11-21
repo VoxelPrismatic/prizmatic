@@ -1,5 +1,5 @@
 from .Perms import Perms
-from .Snow import Snow
+from ..Snow import Snow
 
 class Overwrite:
     """
