@@ -1,4 +1,4 @@
-from models.Error import ClassError
+from .models.Error import ClassError
 import typing
 import re
 
