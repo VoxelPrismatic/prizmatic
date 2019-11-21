@@ -10,6 +10,7 @@ class RawFile:
         url [str]
         - The url to download
         
+        
     FUNCTIONS ---
         thing = RawFile(url)
         - Creates a new RawFile object
@@ -24,7 +25,7 @@ class RawFile:
         await thing.update()
         - Re downloads the file
     """
-    def __init__(self, url):
+    def __init__(self, url, data = {}):
         self.url = url
         self.downloaded = False
         self.data = io.BytesIO()

@@ -10,4 +10,4 @@ class Secrets:
         None yet
     """
     def __init__(self, join, spectate, match):
-        self.self = self
+        pass

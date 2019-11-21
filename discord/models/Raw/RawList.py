@@ -19,6 +19,9 @@ class RawList:
         bot [Bot]
         - The bot object
         
+        **uni
+        - Universal kwargs
+        
     FUNCTIONS ---
         thing = RawList(url)
         - Creates a new RawList object
@@ -43,29 +46,33 @@ class RawList:
         - All changes will be deleted when using the update or remake 
           functions
     """
-    def __init__(self, typ, url, data: dict = {}, bot = None):
+    def __init__(self, typ, url, data: dict = {}, bot = None, **uni):
         self.bot = bot
+        if "bot_obj" in uni:
+            self.bot = uni["bot_obj"]
+        if bot and "bot_obj" not in uni:
+            uni["bot_obj"] = bot
         self.url = url
         self.typ = typ
         self.kw = data
         self.raw_data = []
         self.data = []
         self.is_raw = None
+        self.uni = uni
     
     async def make(self):
         if self.raw == None:
-            data = await self.bot.http.req(u = self.url, d = self.kw)
-            self.data = [self.typ(**data[kw]) for kw in data]
-            self.raw()
+            await self.raw()
+            self.data = self.data.make()
         if self.raw == True:
-            self.data = [obj.make() for obj in self.data]
+            self.data = self.data.make()
         self.is_raw = False
         return self.data
     
     async def raw(self):
         if self.raw == None:
             data = await self.bot.http.req(u = self.url)
-            self.data = RawObjs(self.typ, data)
+            self.data = RawObjs(self.typ, data, **self.uni)
             self.raw_data = self.data
             self.is_raw = True
         return self.raw_data

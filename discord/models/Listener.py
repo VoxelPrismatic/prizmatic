@@ -1,6 +1,5 @@
 from datetime.datetime import fromtimestamp as from_ts
-from .Channel import Channel, NewsChannel, StoreChannel
-from .Channel import Catagory, VC, DM, GroupDM, AnyChannel
+from .Channel import AnyChannel
 from .Text import Text, Crosspost
 from .Emoji import Emoji
 from .Color import Color
@@ -9,6 +8,18 @@ from .Perms import Perms, Overwrite, Overwrites
 from .Guild import Guild
 from .PrizmCls import PrizmDict, PrizmList
 from .Snow import Snow
+from .Audit import AuditLog
+from .Member import Player, User
+from .Error import ClassError
+from .Invite import Invite
+from .Raw import RawList, Raw, RawObj, RawObjs, RawFile
+from . import Events
+from .Voice import VoiceRegion, VoiceClient
+from .Integration import Integration
+from .Webhook import Webhook
+from .Widget import Widget
+from .GuildEmbed import GuildEmbed
+from . import Semi
 
 class Listener:
     """
@@ -23,7 +34,7 @@ class Listener:
         extensive modification in your code
     
     FUNCTIONS ---
-        listener = Listener()
+        listener = Listener(bot)
         - Creates a new Listener object
         
         listener.get(listener_name)
@@ -32,8 +43,12 @@ class Listener:
         
         await listener.act(returned_gateway_obj)
         - Calls all respective listeners with contents of returned_gateway_obj
+        
+        listener.find(type, id)
+        - return the respective object, otherwise create it
     """
-    def __init__(self):
+    def __init__(self, bot_obj):
+        self.bot_obj = bot_obj
         self.listeners = {
             "text": PrizmList(),
             "text_edit": PrizmList(),
@@ -143,6 +158,8 @@ class Listener:
         self.users = PrizmDict()
         self.reactions = PrizmDict()
         self.webhooks = PrizmDict()
+        self.invites = PrizmDict()
+        self.widgets = PrizmDict()
         self.integrations = PrizmDict()
     
     def get(self, listener):
@@ -173,3 +190,27 @@ class Listener:
         elif t == "CHANNEL_PINS_UPDATE":
             o = self.channels[int(d["channel_id"])]
             self.channels[o.id].latest_pin_time = from_ts()
+    
+    async def find(self, c, id, url):
+        try:
+            return self.__getattribute__(c)(id)
+        except KeyError:
+            objs = {
+                "channels": AnyChannel,
+                "guilds": Guild,
+                "texts": Text,
+                "emojis": Emoji,
+                "roles": Role,
+                "players": Player,
+                "users": User,
+                "reactions": Reaction,
+                "webhooks": Webhook,
+                "integrations": Integration,
+                "invites": Invite,
+                "widgets": Widget
+            }
+            d = await self.bot_obj.http.req(u = url)
+            o = objs[c](**d)
+            self.__getattr__(c)[id] = o
+            return o
+            

@@ -4,9 +4,19 @@ import aiohttp
 class Raw:
     """
     DESCRIPTION ---
-        Represents an object that hasn't actually been created yet via URL,
-        useful for objects that shouldn't have any infinite recursions
-        or if it would take too long to grab an object immediately.
+        Represents  an object that  hasn't  actually been  created yet  via URL,
+        useful for  objects that shouldn't have any infinite recursions or if it 
+        would    take    too    long    to     grab    an    object    normally.
+
+        NOTE: If  you  want to  make a class  that says  not to, it  is OKAY  to 
+              initialize that class in this way. However, it will not be able to
+              be  located in any  part of this module  unless you use this line:
+              `bot.listeners.<type eg 'channels'>[<id>] = obj`
+
+              If you want to make a class using URLs, use the following instead:
+              `await bot.make(<type eg 'channels'>, <id>, <url>)`
+              
+              Types: Channels
         
     PARAMS ---
         id [int]
@@ -51,7 +61,7 @@ class Raw:
     async def get(self):
         if not self.obj:
             kw = await self.bot._http(u = self.url)
-            self.obj = self.typ(**kw)
+            self.obj = self.typ(bot_obj = self.bot, **kw)
         return self.obj
     
     async def update(self):

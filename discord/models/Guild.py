@@ -2,7 +2,7 @@ from .Raw import RawFile, RawObj, RawObjs, Raw
 from .Role import Role
 from .Channel import VC, Channel, AnyChannel
 from .Emoji import Emoji
-from .Url import Url
+from . import Url
 from .Player import Player
 from .Perms import Perms
 import datetime
@@ -30,7 +30,7 @@ class Guild:
                  max_presences, max_members, vanity_url_code, description, banner, 
                  premium_teir, premium_subscription_count, preffered_locale, bot_obj):
         self.id = int(id)
-        self.name = name
+        self.name = str(name)
         self.icon_hash = icon
         self.icon = Url.guild_icon(id, icon)
         self.icon_file = RawFile(self.icon)
@@ -51,14 +51,13 @@ class Guild:
         self.verify_level = int(verification_level)
         self.default_message_notifs = default_message_notifications
         self.nsfw_filter = int(explicit_content_filter)
-        self.emojis = RawObjs(Emoji, emojis, bot_obj = bot_obj)
+        self.emojis = 
         self.features = features
         self.mfa_level = mfa_level
         self.app_id = application_id
         self.has_widget = widget_enabled
         self.widget_channel_id = int(widget_channel_id)
-        self.widget_channel = Raw(AnyChannel, widget_channel_id, "/channels/{id}", 
-                                  bot_obj = bot_obj)
+        self.widget_channel = bot_obj.listener.channels(widget_channel_id)
         self.system_channel_id = int(system_channel_id)
         self.system_channel = Raw(AnyChannel, system_channel_id, "/channels/{id}", 
                                   bot_obj = bot_obj)

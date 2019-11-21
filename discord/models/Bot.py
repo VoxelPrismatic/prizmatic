@@ -4,9 +4,10 @@ import asyncio
 import aiohttp
 import zlib
 from pprint import pprint as prinf
-from .Url import Url
+import .Url
 from .PrizmCls import PrizmList, PrizmDict, PrizmInt
 from .Listener import Listener
+import re
 
 def new_cycle():
     cycle = asyncio.new_event_loop()
@@ -89,7 +90,7 @@ class Bot:
         self.connected = False
         self.keepalive = None
         self.__version__ = "0.6.3"
-        self.listener = Listener()
+        self.listener = Listener(self)
         self.voices = PrizmDict()
     
     def run(self, token = None):
@@ -110,6 +111,9 @@ class Bot:
         m = await self.ws.receive()
         return get_json(m)
 
+    async def make(self, cl, id, url):
+        return await self.listeners.find(cl, id, url)
+        
     async def login(self):
         print("LOGGING IN")
         data = {

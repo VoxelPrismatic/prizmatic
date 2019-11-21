@@ -6,7 +6,10 @@ from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
 from ..Overwrite import Overwrite, Overwrites
-from ..Message import Message
+from ..Text import Text
+from ..Embed import Embed
+from typing import Union
+from ..File import File, Files
 
 class Channel:
     """
@@ -33,17 +36,39 @@ class Channel:
         self.slowmode = rate_limit_per_user
         self.topic = topic
         self.guild_id = guild_id
-        self.guild = Raw(Guild, guild_id, "/guilds/{id}")
+        self.guild = bot_obj.listener.guilds[guild_id]
         self.catagory_id = parent_id
+        self.catagory = bot_obj.listener.channels[parent_id]
         self.bot_obj = bot_obj
 
     def __str__(self):
         return "#"+self.name
+    def __trunc__(self):
+        return f"<#{self.id}>"
     def __repr__(self):
         return f"<#Channel '{self.name}'>"
     async def edit(self, **kw):
-        raise NotImplementedError("This feature hasn't actually been created, only the function")
-    async def load(self):
-        await self.guild.make()
-    async def update(self):
-        raise NotImplementedError("This feature hasn't actually been created, only the function")
+        dic = {}
+        if "name" in kw:
+            dic["name"] = str(kw["name"])
+        if "pos" in kw:
+            dic["position"] = int(kw["pos"])
+        if "topic" in kw:
+            dic["topic"] = str(kw["topic"])
+        if "nsfw" in kw:
+            if str(kw["nsfw"]).lower() in ["true", "y", "1", "yes", "ye", "t"]:
+                dic["nsfw"] = True
+            else:
+                dic["nsfw"] = False
+        if "slowmode" in kw:
+            dic["rate_limit_per_user"] = int(kw["slowmode"])
+        if "overwrites" in kw:
+            dic["permission_overwrites"] = dict(Overwrites)
+        if "catagory" in kw:
+            dic["parent_id"] = str(kw["catagory"].id)
+        await self.refresh()
+    async def refresh(self):
+        d = await self.bot_obj.http.req(m = "/", u = f"/channels/{self.id}", d = dic)
+        self.__init__(**d)
+    async def send(self, text, *, tts = False, embed: Embed = {}, file: Union[File, Files]):
+        d = await self.bot_obj.http.req(m = "+", 

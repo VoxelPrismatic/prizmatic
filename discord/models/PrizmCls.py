@@ -1,3 +1,5 @@
+import re
+
 class PrizmList(list):
     def __init__(self, *args):
         self = list(args)
@@ -56,6 +58,17 @@ class PrizmDict(dict):
         return dic
     def __ifloordiv__(self, typ):
         return self // typ
+    def __call__(self, thing):
+        if thing in self:
+            return self[thing]
+        elif str(thing) in self:
+            return self[int(thing)]
+        elif re.search(r"^\d+$", str(thing)) and int(thing) in self:
+            return self[int(thing)]
+        elif re.search(r"^\d+\.\d+$", str(thing)) and float(thing) in self:
+            return self[float(thing)]
+        else:
+            raise KeyError(f"'{thing}' wasn't found in forms: [{int}, {float}, {str}, {type(thing)}]")
 
 def PrizmStr(str):
     def __init__(self, arg = ""):
@@ -180,4 +193,3 @@ class PrizmBool(int):
         return bool(self) != bool(other)
     def __rmod__(self, other):
         return not(self ^ other)
-    

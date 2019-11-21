@@ -1,4 +1,4 @@
-from ..Url import Url
+import ..Url
 from ..Raw import RawFile
 from ..PrizmCls import PrizmList
 from base64 import b64encode as b64e
