@@ -103,4 +103,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-discord/test.py
+*.DS_STORE
+__pycache__
+*/__pycache__
+*/*/__pycache
+*/*/*/__pycache__
+*/*/*/*/__pycache__
+*.pyc

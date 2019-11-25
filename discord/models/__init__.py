@@ -7,6 +7,7 @@ from . import Perms
 from . import Status
 from . import Channel
 from . import PrizmCls
+from . import ClsUtil
 
 from .Bot import Bot
 from .Role import Role
@@ -19,6 +20,7 @@ from .Color import Color
 from .Widget import Widget
 from .Webhook import Webhook
 from .Command import Command
+from .Reaction import Reaction
 from .Listener import Listener
 from .Member import Player, User
 from .Text import Text, Crosspost

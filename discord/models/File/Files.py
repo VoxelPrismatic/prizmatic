@@ -27,5 +27,5 @@ class Files:
     async def send(self):
         dic = {}
         async for i in range(len(ls)):
-            dic[f"file{i}"] = {"filename": 
-        return f
+            dic[ls[i].name] = await ls[i].get()
+        return dic

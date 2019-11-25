@@ -1,5 +1,6 @@
-import aiohttp
-import asyncio
+"""
+This file just provides codes and things as a reference
+"""
 
 gate_codes = {
     "4000": "An unknown error occured, trying to reconnect",
@@ -16,34 +17,16 @@ gate_codes = {
 }
 
 gate_ops = {
-    "dispatch":  0,
-    "heartbeat": 1,
-    "identify":  2,
-    "status":    3,
-    "voice":     4,
-    "resume":    6,
-    "reconnect": 7,
-    "request":   8,
-    "invalid":   9,
-    "hi":       10,
-    "ack":      11
+    0: "dispatch",
+    1: "heartbeat",
+    2: "identify",
+    3: "status",
+    4: "voice",
+    #5 doesn't exist
+    6: "resume",
+    7: "reconnect",
+    8: "request",
+    9: "invalid",
+    10: "hi",
+    11: "ack"
 }
-
-async def payload(self, data, opcode, seq = None, event = None, route = ""):
-    payload = {
-        "op": opcode,
-        "d": data
-    }
-    if seq:
-        payload["s"] = seq
-    if event:
-        payload["t"] = event
-    async with self.client.get(self.uri+route, data = payload) as r:
-        if r.status != 200:
-            raise Exception(r)
-        try:
-            j = await r.json()
-        except aiohttp.client_exceptions.ContentTypeError:
-            j = await r.text()
-        print(j)
-        return j

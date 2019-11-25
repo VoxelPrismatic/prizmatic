@@ -1,8 +1,8 @@
 import random
-from .Error import ClassError
+from ..Error import ClassError
 import re
 import io
-from .Raw import RawFile, RawData
+from ..Raw import RawFile, RawData
 import aiohttp
 import aiofiles
 
@@ -48,9 +48,9 @@ class File:
             else:
                 self.data = RawData(bytes(open(obj, "rb").read()))
         elif type(obj) == bytes:
-            self.data = RawData(obj):
+            self.data = RawData(obj)
         elif type(obj) == io.IOBase:
-            self.data = RawData(bytes(obj.read())))
+            self.data = RawData(bytes(obj.read()))
         elif type(obj) == RawData or type(obj) == RawFile:
             self.data = data
         else:

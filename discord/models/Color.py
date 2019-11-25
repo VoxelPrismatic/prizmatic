@@ -1,5 +1,8 @@
 import re
 
+def hexx(num, fill = 2):
+    return hex(num)[2:].zfill(fill)
+
 class Color:
     """
     DESCRIPTION ---
@@ -35,7 +38,7 @@ class Color:
         self.color = num
 
     def __init__(self, r: int = 0, g: int = 0, b: int = 0):
-        self.color = int(hex(r).zfill(2) + hex(g).zfill(2) + hex(b).zfill(2), 16)
+        self.color = int(hexx(r) + hexx(g) + hexx(b), 16)
 
     def __init__(self, hx: str = "0x000000"):
         if not re.search(r"^(0x|\#)?[0-9a-fA-F]{6}$"):
@@ -43,8 +46,17 @@ class Color:
         self.color = int(hx.replace("0x", "").replace("#", ""), 16)
 
     def __init__(self, rgb: tuple = (0, 0, 0)):
-        r, g, b = tuple
-        self.color = int(hex(r).zfill(2) + hex(g).zfill(2) + hex(b).zfill(2), 16)
+        r, g, b = rgb
+        self.color = int(hexx(r) + hexx(g) + hexx(b), 16)
 
     def __str__(self):
         return hex(self.color).replace("0x", "#")
+    
+    def __int__(self):
+        return self.color
+
+def grab_color(obj):
+    if type(obj) == Color:
+        return int(color)
+    else:
+        return int(Color(color))

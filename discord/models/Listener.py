@@ -1,4 +1,4 @@
-from ..ClsUtil import from_ts
+from .ClsUtil import from_ts
 from .Channel import AnyChannel
 from .Text import Text, Crosspost
 from .Emoji import Emoji
@@ -12,7 +12,7 @@ from .Audit import AuditLog
 from .Member import Player, User
 from .Error import ClassError
 from .Invite import Invite
-from .Raw import RawList, Raw, RawObj, RawObjs, RawFile
+from .Raw import RawList, Raw, RawObj, RawObjs, RawFile, RawAny
 from . import Events
 from .Voice import VoiceRegion, VoiceClient
 from .Integration import Integration
@@ -20,6 +20,7 @@ from .Webhook import Webhook
 from .Widget import Widget
 from .GuildEmbed import GuildEmbed
 from . import Semi
+from .Status import Status
 
 class Listener:
     """
@@ -29,9 +30,6 @@ class Listener:
     
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        This class is used internally to help clean up code, don't 
-        use this class in your code because it will not work without
-        extensive modification in your code
     
     FUNCTIONS ---
         listener = Listener(bot)
@@ -44,8 +42,16 @@ class Listener:
         await listener.act(returned_gateway_obj)
         - Calls all respective listeners with contents of returned_gateway_obj
         
-        listener.find(type, id)
-        - return the respective object, otherwise create it
+        await listener.find(type, id, url)
+        - Return the respective object, otherwise create it
+        - Types: "channels", "texts", "emojis", "guilds", "webhooks", 
+                 "integrations", "players", "users", "widgets", "invites",
+                 "roles", "reactions"
+        
+        listener.raw_make(type, objects, *global_args, **global_kwargs)
+        - Return the list of objects from the class. If it doesn't exist,
+          then make it.
+        - Types are the same as above
     """
     def __init__(self, bot_obj):
         self.bot_obj = bot_obj
@@ -160,6 +166,7 @@ class Listener:
         self.webhooks = PrizmDict()
         self.invites = PrizmDict()
         self.widgets = PrizmDict()
+        self.statuses = PrizmDict()
         self.integrations = PrizmDict()
     
     def get(self, listener):
@@ -191,7 +198,7 @@ class Listener:
             o = self.channels[int(d["channel_id"])]
             self.channels[o.id].latest_pin_time = from_ts()
     
-    async def find(self, c, id, url):
+    async def make(self, c, id, url):
         try:
             return self.__getattribute__(c)(id)
         except KeyError:
@@ -207,10 +214,71 @@ class Listener:
                 "webhooks": Webhook,
                 "integrations": Integration,
                 "invites": Invite,
-                "widgets": Widget
+                "widgets": Widget,
+                "statuses": Status
             }
             d = await self.bot_obj.http.req(u = url)
             o = objs[c](**d)
             self.__getattr__(c)[id] = o
             return o
-            
+    
+    def raw_make(self, c, o, *a, **kw):
+        if type(raw) not in [tuple, list]:
+            o = [o]
+        objs = {
+            "channels": AnyChannel,
+            "guilds": Guild,
+            "texts": Text,
+            "emojis": Emoji,
+            "roles": Role,
+            "players": Player,
+            "users": User,
+            "reactions": Reaction,
+            "webhooks": Webhook,
+            "integrations": Integration,
+            "invites": Invite,
+            "widgets": Widget,
+            "statuses": Status
+        }
+        ls = []
+        for raw in o:
+            try:
+                ls.append(self.__getattribute__(c)(raw["id"]))
+            except KeyError:
+                obj = objs[c](*a, **kw, **raw)
+                self.__getattribute__(c)[int(raw["id"])] = obj
+                ls.append(obj)
+        return ls
+    
+    def find(self, c, id, url = None, fmt = {}, **kw):
+        fmt["id"] = id
+        objs = {
+            "channels": AnyChannel,
+            "guilds": Guild,
+            "texts": Text,
+            "emojis": Emoji,
+            "roles": Role,
+            "players": Player,
+            "users": User,
+            "reactions": Reaction,
+            "webhooks": Webhook,
+            "integrations": Integration,
+            "invites": Invite,
+            "widgets": Widget
+        }
+        urls = {
+            "channels": "/channels/{id}",
+            "guilds": "/guilds/{id}",
+        }
+        try:
+            return self.__getattribute__(c)(id)
+        except:
+            if not url and c in urls:
+                url = urls[c].format(**fmt)
+            elif url:
+                url = url.format(**fmt)
+            else:
+                raise TypeError("URL not given")
+            o = RawAny(objs[c], url, bot_obj = self.bot_obj, **kw)
+            self.__getattribute__(c)[id] = o
+            return o

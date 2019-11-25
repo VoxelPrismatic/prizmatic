@@ -1,11 +1,11 @@
 from ..ClsUtil import from_ts
 from ..Perms import Perms
-from ..Guild import Guild
-from ..User import User
+#from ..Guild import Guild
+from ..Member import User
 from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
-from ..Overwrite import Overwrite
+from ..Perms import Overwrite
 
 class VC:
     """

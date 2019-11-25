@@ -1,10 +1,10 @@
-import interface
 import json
 import asyncio
 import aiohttp
 import zlib
+from .. import ver
 from pprint import pprint as prinf
-import .Url
+from . import Url
 from .PrizmCls import PrizmList, PrizmDict, PrizmInt
 from .Listener import Listener
 import re
@@ -89,7 +89,7 @@ class Bot:
         self.ack = 5
         self.connected = False
         self.keepalive = None
-        self.__version__ = "0.6.3"
+        self.__version__ = ver.__ver__
         self.listener = Listener(self)
         self.voices = PrizmDict()
     
@@ -109,10 +109,32 @@ class Bot:
     async def _gate(self, **payload):
         await self.ws.send_json(payload)
         m = await self.ws.receive()
-        return get_json(m)
+        return await get_json(m)
 
     async def make(self, cl, id, url):
         return await self.listeners.find(cl, id, url)
+    
+    def raw(self, c, objs, *a, **kw):
+        return self.listeners.raw_make(c, objs, *a, **kw)
+    
+    def find(self, c, id, url = "", fmt = {}, **kw):
+        return self.listeners.find(c, id, url, fmt, **kw)
+    
+    def find_list(self, c, ids, fmt_url = "", fmt = {}, **kw):
+        ls = []
+        for id in ids:
+            fmt["id"] = id
+            ls.append(c, id, fmt_url.format(**fmt), **kw)
+        return ls
+    
+    def find_existing(self, c, ids):
+        if type(ids) not in [list, tuple]:
+            return self.listeners.__getattribute__(c)(ids)
+        else:
+            ls = []
+            for id in ids:
+                ls.append(self.listeners.__getattribute__(c)(id))
+            return ls
         
     async def login(self):
         print("LOGGING IN")
@@ -127,7 +149,7 @@ class Bot:
             "large_threshold": self.thresh,
             "guild_subscriptions": True
         }
-        self.uri = (await interface.payload(self, data, 10))["url"] + "?v=6&encoding=json"
+        self.uri = (await self.http.payload(self, data, 10))["url"] + "?v=6&encoding=json"
         async with self.client.ws_connect(self.uri) as ws:
             self.ws = ws
             print("FINDING GATEWAY")

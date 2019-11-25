@@ -1,12 +1,3 @@
-from ..ClsUtil import from_ts
-from ..Perms import Perms
-from ..Guild import Guild
-from ..User import User
-from ..PrizmCls import PrizmList
-from ..Role import Role
-from ..Raw import Raw, RawObj, RawList, RawFile
-from ..Overwrite import Overwrite, Overwrites
-from ..Text import Text
 from ..Embed import Embed
 from typing import Union
 from ..File import File, Files
@@ -36,9 +27,9 @@ class Channel:
         self.slowmode = rate_limit_per_user
         self.topic = topic
         self.guild_id = guild_id
-        self.guild = bot_obj.listener.guilds[guild_id]
+        self.guild = bot_obj.listener.guilds(guild_id)
         self.catagory_id = parent_id
-        self.catagory = bot_obj.listener.channels[parent_id]
+        self.catagory = bot_obj.listener.channels(parent_id)
         self.bot_obj = bot_obj
 
     def __str__(self):

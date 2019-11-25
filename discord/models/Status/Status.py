@@ -16,5 +16,7 @@ class Status:
     def __init__(self, user, roles, game, guild_id, status,
                  activities, client_status, bot_obj):
         self.user = User(**user)
-        self.roles = RawObjs(Role, roles, bot_obj = bot_obj)
+        #self.roles = bot_obj.find_list("roles", roles, f"/guilds/{guild_id}/roles/"bot_obj = bot_obj)
+        self.status = status
+        self.text = activities
         

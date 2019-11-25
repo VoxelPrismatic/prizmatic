@@ -61,3 +61,12 @@ class SnowDecodeError(Error):
             snowflake = snowflake
         )
 
+class LoginError(Error):
+    def __init__(self, code, j):
+        super.__init__(
+            name = "Bad login info given",
+            typ = "LoginError",
+            attempts = "Stripped space characters from token",
+            reponse = j,
+            status_code = code
+        )
