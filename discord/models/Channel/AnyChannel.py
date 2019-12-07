@@ -13,13 +13,13 @@ def AnyChannel(**kw):
         raise TypeError("Could not find bot object as 'bot_obj' in kw")
     bot = kw["bot_obj"]
     channels = {
-        0: (lambda kw: bot.raw(Channel, **kw)),
-        1: (lambda kw: bot.raw(DM, **kw)),
-        2: (lambda kw: bot.raw(VC, **kw)),
-        3: (lambda kw: bot.raw(GroupDM, **kw)),
-        4: (lambda kw: bot.raw(Catagory, **kw)),
-        5: (lambda kw: bot.raw(NewsChannel, **kw)),
-        6: (lambda kw: bot.raw(StoreChannel, **kw))
+        0: (lambda kw: Channel(**kw)),
+        1: (lambda kw: DM(**kw)),
+        2: (lambda kw: VC(**kw)),
+        3: (lambda kw: GroupDM(**kw)),
+        4: (lambda kw: Catagory(**kw)),
+        5: (lambda kw: NewsChannel(**kw)),
+        6: (lambda kw: StoreChannel(**kw))
     }
 
     return channels[kw["type"]](kw)

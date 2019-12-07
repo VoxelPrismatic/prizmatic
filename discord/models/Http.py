@@ -473,7 +473,7 @@ class Http:
 
 
     def get_emojis(self, gID, **kw):
-        d = await self.req(
+        d = self.req(
             u = f"/guilds/{gID}/emojis"
         )
         return self.bot.await_make("emojis", d, **kw)

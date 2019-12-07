@@ -1,6 +1,5 @@
 from ..ClsUtil import from_ts
 from ..Perms import Perms, Overwrites
-from ..Guild import Guild
 from ..Member import User
 from ..PrizmCls import PrizmList
 from ..Role import Role
@@ -23,7 +22,7 @@ class StoreChannel:
                  nsfw, parent_id, bot_obj):
         self.id = int(id)
         self.guild_id = int(guild_id)
-        self.guild = Raw(Guild, guild_id, "/guilds/{id}")
+        self.guild = bot_obj.listeners.guilds(guild_id)
         self.name = name
         self.position = position
         self.nsfw = nsfw

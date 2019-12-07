@@ -3,7 +3,6 @@ from ..Snow import Snow
 from ..Member import Player
 from ..Reaction import Reaction
 from ..Raw import Raw
-from ..Guild import Guild
 from ..Channel import AnyChannel
 
 __all__ = ["Text"]
@@ -25,12 +24,12 @@ class Text:
                  mention_roles = [], mention_channels = [], attachments, embeds,
                  reactions = [], nonce, webhook_id = None, type: int,
                  activity = None, application = None, message_reference = None,
-                 flags: int = 0, bot):
+                 flags: int = 0, bot_obj = None):
         self.id = int(id)
         self.channel_id = int(channel_id)
         self.guild_id = None
         if guild_id != None:
-            self.guild_id = Raw(guild_id, "/guilds/{id}", bot)
+            self.guild_id = bot_obj.listeners.guilds(guild_id)
         self.author = member or author
         self.text = content
         self.time = from_ts(timestamp)

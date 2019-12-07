@@ -1,7 +1,6 @@
 from ..Embed import Embed
 from typing import Union
 from ..File import File, Files
-from ..Text import Text
 from ..Perms import Overwrites
 from ..ClsUtil import from_ts
 

@@ -6,8 +6,8 @@ from . import Audit
 from . import Perms
 from . import Status
 from . import Channel
-from . import PrizmCls
 from . import ClsUtil
+from . import PrizmCls
 
 from .Bot import Bot
 from .Role import Role

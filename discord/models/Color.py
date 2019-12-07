@@ -1,6 +1,6 @@
 import re
 
-__all__ = ["hexx", "Color", "get_color"]
+__all__ = ["hexx", "Color", "get_color", "grab_color"]
 
 def hexx(num, fill = 2):
     return hex(num)[2:].zfill(fill)
@@ -68,3 +68,5 @@ def get_color(obj):
         return int(obj)
     else:
         return int(Color(obj))
+
+grab_color = get_color
