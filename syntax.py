@@ -7,10 +7,12 @@ def get_all_files(dir = "."):
     thing = os.listdir(dir)
     for filename in thing:
         if filename.endswith(".py"):
-            files.append(dir+"/"+filename)
+            files.append(dir + "/" + filename)
         elif "." not in filename:
-            get_all_files(dir+"/"+filename)
+            get_all_files(dir + "/" + filename)
+
 get_all_files()
+
 for filename in files:
     #print("CHECKING", filename)
     with open(filename, "r") as f:
@@ -29,4 +31,4 @@ for filename in files:
         for line in lines:
             line = line.strip()
             if line.startswith("class") or line.startswith("def") and not line.endswith(":"):
-                print(filename, "\n--------"+line+"\n--------", "MISSING COLON")
+                print(filename, "\n--------" + line + "\n--------", "MISSING COLON")
