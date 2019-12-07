@@ -20,42 +20,46 @@ from . import Events
 from .Voice import VoiceRegion, VoiceClient
 from .Integration import Integration
 from .Webhook import Webhook
+from .Role import Role
 from .Widget import Widget
 from .GuildEmbed import GuildEmbed
 from . import Semi
 from . import Url
+import aiohttp
+
+__all__ = ["Http"]
 
 class Http:
     """
     DESCRIPTION ---
         Cleans up code by providing functions instead of so many URLs.
         Also, that "interface.py" bit is a joke, this is the true interface.
-    
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         This class is used internally and should only be used that way.
-        Please, do not even touch this class 
+        Please, do not even touch this class
     """
     def __init__(self, token, client, bot):
         self.client = client
         self.bot = bot
-    
-    async def get_json(data):
+
+    async def get_json(self, data):
         try:
             data = await data.data
-        except:
+        except AttributeError:
             pass
         try:
             j = json.loads(data) #Raw JSON
-        except:
+        except json.JSONDecodeError:
             try:
                 j = json.loads(zlib.decompress(data)) #Compressed JSON
-            except:
+            except json.JSONDecodeError:
                 j = None #Some other thing that cannot be decoded
         return j
-    
+
     async def req(self, *, m = "GET", u = "", t = "j", r = None, d = {}, **data):
         m = m.upper()
         if d == {} and data != {}:
@@ -79,11 +83,13 @@ class Http:
                 m = M
                 break
         else:
-            raise TypeError("Invalid request type '"+m+"'")
+            raise TypeError("Invalid request type '" + m + "'")
+        url = "https://github.com/VoxelPrismatic/prizmatic"
         payload = {
             "headers": {
                 "Authorization": f"Bot {self.token}",
-                "User-Agent": f"DiscordBot (https://github.com/VoxelPrismatic/prizmatic, {self.bot.__version__})"
+                "User-Agent":
+                    f"DiscordBot ({url}, {self.bot.__version__})"
             },
             "data": d
         }
@@ -105,7 +111,7 @@ class Http:
             payload["s"] = seq
         if event:
             payload["t"] = event
-        async with self.client.get(self.bot.uri+route, data = payload) as r:
+        async with self.client.get(self.bot.uri + route, data = payload) as r:
             if r.status != 200:
                 raise LoginError(r.status, await r.json())
             try:
@@ -115,9 +121,8 @@ class Http:
             print(j)
             return j
 
-    
-    async def get_audit(self, id, user = None, action = None, before = None, 
-                        limit:int = 50, **kw):
+    async def get_audit(self, id, user = None, action = None, before = None,
+                        limit: int = 50, **kw):
         d = {"limit": limit}
         if user is None:
             pass
@@ -125,7 +130,7 @@ class Http:
             d["user_id"] = user.id
         elif type(user) == int:
             d["user_id"] = user
-        elif re.search("^\d{20}$", str(user)):
+        elif re.search(r"^\d{20}$", str(user)):
             d["user_id"] = int(user)
         elif type(user) == Snow:
             d["user_id"] = user.id
@@ -133,11 +138,11 @@ class Http:
             raise ClassError(user, int, [str, int, User, Player, Snow])
         actions = {
             "guild_edit": 1,
-            "channel_make": 10, 
+            "channel_make": 10,
             "channel_edit": 11,
             "channel_delete": 12,
             "channel_overwrites_make": 13,
-            "channel_overwrites_edit": 14, 
+            "channel_overwrites_edit": 14,
             "channel_overwrites_delete": 15,
             "player_kick": 20,
             "player_prune": 21,
@@ -163,7 +168,7 @@ class Http:
             action = action.lower().replace(" ", "_")
             if action in actions:
                 d["action_type"] = actions[action]
-            elif re.search("^\d{1,2}$", action):
+            elif re.search(r"^\d{1,2}$", action):
                 d["action_type"] = int(action)
             else:
                 raise TypeError(f"Action '{action}' isn't valid")
@@ -171,43 +176,83 @@ class Http:
             d["action_type"] = action
         else:
             raise ClassError(action, int, [int, str])
-        
+
         if before:
             d["before"] = str(Snow(before))
         j = await self.req(u = f"/guilds/{id}/audit-logs", d = d)
         return AuditLog(**j, **kw)
-        
-        
+
+
+    #Guilds
     async def make_guild(self, data, **kw):
-        return await self.req(m = "+", u = "/guilds", d = dict(data), **kw)
+        d = await self.req(
+            m = "+",
+            u = "/guilds",
+            d = dict(data)
+        )
+        return self.bot.raw_make("guilds", d, **kw)
     async def get_guild(self, id, **kw):
-        d = await self.req(u = f"/guilds/{id}", **kw)
-        return Guild(**d)
+        d = await self.req(
+            u = f"/guilds/{id}"
+        )
+        return self.bot.raw_make("guilds", d, **kw)
     async def edit_guild(self, id, data, **kw):
-        return await self.req(m = "/", u = f"/guilds/{id}", d = dict(data), **kw)
+        d = await self.req(
+            m = "/",
+            u = f"/guilds/{id}",
+            d = dict(data),
+        )
+        return self.bot.raw_edit("guilds", d, **kw)
     async def delete_guild(self, id, **kw):
-        return await self.req(m = "-", u = f"/guilds/{id}", **kw)
-    
-    
-    async def get_channels(self, id, **kw):
-        d = await self.req(f"/guilds/{id}/channels", **kw)
-        return [AnyChannel(**kw) for kw in d]
+        return await self.req(
+            m = "-",
+            u = f"/guilds/{id}",
+            **kw
+        )
+
+    #Channels
+    def get_channels(self, id, **kw):
+        d = self.req(
+            u = f"/guilds/{id}/channels"
+        )
+        return self.bot.await_make("channels", d, **kw)
     async def make_channel(self, id, data, **kw):
-        return await self.req(m = "+", u = f"/guilds/{id}/channels", d = dict(data), **kw)
+        d = await self.req(
+            m = "+",
+            u = f"/guilds/{id}/channels",
+            d = dict(data)
+        )
+        return self.bot.raw_make("channels", d, **kw)
     async def get_channel(self, id, **kw):
-        d = await self.req(u = f"/channels/{id}", **kw)
-        return AnyChannel(**d)
+        d = await self.req(
+            u = f"/channels/{id}",
+            **kw
+        )
+        return self.bot.raw_make("channels", d)
     async def edit_channel(self, id, data, **kw):
-        return await self.req(m = "/", u = f"/channels/{id}", d = dict(data), **kw)
+        d = await self.req(
+            m = "/",
+            u = f"/channels/{id}",
+            d = dict(data)
+        )
+        return self.bot.raw_edit("channels", d, **kw)
     async def delete_channel(self, id, **kw):
-        return await self.req(m = "-", u = f"/channels/{id}", **kw)
+        return await self.req(
+            m = "-",
+            u = f"/channels/{id}",
+            **kw
+        )
     async def edit_channel_pos(self, gID, cID, pos, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/channels", 
-                       d = {"id": str(cID), "position": pos}, **kw)
-    
-    
-    def get_texts(self, id, *, around = None, before = None, after = None, 
-                     limit = 50, **kw):
+        return await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/channels",
+            d = {"id": str(cID), "position": pos},
+            **kw
+        )
+
+    #Messages
+    def get_texts(self, id, *, around = None, before = None, after = None,
+                  limit = 50, **kw):
         d = {"limit": limit}
         if around:
             d["around"] = str(Snow(around))
@@ -215,155 +260,363 @@ class Http:
             d["before"] = str(Snow(before))
         if after:
             d["after"] = str(Snow(after))
-        return RawList(Text, f"/channels/{id}/messages", d, self.bot, **kw)
+        o = self.req(
+            u = f"/channels/{id}/messages"
+        )
+        return self.bot.await_make("texts", o, **kw)
+
     async def get_text(self, cID, tID, **kw):
-        j = await self.req(u = f"/channels/{cID}/messages/{tID}", **kw)
+        j = await self.req(
+            u = f"/channels/{cID}/messages/{tID}",
+            **kw
+        )
         return Text(**j)
     async def send_text(self, id, data, **kw):
-        return await self.req(m = "+", u = f"/channels/{id}/messages", d = dict(data), **kw)
+        o = await self.req(
+            m = "+",
+            u = f"/channels/{id}/messages",
+            d = dict(data)
+        )
+        return self.bot.raw_make("texts", o, **kw)
     async def edit_text(self, cID, tID, data, **kw):
-        return await self.req(m = "/", u = f"/channels/{cID}/messages/{tID}", d = dict(data), **kw)
+        obj = await self.req(
+            m = "/",
+            u = f"/channels/{cID}/messages/{tID}",
+            d = dict(data),
+        )
+        return self.bot.raw_edit("texts", obj, **kw)
     async def delete_text(self, cID, tID, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/messages/{tID}", **kw)
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/messages/{tID}",
+            **kw
+        )
     async def bulk_delete_texts(self, cID, texts, **kw):
-        return await self.req(m = "+", u = f"/channels/{cID}/messages", d = {"messages": texts}, **kw)
-        
-        
+        return await self.req(
+            m = "+",
+            u = f"/channels/{cID}/messages",
+            d = {"messages": texts},
+            **kw
+        )
+
+    #Reactions
     async def reaction_add(self, cID, tID, emoji, **kw):
-        return await self.req(m = ">", u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/@me", **kw)
+        obj = await self.req(
+            m = ">",
+            u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/@me"
+        )
+        return self.bot.raw_make("reactions", obj, **kw)
     async def reaction_delete_own(self, cID, tID, emoji, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/@me", **kw)
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/@me",
+            **kw
+        )
     async def reaction_delete(self, cID, tID, emoji, uID, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/{uID}", **kw)
-    def get_reactions(self, cID, tID, emoji, *, limit = 25, before = None, 
-                      after = None, **kw):
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/{uID}",
+            **kw
+        )
+    async def get_reactions(self, cID, tID, emoji, *, limit = 25, before = None,
+                            after = None, **kw):
         d = {"limit": limit}
         if before:
             d["before"] = str(Snow(before))
         if after:
             d["after"] = str(Snow(after))
-        return RawList(User, f"/channels/{cID}/messages/{tID}/reactions/{emoji}", d, self.bot_obj, **kw)
+        objs = await self.req(
+            u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}",
+            d = d,
+            **kw
+        )
+        return self.bot.raw_make("users", objs, bot_obj = self.bot)
     async def delete_all_reactions(self, cID, tID, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/messages/{tID}/reactions", **kw)
-    
-    
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/messages/{tID}/reactions",
+            **kw
+        )
+
+    #Perms
     async def edit_channel_perms(self, cID, oID, *, perms: Overwrite, **kw):
-        return await self.req(m = ">", u = f"/channels/{cID}/permissions/{oID}", d = dict(perms), **kw)
+        return await self.req(
+            m = ">",
+            u = f"/channels/{cID}/permissions/{oID}",
+            d = dict(perms),
+            **kw
+        )
     async def delete_channel_perms(self, cID, oID, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/permissions/{oID}", **kw)
-    
-    
-    async def get_channel_invite(self, cID, **kw):
-        return RawList(Invite, f"/channels/{cID}/invites", {}, self.bot, **kw)
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/permissions/{oID}",
+            **kw
+        )
+
+    #Invites
+    def get_channel_invites(self, cID, **kw):
+        ls = self.req(
+            u = f"/channels/{cID}/invites"
+        )
+        return self.bot.await_make("invites", ls, **kw)
     async def make_invite(self, cID, data, **kw):
-        return await self.req(m = "+", u = f"/channels/{cID}/invites", d = data, **kw)
-    def get_invites(self, gID, **kw):
-        return RawList(Invite, f"/guilds/{gID}/invites", bot_obj = self.bot_obj, **kw)
-        
-        
-    def get_integrations(self, gID, **kw):
-        return RawList(Integration, f"/guilds/{gID}/integrations", **kw)
+        obj = await self.req(
+            m = "+",
+            u = f"/channels/{cID}/invites",
+            d = data
+        )
+        return self.bot.raw_make("invites", obj, **kw)
+    async def get_invites(self, gID, **kw):
+        ls = await self.req(
+            u = f"/guilds/{gID}/invites"
+        )
+        return self.bot.raw_make("invites", ls, **kw)
+
+    async def get_integrations(self, gID, **kw):
+        ls = await self.req(
+            u = f"/guilds/{gID}/integrations"
+        )
+        return self.bot.raw_make("invites", ls, **kw)
     async def make_integration(self, gID, data, **kw):
-        return await self.req(m = "+", u = f"/guilds/{gID}/integrations", d = data, **kw)
+        d = await self.req(
+            m = "+",
+            u = f"/guilds/{gID}/integrations",
+            d = data
+        )
+        return self.bot.raw_make("integrations", d, **kw)
     async def edit_integration(self, gID, iID, data, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/integrations/{iID}", d = data, **kw)
+        d = await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/integrations/{iID}",
+            d = data
+        )
+        return self.bot.raw_edit("integrations", d, **kw)
     async def delete_integration(self, gID, iID, **kw):
-        return await self.req(m = "-", u = f"/guilds/{gID}/integrations/{iID}", **kw)
+        return await self.req(
+            m = "-",
+            u = f"/guilds/{gID}/integrations/{iID}",
+            **kw
+        )
     async def sync_integration(self, gID, iID, **kw):
-        return await self.req(u = f"/guilds/{gID}/integrations/{iID}/sync", **kw)
-    
+        return await self.req(
+            u = f"/guilds/{gID}/integrations/{iID}/sync",
+            **kw
+        )
+
     async def get_guild_embed(self, gID, **kw):
-        d = await self.req(u = f"/guilds/{gID}/embed", **kw)
-        return RawObj(GuildEmbed, **d)
+        d = await self.req(
+            u = f"/guilds/{gID}/embed"
+        )
+        return self.bot.raw_make("embeds", d, **kw)
     async def edit_guild_embed(self, gID, data, **kw):
-        d = await self.req(m = "/", u = f"/guilds/{gID}/embed", d = data, **kw)
-        return RawObj(GuildEmbed, **d)
-    
+        d = await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/embed",
+            d = data
+        )
+        return self.bot.raw_edit("embeds", d, **kw)
+
     async def get_guild_vanity(self, gID, **kw):
-        d = await self.req(u = f"/guilds/{gID}/vanity-url", **kw)
+        d = await self.req(
+            u = f"/guilds/{gID}/vanity-url",
+            **kw
+        )
         return Semi.SemiInvite(**d)
-    
+
     async def get_guild_widget(self, gID, style = "shield", **kw):
-        return await self.req(u = f"/guilds/{gID}/widget.png", d = {"style": style}, t = "b", **kw)
-        
+        return await self.req(
+            u = f"/guilds/{gID}/widget.png",
+            d = {"style": style},
+            t = "b",
+            **kw
+        )
+
     async def trigger_typing(self, cID, **kw):
-        return await self.req(m = "+", u = f"/channels/{cID}/typing", **kw)
-        
-        
+        return await self.req(
+            m = "+",
+            u = f"/channels/{cID}/typing",
+            **kw
+        )
+
+
     def get_pins(self, cID, **kw):
-        return RawList(Text, f"/channels/{cID}/pins", {}, self.bot, **kw)
+        d = self.req(
+            u = f"/channels/{cID}/pins",
+        )
+        return self.bot.await_make("texts", d, **kw)
     async def delete_pin(self, cID, tID, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/pins/{tID}", **kw)
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/pins/{tID}",
+            **kw
+        )
     async def add_pin(self, cID, tID, **kw):
-        return await self.req(m = ">", u = f"/channels/{cID}/pins/{tID}", **kw)
-    
-    
+        return await self.req(
+            m = ">",
+            u = f"/channels/{cID}/pins/{tID}",
+            **kw
+        )
+
+
     async def add_group_user(self, cID, uID, **kw):
-        return await self.req(m = ">", u = f"/channels/{cID}/recipients/{uID}", **kw)
+        return await self.req(
+            m = ">",
+            u = f"/channels/{cID}/recipients/{uID}",
+            **kw
+        )
     async def remove_group_user(self, cID, uID, **kw):
-        return await self.req(m = "-", u = f"/channels/{cID}/recipients/{uID}", **kw)
-    
-    
+        return await self.req(
+            m = "-",
+            u = f"/channels/{cID}/recipients/{uID}",
+            **kw
+        )
+
+
     def get_emojis(self, gID, **kw):
-        return RawList(Emoji, f"/guilds/{gID}/emojis", self.bot, **kw)
+        d = await self.req(
+            u = f"/guilds/{gID}/emojis"
+        )
+        return self.bot.await_make("emojis", d, **kw)
     async def get_emoji(self, gID, eID, **kw):
-        d = await self.req(u = f"/guilds/{gID}/emojis/{eID}", **kw)
-        return Emoji(**d)
+        d = await self.req(
+            u = f"/guilds/{gID}/emojis/{eID}",
+        )
+        return self.bot.raw_make("emojis", d, **kw)
     async def make_emoji(self, gID, data, **kw):
-        return await self.req(m = "+", u = f"/guilds/{gID}/emojis", d = data, **kw)
+        d = await self.req(
+            m = "+",
+            u = f"/guilds/{gID}/emojis",
+            d = data
+        )
+        return self.bot.raw_make("emojis", d, **kw)
     async def edit_emoji(self, gID, eID, data, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/emojis/{eID}", d = data, **kw)
+        d = await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/emojis/{eID}",
+            d = data
+        )
+        return self.bot.raw_edit("emojis", d, **kw)
     async def delete_emoji(self, gID, eID, **kw):
-        return await self.req(m = "-", u = f"/guilds/{gID}/emojis/{eID}", **kw)
-        
-        
+        return await self.req(
+            m = "-",
+            u = f"/guilds/{gID}/emojis/{eID}",
+            **kw
+        )
+
+
     async def get_player(self, gID, pID, **kw):
-        d = await self.req(u = f"/guilds/{gID}/members/{pID}", **kw)
-        return Player(**d)
-    async def get_players(self, gID, limit = 100, after = 0, **kw):
-        d = await self.req(u = f"/guilds/{gID}/members", 
-                           d = {"limit": limit, "after": after}, **kw)
-        return RawObjs(Player, d, bot_obj = bot_obj)
+        d = await self.req(u = f"/guilds/{gID}/members/{pID}")
+        return self.bot.raw_make("players", d, **kw)
+    def get_players(self, gID, limit = 100, after = 0, **kw):
+        d = self.req(
+            u = f"/guilds/{gID}/members",
+            d = {"limit": limit, "after": after}
+        )
+        return self.bot.await_make("players", d, **kw)
     async def add_player(self, gID, pID, data, **kw):
-        return await self.req(m = ">", u = f"/guilds/{gID}/members/{pID}", d = data, **kw)
+        return await self.req(
+            m = ">",
+            u = f"/guilds/{gID}/members/{pID}",
+            d = data,
+            **kw
+        )
     async def edit_player(self, gID, pID, data, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/members/{pID}", d = data, **kw)
+        d = await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/members/{pID}",
+            d = data
+        )
+        return self.bot.raw_edit("players", d, **kw)
     async def edit_self_nick(self, gID, nick, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/members/@me/nick",
-                       d = {"nick": nick}, **kw)
+        return await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/members/@me/nick",
+            d = {"nick": nick},
+            **kw
+        )
     async def add_player_role(self, gID, pID, rID, **kw):
-        return await self.req(m = ">", u = f"/guilds/{gID}/members/{pID}/roles/{rID}", **kw)
+        return await self.req(
+            m = ">",
+            u = f"/guilds/{gID}/members/{pID}/roles/{rID}",
+            **kw
+        )
     async def remove_player_role(self, gID, pID, rID, **kw):
-        return await self.req(m = "-", u = f"/guilds/{gID}/members/{pID}/roles/{rID}", **kw)
+        return await self.req(
+            m = "-",
+            u = f"/guilds/{gID}/members/{pID}/roles/{rID}",
+            **kw
+        )
     async def kick_player(self, gID, pID, **kw):
-        return await self.req(m = "-", u = f"/guilds/{gID}/members/{pID}", **kw)
-    async def get_bans(self, gID, **kw):
-        d = await self.req(u = f"/guilds/{gID}/bans", **kw)
-        return RawObjs(Events.Ban, d, bot_obj = self.bot_obj)
+        return await self.req(
+            m = "-",
+            u = f"/guilds/{gID}/members/{pID}",
+            **kw
+        )
+    def get_bans(self, gID, **kw):
+        d = self.req(
+            u = f"/guilds/{gID}/bans"
+        )
+        return self.bot.await_make("bans", d, **kw)
     async def get_ban(self, gID, pID, **kw):
-        d = await self.req(u = f"/guilds/{gID}/bans/{pID}", **kw)
-        return Events.Ban(**d)
+        d = await self.req(
+            u = f"/guilds/{gID}/bans/{pID}"
+        )
+        return self.bot.raw_make("bans", d, **kw)
     async def ban_player(self, gID, pID, data = {}, **kw):
-        return await self.req(m = ">", u = f"/guilds/{gID}/bans/{pID}", d = data, **kw)
+        return await self.req(
+            m = ">",
+            u = f"/guilds/{gID}/bans/{pID}",
+            d = data,
+            **kw
+        )
     async def unban_player(self, gID, pID, **kw):
         return await self.req(m = "-", u = f"/guilds/{gID}/bans/{pID}", **kw)
-        
-        
+
+
     def get_roles(self, gID, **kw):
-        return RawList(Role, f"/guilds/{gID}/roles", bot_obj = self.bot_obj, **kw)
+        ls = self.req(
+            u = f"/guilds/{gID}/roles"
+        )
+        return self.bot.await_make("roles", ls, **kw)
     async def edit_roles_pos(self, gID, rID, pos, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/roles", d = {"id": str(rID), "position": pos}, **kw)
+        ls = await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/roles",
+            d = {"id": str(rID), "position": pos},
+        )
+        return self.bot.raw_make("roles", ls, **kw)
     async def edit_role(self, gID, rID, data, **kw):
-        return await self.req(m = "/", u = f"/guilds/{gID}/roles/{rID}", d = data, **kw)
+        ls = await self.req(
+            m = "/",
+            u = f"/guilds/{gID}/roles/{rID}",
+            d = data
+        )
+        return self.bot.raw_edit("roles", ls, **kw)
     async def delete_role(self, gID, rID, **kw):
-        return await self.req(m = "-", u = f"/guilds/{gID}/roles/{rID}", **kw)
-    
+        return await self.req(
+            m = "-",
+            u = f"/guilds/{gID}/roles/{rID}",
+            **kw
+        )
+
     async def get_prune(self, gID, days = 7, **kw):
-        return await self.req(u = f"/guilds/{gID}/prune", d = {"days": days}, **kw)
+        return await self.req(
+            u = f"/guilds/{gID}/prune",
+            d = {"days": days},
+            **kw
+        )
     async def start_prune(self, gID, days = 7, rtn = True, **kw):
-        return await self.req(m = "+", u = f"/guilds/{gID}/prune", 
-                              d = {"days": days, "compute_prune_count": rtn}, **kw)
-    
+        return await self.req(
+            m = "+",
+            u = f"/guilds/{gID}/prune",
+            d = {"days": days, "compute_prune_count": rtn},
+            **kw
+        )
+
     def get_regions(self, gID, **kw):
-        return RawList(VoiceRegion, f"/guilds/{gID}/regions", bot_obj = self.bot_obj, **kw)
-    
+        return RawList(
+            VoiceRegion,
+            f"/guilds/{gID}/regions",
+            bot_obj = self.bot,
+            **kw
+        )

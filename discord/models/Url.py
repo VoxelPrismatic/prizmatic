@@ -1,3 +1,29 @@
+__all__ = [
+    "home",
+    "cdn",
+    "media",
+    "api",
+    "gateway",
+    "wss",
+    "gg",
+    "invite",
+    "devs",
+    "oauth2",
+    "webhooks",
+    "emoji",
+    "guild_icon",
+    "guild_splash",
+    "guild_banner",
+    "default_pfp",
+    "user_pfp",
+    "app_icon",
+    "app_asset",
+    "chat",
+    "webhook",
+    "team_pfp",
+    "achievement"
+]
+
 global home, cdn, media, api, gateway, wss
 global gg, invite, devs, oauth2, webhooks
 home = "https://discordapp.com"

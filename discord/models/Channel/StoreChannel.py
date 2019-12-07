@@ -6,14 +6,16 @@ from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
 
+__all__ = ["StoreChannel"]
+
 class StoreChannel:
     """
     DESCRIPTION ---
         Represents a store channel
-        
+
     PARAMS ---
         This class shouldn't be initalized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
@@ -28,5 +30,9 @@ class StoreChannel:
         self.overwrites = Overwrites(**permission_overwrites)
         self.catagory_id = parent_id
         self.bot_obj = bot_obj
-    
-    #async def edit(self, *, id, catagory,: Catagory, overwrites, 
+
+    #async def edit(self, *, id, catagory,: Catagory, overwrites,
+
+    @property
+    def ping(self):
+        return f"<#{self.id}>"

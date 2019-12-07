@@ -1,27 +1,29 @@
 from ..Semi import SemiUser
 
+__all__ = ["Invite"]
+
 class Invite:
     """
     DESCRIPTION ---
         Represents an invite
-    
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-    
+
     FUNCTIONS ---
         invite = Invite(code, guild, channel, user, type, presences, members)
         - Create a new Invite object
-        
+
         await invite.update()
         - Updates the invite data
-        
+
         await invite.delete()
         - Deletes the invite, and the object
     """
     def __init__(self, code, guild, channel, target_user, target_user_type,
                  approximate_presence_count, approximate_member_count, bot_obj):
         self.code = code
-        self.url = "https://discord.gg/"+code
+        self.url = "https://discord.gg/" + code
         self.target = SemiUser(**self.target_user)
         self.rough_status_count = approximate_presence_count
         self.rough_player_count = approximate_member_count

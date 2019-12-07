@@ -103,10 +103,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# linuxy things
 *.DS_STORE
-__pycache__
-*/__pycache__
-*/*/__pycache
-*/*/*/__pycache__
-*/*/*/*/__pycache__
 *.pyc
+*.kdev4
+*.*~
+~*.*
+*.kate-swp

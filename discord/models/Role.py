@@ -2,14 +2,16 @@ from .Color import Color, grab_color
 from .Perms import Perms
 from .NonExistentObj import NonExistentObj
 
+__all__ = ["Role"]
+
 class Role:
     """
     DESCRIPTION ---
         Represents a role
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
@@ -27,7 +29,7 @@ class Role:
         self.guild = bot_obj.find("guilds", guild_id, bot_obj = bot_obj)
         self.bot_obj
         self.ping = f"<@&{self.id}>"
-    
+
     async def edit(self, *, name = None, perms: Perms = None, color = None,
                    hoist: bool = None, pingable: bool = None, reason = None,
                    pos = None):
@@ -51,7 +53,7 @@ class Role:
             o = await self.bot_obj.http.edit_roles_pos(self.guild_id, self.id, pos)
             for obj in o:
                 self.bot_obj.find_existing("roles", obj["id"]).pos = obj["position"]
-    
+
     def __dict__(self):
         return {
             "id": self.id,
@@ -63,17 +65,20 @@ class Role:
             "managed": self.managed,
             "mentionable": self.pingable
         }
-        
+
     async def delete(self, reason = None):
         await self.bot_obj.http.delete_role(self.guild_id, self.id, r = reason)
-        o = NonExistentObj(f"/guilds/{self.guild_id}/roles/{self.id}", self.__class__,
-                           data = {
-                               "name": self.name,
-                               "color": int(self.color),
-                               "permissions": self.perms.allow_int,
-                               "hoist": self.hoist,
-                               "mentionable": self.pingable
-                           }, edit = {
-                               "pos": self.pos
-                           })
-    
+        o = NonExistentObj(
+            f"/guilds/{self.guild_id}/roles/{self.id}",
+            self.__class__,
+            data = {
+                "name": self.name,
+                "color": int(self.color),
+                "permissions": self.perms.allow_int,
+                "hoist": self.hoist,
+                "mentionable": self.pingable
+            },
+            edit = {
+                "pos": self.pos
+            }
+        )

@@ -6,14 +6,16 @@ from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
 
+__all__ = ["NewsChannel"]
+
 class NewsChannel:
     """
     DESCRIPTION ---
         Represents a news/announcements channel
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
@@ -34,12 +36,24 @@ class NewsChannel:
         self.bot_obj = bot_obj
 
     def __str__(self):
-        return "#"+self.name
+        return "#" + self.name
+
+    @property
+    def ping(self):
+        return f"<#{self.id}>"
+
     def __repr__(self):
-        return f"<#Channel '{self.name}'>"
+        return f"<#NewsChannel '{self.name}'>"
+
     async def edit(self, **kw):
-        raise NotImplementedError("This feature hasn't actually been created, only the function")
+        raise NotImplementedError(
+            "This feature hasn't actually been created, only the function"
+        )
+
     async def load(self):
         await self.guild.make()
+
     async def update(self):
-        raise NotImplementedError("This feature hasn't actually been created, only the function")
+        raise NotImplementedError(
+            "This feature hasn't actually been created, only the function"
+        )

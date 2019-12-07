@@ -3,6 +3,8 @@ from .. import PrizmCls
 from ..Raw import RawObjs
 from ..Role import Role
 
+__all__ = ["Player"]
+
 class Player:
     """
     Represents a player [or member] in a guild

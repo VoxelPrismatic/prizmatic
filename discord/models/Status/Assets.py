@@ -1,11 +1,13 @@
+__all__ = ["Assets"]
+
 class Assets:
     """
     DESCRIPTION ---
         Represents assets
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """

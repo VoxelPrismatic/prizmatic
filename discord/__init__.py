@@ -1,4 +1,4 @@
 from . import util
-from . import iter
+from . import iters
 from . import models
 from . import interface

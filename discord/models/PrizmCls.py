@@ -1,5 +1,15 @@
 import re
 
+__all__ = [
+    "PrizmBool",
+    "PrizmDict",
+    "PrizmFloat",
+    "PrizmInt",
+    "PrizmList",
+    "PrizmSet",
+    "PrizmStr"
+]
+
 class PrizmList(list):
     def __init__(self, *args):
         self = list(args)
@@ -68,14 +78,14 @@ class PrizmDict(dict):
         elif re.search(r"^\d+\.\d+$", str(thing)) and float(thing) in self:
             return self[float(thing)]
         else:
-            raise KeyError(f"'{thing}' wasn't found in forms: [{int}, {float}, {str}, {type(thing)}]")
+            raise KeyError(
+                f"'{thing}' wasn't found in forms: [{int}, {float}, {str}, {type(thing)}]"
+            )
 
 def PrizmStr(str):
-    def __init__(self, arg = ""):
-        self = str(arg)
     def __ge__(self, string):
         "str >=  other  ||  str = other + str"
-        self = self+str(string)
+        self = self + str(string)
     def __isub__(self, string):
         "str -= chars  ||  str.strip(chars)"
         return self.strip(string)
@@ -96,15 +106,10 @@ def PrizmStr(str):
         return self.rjust(amount)
     def __xor__(self, amount: int):
         "str ^ num  ||  f'{str:^literal_num}'"
-        while len(" "+self+" ") < amount:
-            self = " "+self+" "
+        while len(" " + self + " ") < amount:
+            self = " " + self + " "
         if len(self) < amount:
             self += " "
-        return self
-    def __truediv__(self, length: int):
-        "str / length  ||  str[:length] if len(str) > length else str"
-        if len(self) > length:
-            return self[:length]
         return self
     def __delitem__(self, index: int):
         "del str[x]  ||  impossible"
@@ -150,14 +155,14 @@ class PrizmSet(set):
     def __init__(self, *args):
         self = set(args)
     def __rshift__(self, num: int):
-        return self[num:]+self[:num]
+        return self[num:] + self[:num]
     def __irshift__(self, num: int):
-        return self[num:]+self[:num]
+        return self >> num
     def __lshift__(self, num: int):
-        return self[:num]+self[num:]
+        return self[:num] + self[num:]
     def __ilshift__(self, num: int):
-        return self[:num]+self[num:]
-        
+        return self << num
+
 class PrizmBool(int):
     def __add__(self, other):
         return bool(self) or bool(other)

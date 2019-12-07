@@ -1,14 +1,16 @@
 from ..ClsUtil import from_ts
 from ..Member import User
 
+__all__ = ["InviteMetadata"]
+
 class InviteMetadata:
     """
     DESCRIPTION ---
         Represents invite metadata
-    
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-    
+
     FUNCTIONS ---
         meta = InviteMetadata(inviter, uses, max_uses, max_age, temp, made)
         - Created a new InviteMetadata object

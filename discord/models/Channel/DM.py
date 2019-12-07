@@ -5,14 +5,16 @@ from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
 
+__all__ = ["DM"]
+
 class DM:
     """
     DESCRIPTION ---
         Represents a dm channel
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """

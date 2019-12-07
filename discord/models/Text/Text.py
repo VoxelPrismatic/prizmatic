@@ -6,22 +6,24 @@ from ..Raw import Raw
 from ..Guild import Guild
 from ..Channel import AnyChannel
 
+__all__ = ["Text"]
+
 class Text:
     """
     DESCRIPTION ---
         Represents a message
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
-    def __init__(self, *, id, channel_id, guild_id = None, author, member = None, 
-                 content: str, timestamp, edited_timestamp = None, tts: bool, 
-                 mention_everyone: bool, mentions = [], pinned: bool, 
-                 mention_roles = [], mention_channels = [], attachments, embeds, 
-                 reactions = [], nonce, webhook_id = None, type: int, 
+    def __init__(self, *, id, channel_id, guild_id = None, author, member = None,
+                 content: str, timestamp, edited_timestamp = None, tts: bool,
+                 mention_everyone: bool, mentions = [], pinned: bool,
+                 mention_roles = [], mention_channels = [], attachments, embeds,
+                 reactions = [], nonce, webhook_id = None, type: int,
                  activity = None, application = None, message_reference = None,
                  flags: int = 0, bot):
         self.id = int(id)

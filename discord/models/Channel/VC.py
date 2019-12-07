@@ -7,14 +7,16 @@ from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
 from ..Perms import Overwrite
 
+__all__ = ["VC"]
+
 class VC:
     """
     DESCRIPTION ---
         Represents a voice channel
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
@@ -22,5 +24,5 @@ class VC:
                  type, user_limit, guild_id, bot_obj):
         self.id = id
         self.name = name
-        self.overrides = PrizmList([])
+        self.overrides = PrizmList()
         self.bot_obj = bot_obj

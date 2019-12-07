@@ -1,15 +1,20 @@
 from ..Embed import Embed
 from typing import Union
 from ..File import File, Files
+from ..Text import Text
+from ..Perms import Overwrites
+from ..ClsUtil import from_ts
+
+__all__ = ["Channel"]
 
 class Channel:
     """
     DESCRIPTION ---
         Represents a text channel
-        
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
@@ -19,8 +24,12 @@ class Channel:
         self.id = id
         self.latest_message_id = int(last_message_id)
         self.latest_pin_time = from_ts(last_pin_timestamp)
-        self.latest_message = Raw(Message, last_message_id, 
-                                  "/channels/{cID}/messages/{id}", cID = id)
+        self.latest_message = bot_obj.find(
+            "messages",
+            last_message_id,
+            "/channels/{cID}/messages/{id}",
+            cID = id
+        )
         self.name = name
         self.overwrites = Overwrites(**permission_overwrites)
         self.pos = position
@@ -33,11 +42,15 @@ class Channel:
         self.bot_obj = bot_obj
 
     def __str__(self):
-        return "#"+self.name
-    def __trunc__(self):
+        return "#" + self.name
+
+    @property
+    def ping(self):
         return f"<#{self.id}>"
+
     def __repr__(self):
         return f"<#Channel '{self.name}'>"
+
     async def edit(self, **kw):
         dic = {}
         if "name" in kw:
@@ -58,8 +71,10 @@ class Channel:
         if "catagory" in kw:
             dic["parent_id"] = str(kw["catagory"].id)
         await self.refresh()
+
     async def refresh(self):
-        d = await self.bot_obj.http.req(m = "/", u = f"/channels/{self.id}", d = dic)
+        d = await self.bot_obj.http.req(m = "=", u = f"/channels/{self.id}")
         self.__init__(**d)
+
     async def send(self, text, *, tts = False, embed: Embed = {}, file: Union[File, Files]):
         d = await self.bot_obj.http.req(m = "+", u = "what")

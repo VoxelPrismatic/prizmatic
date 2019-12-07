@@ -1,17 +1,19 @@
 from ..Guild import Guild
 
+__all__ = ["OfflineGuild"]
+
 class OfflineGuild(Guild):
     """
     DESCRIPTION ---
         Represents a guild, thats offline
-    
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         semiguild = OfflineGuild(id, unavailable)
         - Creates a new OfflineGuild object
-        
+
         await semiguild.refresh()
         - Returns the guild object
         - The regular guild class has this too, but this is needed

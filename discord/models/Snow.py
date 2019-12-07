@@ -3,23 +3,25 @@ from .Error import SnowDecodeError
 import datetime
 import time
 
+__all__ = ["Snow"]
+
 class Snow:
     """
     DESCRIPTION ---
         Represents a snowflake... wonderfully named btw
         000000000000000000000000000000000000000000 00000 00000 000000000000
         ----------------TIME STAMP---------------- -wID- -PID- --INCREMENT--
-        
+
     PARAMS ---
         snowflake [int, str]
         - Represents a Discord snowflake
         - Can be encoded in hex, binary, or an int all as strings
         - Can also be a raw int
-        
+
     FUNCTIONS ---
         snow = Snow(snowflake)
         - Creates a Snow object
-        
+
         str(snow)
         - Prepares the snowflake to send
     """
@@ -44,7 +46,9 @@ class Snow:
         self.id = snowflake
         self.raw = f"{self.id:b}".zfill(64)
         self.hex = f"{self.id:h}".upper().zfill(16)
-        self.dt = datetime.datetime.fromisoformat(time.gmtime(self.timestamp).strftime("%Y-%m-%dT%H:%M:%S%z"))
-    
+        self.dt = datetime.datetime.fromisoformat(
+            time.gmtime(self.timestamp).strftime("%Y-%m-%dT%H:%M:%S%z")
+        )
+
     def __str__(self):
         return str(self.id)

@@ -1,18 +1,21 @@
 from .. import Url
 from ..Raw import RawFile
 from ..PrizmCls import PrizmList
+from ..Error import InputError
 from base64 import b64encode as b64e
 import io
 import re
+
+__all__ = ["User"]
 
 class User:
     """
     DESCRIPTION ---
         Represents a non-guild player
-    
+
     PARAMS ---
         This class shouldn't be initalized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None yet
     """
@@ -51,14 +54,14 @@ class User:
             self.flags << "Early Supporter"
         if bin_flags[10] == "1":
             self.flags << "Team User"
-        
+
         self.nitro = ""
         if premium_type == 1:
             self.nitro = "Nitro Classic"
         elif premium_type == 2:
             self.nitro = "Nitro"
-            
-            
+
+
     async def edit(self, name = None, pfp = None):
         if type(pfp) == str:
             if re.search(r"^https?\://.*\.(png|jpeg|jpg|gif)$", pfp):
@@ -67,11 +70,20 @@ class User:
                 try:
                     pfp = open(pfp, "rb")
                 except FileNotFoundError:
-                    raise TypeError("The PFP param must lead to a bytes like object, either through URL, file, or raw")
+                    raise InputError(
+                        pfp, ["URL", RawFile, bytes, io.BytesIO, "name of file"]
+                    )
         elif type(pfp) == RawFile:
             pfp = pfp.get()
         elif type(pfp) not in [bytes, io.BytesIO]:
-            raise TypeError("The PFP param must lead to a bytes like object, either through URL, file, or raw")
-        user = await self.bot_obj._http(m = "/", d = {"username": name, "avatar": b64e(bytes(pfp))})
+            raise InputError(
+                pfp, ["URL", RawFile, bytes, io.BytesIO, "name of file"]
+            )
+        user = await self.bot_obj._http(
+            m = "/",
+            d = {
+                "username": name,
+                "avatar": b64e(bytes(pfp))
+            }
+        )
         self.__init__(user)
-        

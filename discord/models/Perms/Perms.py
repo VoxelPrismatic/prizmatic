@@ -1,6 +1,8 @@
 from ..PrizmCls import PrizmList, PrizmDict
 global permissions
 
+__all__ = ["permissions", "decode_perms", "encode_perms", "Perms"]
+
 permissions = {
     "MANAGE_EMOJIS":         0x40000000,
     "MANAGE_WEBHOOKS":       0x20000000,
@@ -54,38 +56,38 @@ class Perms:
     """
     DESCRIPTION ---
         Represents the permissions of a member, user, or overwrite
-    
+
     PARAMS ---
         allow [int]
         - The allowed things, as an int
-        
+
         deny [int]
         - The denied things, as an int
-        
+
         none [int]
         - The inherited things, as an int
-        
+
         *Use the encode method to create an int from a list of perms
-        
+
     FUNCTIONS ---
         perms = Perms(allow, deny, none)
         - Creates a Perms object
-        
+
         dict(perms)
         - Creates a dict object and returns it
-        
+
         perms.update(other_dict)
         - Updates `perms' with the values of other_dict
-        
+
         perms.update_int(?allow, ?deny, ?none)
         - Updates `perms' with the specified ints
-        
+
         perms.is_empty()
         - Returns `True' if the perms do absolutely nothing
-        
+
         perms[perm]
         - Returns the value of that perm
-        
+
         perms[perm] = val
         - Updates perm to be True [allow], False [deny], or None [none]
     """
@@ -148,18 +150,14 @@ class Perms:
         self.allow = decode_perms(allow)
 
     def is_empty(self):
-        if all(i == None for i in self.none) \
-           and all(i == None for i in self.deny) \
-           and all(i == None for i in self.allow):
-               return True
-        return False
-    
+        return all(all(i == None for i in ls) for ls in [self.none, self.deny, self.allow])
+
     def __getitem__(self, key):
         return dict(self)[key.upper().replace(" ", "_")]
-        
+
     def __setitem__(self, key, val):
         self.set({key: val})
-    
+
     def decode(num: int):
         return decode_perms(num)
 

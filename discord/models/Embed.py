@@ -1,13 +1,15 @@
 import re
 import datetime
 from .Color import Color
-from .PrizmCls import *
+from .PrizmCls import PrizmList, PrizmDict
+
+__all__ = ["https", "typed", "Embed"]
 
 def https(thing):
     if re.search(r"^(https?|attachment)\:\/\/", thing):
         return thing
     return ""
-    
+
 def typed(thing):
     ls = []
     for th in thing:
@@ -18,158 +20,158 @@ class Embed:
     """
     DESCRIPTION ---
         Represents a Discord Embed
-    
+
     PARAMS ---
         title [str]
         - The Embed Title, 256 chars max*
-        
-        type [str] 
+
+        type [str]
         - Type of embed, "rich" by default
-        
-        desc [str] 
+
+        desc [str]
         - The Embed Description, 2048 chars max*
         - An alias resides under 'description', but this takes priority
-        
-        fields [list] 
+
+        fields [list]
         - The fields, in [name: str, value: str, inline: bool] format
         - - name is 256 chars max*
         - - value is 1024 chars max*
         - - inline is False by default
         - Any more than 25 fields will be discarded
         - Any invalid fields will silently be discarded
-        
-        foot [str] 
+
+        foot [str]
         - The footer, 2048 chars max*
         - An alias resides under 'footer', but this takes priority
-        
+
         foot_icon [str]
         - The http[s] url of the footer icon**
         - An alias resides under 'footer_icon', but this takes priority
-        
+
         foot_proxy_icon [str]
         - The proxied url of the footer icon
         - An alias resides under 'footer_proxy_icon', but this takes priority
-        
-        url [str] 
+
+        url [str]
         - The url of the embed, http[s] only**
-        
+
         time [datetime.datetime, str]
         - The Datetime object of the time you wish to put
         - Placing "now" will give you the current time in UTC
         - Placing a VALID ISO8601 timestamp will also work
-        
+
         color [Color, int, str, tuple]
         - The color of the embed
         - - if str, must be in hex eg #004466, in that format
         - - if tuple, then it must be 3 ints with max value 255, RGB
         - - if int, then no problem
         - - if Color, then it must be a Color object from this library
-        
+
         image [str]
         - The http[s] url of the image**
-        
+
         image_proxy [str]
         - The proxied url of the image
-        
+
         image_height [int]
         - How tall the image should be
-        
+
         image_width [int]
         - How wide the image should be
-        
+
         thumb [str]
         - The http[s] url of the thumbnail**
         - An alias resides under 'thumbnail', but this takes priority
-        
+
         thumb_proxy [str]
         - The proxied url of the thumbnail
         - An alias resides under 'thumbnail_proxy', but this takes priority
-        
+
         thumb_height [int]
         - How tall the thumbnail should be
         - An alias resides under 'thumbnail_height', but this takes priority
-        
+
         thumb_width [int]
         - How wide the thumbnail should be
         - An alias resides under 'thumbnail_width', but this takes priority
-        
+
         video [str]
         - The http[s] url of the video**
-        
+
         video_height [int]
         - How tall the video should be
-        
+
         video_width [int]
         - How wide the video should be
-        
+
         provider [str]
         - Name of the provider
-        
+
         provider_url [str]
         - The url of the provider
-        
+
         author [str]
         - Name of the author, 256 chars max*
-        
+
         author_url [str]
         - The url of the author
-        
+
         author_icon [str]
         - The http[s] url of the author's pfp
-        
+
         author_proxy_icon [str]
         - The proxied url of the author's pfp
-        
+
         *All text will automatically be stripped to meet
          length requirements
-         
+
         **All non http[s] or urls [not including proxied ones]
-          will be silently discarded, but Discord does allow the 
+          will be silently discarded, but Discord does allow the
           `attachment://<file_name>.<type>` scheme, and is supported
           here too.
-          
+
     FUNCTIONS ---
         dict(Embed) -> dict
         - Returns the Discord readable version
-        
+
         thing = Embed(**kwargs_from_above) -> Embed
         - Creates a new Embed object
-        
+
         repr(Embed) -> str
         - The repr thing
-        
+
         Embed.set(**kwargs_from_above)
         - Just like creating a new Embed object, but with the
           old params too
-          
+
         Embed.add_field(field)
         - Adds a field
-        
+
         Embed.add_fields(fields)
         - Adds many fields
-        
+
         Embed.remove_field(index)
         - Removes field number index
-        
+
         Embed.remove_fields(indexes)
         - Removes fields at the corresponding indexes
-        
+
         Embed.set_field(index, field)
         - Sets field number index to field
-        
+
         Embed.fromdict(dict_object)
         - Sets fields and things from the output template of `dict(embed)`
-        
+
         Embed[param] -> Parameter
         - An alias for Embed.param if you want that
-        
+
         Embed[param] = value
-        - Shortcut for Embed.set(param = value), 
+        - Shortcut for Embed.set(param = value),
     """
-    
+
     def __repr__(self):
         return f"<Embed object - '{self.title or '[no title]'}'>"
-        
+
     def __aliases(self):
         self.thumbnail = self.thumb
         self.thumbnail_proxy = self.thumb_proxy
@@ -179,7 +181,7 @@ class Embed:
         self.footer_icon = self.foot_icon
         self.footer_proxy_icon = self.foot_proxy_icon
         self.description = self.desc
-    
+
     def __init__(self, *, title = "", type = "rich", desc = "", description = "",
                  fields = [], foot = "", footer = "", foot_icon = "", timestamp = None,
                  footer_icon = "", foot_proxy_icon = "", footer_proxy_icon = "",
@@ -233,16 +235,18 @@ class Embed:
             if typed(field) == [str, str, bool]:
                 self.fields << field
             elif typed(field) == [str, str, int]:
-                self.fields << field[:-1]+[bool(field[-1])]
+                self.fields << field[:-1] + [bool(field[-1])]
             elif typed(field) == [str, str]:
                 self.fields << field + [False]
             else:
                 pass
                 #Invalid fields will silently be discarded
         self.__aliases()
-        
+
     def __dict__(self):
-        "Creates a JSON Embed object according to the Discord API"
+        """
+        Creates a JSON Embed object according to the Discord API
+        """
         emb = {"type": self.type}
         if self.title:
             emb["title"] = self.title
@@ -308,9 +312,13 @@ class Embed:
         if self.fields:
             emb["fields"] = []
             for field in self.fields:
-                emb["fields"].append({"name": field[0], "value": field[1], "inline": field[2]})
+                emb["fields"].append({
+                    "name": field[0],
+                    "value": field[1],
+                    "inline": field[2]
+                })
         return emb
-        
+
     def set(self, *, title = "", type = "rich", desc = "", description = "",
             fields = [], foot = "", footer = "", foot_icon = "",
             footer_icon = "", foot_proxy_icon = "", footer_proxy_icon = "",
@@ -326,7 +334,8 @@ class Embed:
         self.desc = str(desc or description)[:2049] or self.desc
         self.foot = str(foot or footer)[:2049] or self.foot
         self.foot_icon = https(str(foot_icon or footer_icon)) or self.foot_icon
-        self.foot_proxy_icon = str(foot_proxy_icon or footer_proxy_icon) or self.foot_proxy_icon
+        self.foot_proxy_icon =\
+            str(foot_proxy_icon or footer_proxy_icon) or self.foot_proxy_icon
         self.url = https(str(url)) or self.url
         if type(time) == datetime.datetime:
             self.time = time
@@ -361,14 +370,14 @@ class Embed:
             if typed(field) == [str, str, bool]:
                 self.fields << field
             elif typed(field) == [str, str, int]:
-                self.fields << field[:-1]+[bool(field[-1])]
+                self.fields << field[:-1] + [bool(field[-1])]
             elif typed(field) == [str, str]:
                 self.fields << field + [False]
             else:
                 pass
                 #Invalid fields will silently be discarded
         self.__aliases()
-    
+
     def add_fields(self, fields):
         for field in fields:
             if len(self.fields) >= 25:
@@ -376,38 +385,38 @@ class Embed:
             if typed(field) == [str, str, bool]:
                 self.fields << field
             elif typed(field) == [str, str, int]:
-                self.fields << field[:-1]+[bool(field[-1])]
+                self.fields << field[:-1] + [bool(field[-1])]
             elif typed(field) == [str, str]:
                 self.fields << field + [False]
             #Invalid fields will silently be discarded
-    
+
     def remove_field(self, index: int):
-        del self.fields[index-1] #Humans don't count from 0
-    
+        del self.fields[index - 1] #Humans don't count from 0
+
     def edit_field(self, index: int, field):
         if typed(field) == [str, str, bool]:
-            self.fields[index-1] = field
+            self.fields[index - 1] = field
         elif typed(field) == [str, str, int]:
-            self.fields[index-1] = field[:-1]+[bool(field[-1])]
+            self.fields[index - 1] = field[:-1] + [bool(field[-1])]
         elif typed(field) == [str, str]:
-            self.fields[index-1] = field + [False]
+            self.fields[index - 1] = field + [False]
         #Invalid fields will silently be discarded
-    
+
     def add_field(self, index: int, field):
         if len(self.fields) > 25:
             return
         if typed(field) == [str, str, bool]:
             self.fields << field
         elif typed(field) == [str, str, int]:
-            self.fields << field[:-1]+[bool(field[-1])]
+            self.fields << field[:-1] + [bool(field[-1])]
         elif typed(field) == [str, str]:
             self.fields << field + [False]
         #Invalid fields will silently be discarded
-            
+
     def remove_fields(self, indexes):
         for index in indexes:
-            del self.fields[int(index)-1]
-    
+            del self.fields[int(index) - 1]
+
     def fromdict(self, emb):
         "Converts a dict to an Embed object"
         if "footer" in emb:
@@ -421,7 +430,7 @@ class Embed:
         if "image" in emb:
             emb["img"] = emb["image"]
             if "url" in emb["img"]:
-                 emd["image"] = emb["img"]["url"]
+                emb["image"] = emb["img"]["url"]
             if "proxy_url" in emb["img"]:
                 emb["image_proxy"] = emb["img"]["proxy_url"]
             if "width" in emb["img"]:
@@ -445,13 +454,13 @@ class Embed:
                 emb["video"] = emb["vid"]["url"]
             if "height" in emb["vid"]:
                 emb["video_height"] = emb["vid"]["height"]
-            if width in emb["vid"]:
+            if "width" in emb["vid"]:
                 emb["video_width"] = emb["video"]["width"]
             del emb["vid"]
         if "provider" in emb:
             if "url" in emb["provider"]:
                 emb["provider_url"] = emb["provider"]["name"]
-            if "name" in emd["provider"]:
+            if "name" in emb["provider"]:
                 emb["provider"] = emb["provider"]["name"]
         if "author" in emb:
             emb["auth"] = emb["author"]
@@ -466,9 +475,9 @@ class Embed:
         if self.fields:
             emb["fields"] = [(d["name"], d["value"], d["inline"]) for d in emb["fields"]]
         self.set(**emb) #Provides checks too :D
-            
+
     def __getitem__(self, key):
         return self.__getattribute__(key)
-    
+
     def __setitem__(self, key, val):
         self.set(**{key: val})

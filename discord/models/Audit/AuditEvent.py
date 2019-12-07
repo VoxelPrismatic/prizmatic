@@ -1,24 +1,26 @@
 from .AuditChange import AuditChange
 
+__all__ = ["AuditEvent"]
+
 class AuditEvent:
     """
     DESCRIPTION ---
         Represents an audit log event
-    
+
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-        
+
     FUNCTIONS ---
         None
     """
-    def __init__(self, target_id, changes = [], user_id = 0, id = 0, 
+    def __init__(self, target_id, changes = [], user_id = 0, id = 0,
                  action_type = 0, options = {}, reason = ""):
         self.target_id = int(target_id)
         self.event_id = int(id)
         self.changes = [AuditChange(**d) for d in changes]
         self.user_id = int(user_id)
         actions = {
-             1: "guild_edit",
+            1: "guild_edit",
             10: "channel_make",
             11: "channel_edit",
             12: "channel_delete",
@@ -48,4 +50,3 @@ class AuditEvent:
         self.action = actions[action_type]
         self.other_info = options
         self.reason = reason
-        

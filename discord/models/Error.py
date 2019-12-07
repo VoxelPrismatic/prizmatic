@@ -1,5 +1,15 @@
 from pprint import pformat as fmt
 
+__all__ = [
+    "typed",
+    "Error",
+    "ClassError",
+    "LoginError",
+    "URLError",
+    "SnowDecodeError",
+    "InputError"
+]
+
 def typed(thing):
     if type(thing) == type:
         return str(thing).split("'")[1]
@@ -16,7 +26,7 @@ class Error(Exception):
         self.other_info = args
         self.specific_info = kwargs
         self.typ = typ.strip() + " "
-        
+
     def __str__(self):
         return f"""\
 {self.typ:-<20}-----
@@ -69,4 +79,12 @@ class LoginError(Error):
             attempts = "Stripped space characters from token",
             reponse = j,
             status_code = code
+        )
+
+class InputError(Error):
+    def __init__(self, obj, reqd):
+        super.__init__(
+            name = "Bad argument or input",
+            given = obj,
+            allowed = reqd
         )
