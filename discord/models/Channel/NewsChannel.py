@@ -30,7 +30,7 @@ class NewsChannel:
         self.slowmode = rate_limit_per_user
         self.topic = topic
         self.guild_id = guild_id
-        self.guild = Raw(Guild, guild_id, "/guilds/{id}")
+        self.guild = bot_obj.listener.guilds(guild_id)
         self.catagory_id = parent_id
         self.bot_obj = bot_obj
 
