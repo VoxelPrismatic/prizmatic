@@ -17,10 +17,11 @@ def typed(thing):
 
 class Error(Exception):
     """
-    Base class for all exceptions
+    DESCRIPTION ---
+        Base class for all exceptions, shows attempts taken, args, and kwargs
     """
-    def __init__(self, name = "UnknownError", attempts = "None", typ = "PrizmaticError",
-                 *args, **kwargs):
+    def __init__(self, name = "UnknownError", attempts = "None",
+                 typ = "PrizmaticError", *args, **kwargs):
         self.name = name.strip()
         self.attempts = attempts.strip()
         self.other_info = args
@@ -29,20 +30,24 @@ class Error(Exception):
 
     def __str__(self):
         return f"""\
-{self.typ:-<20}-----
+{self.typ} ---
 {self.name}
 
-ATTEMPTS TAKEN ----------
+ATTEMPTS TAKEN ---
 {self.attempts}
 
-OTHER INFO --------------
+OTHER INFO ---
 {fmt(self.other_info)}
 
-SPECIFIC INFO -----------
+SPECIFIC INFO ---
 {fmt(self.specific_info)}
 """
 
 class ClassError(Error):
+    """
+    DESCRIPTION ---
+        A much more specific TypeError
+    """
     def __init__(self, clsA, clsB, ls):
         tmp = "', '".join(typed(t) for t in ls)
         super.__init__(
@@ -55,6 +60,10 @@ class ClassError(Error):
         )
 
 class URLError(Error):
+    """
+    DESCRIPTION ---
+        Warns about a bad URL
+    """
     def __init__(self, url):
         super.__init__(
             name = "Bad url given",
@@ -63,6 +72,10 @@ class URLError(Error):
         )
 
 class SnowDecodeError(Error):
+    """
+    DESCRIPTION ---
+        Warns about a malformed snowflake
+    """
     def __init__(self, snowflake):
         super.__init__(
             name = "Bad snowflake given",
@@ -72,6 +85,10 @@ class SnowDecodeError(Error):
         )
 
 class LoginError(Error):
+    """
+    DESCRIPTION ---
+        Is thrown upon login failure
+    """
     def __init__(self, code, j):
         super.__init__(
             name = "Bad login info given",
@@ -82,9 +99,26 @@ class LoginError(Error):
         )
 
 class InputError(Error):
+    """
+    DESCRIPTION ---
+        Is thrown when a command gets bad input
+    """
     def __init__(self, obj, reqd):
         super.__init__(
             name = "Bad argument or input",
             given = obj,
             allowed = reqd
+        )
+
+class ForbiddenError(Error):
+    """
+    DESCRIPTION ---
+        Is thrown upon a 403 response
+    """
+    def __init__(self, code, j):
+        super.__init__(
+            name = "Client is forbidden to do an action",
+            typ = "ForbiddenError",
+            response = j,
+            status_code = code
         )

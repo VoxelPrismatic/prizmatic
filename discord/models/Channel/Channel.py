@@ -3,6 +3,7 @@ from typing import Union
 from ..File import File, Files
 from ..Perms import Overwrites
 from ..ClsUtil import from_ts
+from .. import Error
 
 __all__ = ["Channel"]
 
@@ -13,9 +14,6 @@ class Channel:
 
     PARAMS ---
         This class shouldn't be initialized by hand. Don't do that.
-
-    FUNCTIONS ---
-        None yet
     """
     def __init__(self, *, id, guild_id, name, type, position,
                  permission_overwrites, rate_limit_per_user, nsfw, topic,
@@ -50,30 +48,107 @@ class Channel:
     def __repr__(self):
         return f"<#Channel '{self.name}'>"
 
-    async def edit(self, **kw):
-        dic = {}
-        if "name" in kw:
-            dic["name"] = str(kw["name"])
-        if "pos" in kw:
-            dic["position"] = int(kw["pos"])
-        if "topic" in kw:
-            dic["topic"] = str(kw["topic"])
-        if "nsfw" in kw:
-            if str(kw["nsfw"]).lower() in ["true", "y", "1", "yes", "ye", "t"]:
-                dic["nsfw"] = True
+    async def edit(self, *, name = None, pos = None, position = None,
+                   nsfw = None, topic = None, slowmode = None, catagory = None,
+                   overwrites = None, reason = None):
+        """
+        DESCRIPTION ---
+            Edits the object on Discord's end
+
+        PARAMS ---
+            NOTE: All of these params are optional
+
+            name [str]
+            - Name of the channel
+
+            pos [int]
+            - Where it is located on the channel listing
+            - This param has an alias under 'position', but this takes priority
+
+            slowmode [int]
+            - How many seconds of slowmode
+
+            nsfw [bool]
+            - Is this channel NSFW
+
+            topic [str]
+            - Channel topic
+
+            catagory [Catagory]
+            - The catagory of this channel
+
+            overwrites [Overwrites]
+            - The overwrites object representing the channel's overwrites
+
+            reason [str]
+            - Reason for this action
+        """
+        data = {}
+        if name is not None:
+            data["name"] = str(name)
+        if pos is not None or position is not None:
+            data["position"] = int(pos or position)
+        if topic is not None:
+            data["topic"] = str(topic)
+        if nsfw is not None:
+            if str(topic).lower() in ["true", "y", "1", "yes", "ye", "t"]:
+                data["nsfw"] = True
             else:
-                dic["nsfw"] = False
-        if "slowmode" in kw:
-            dic["rate_limit_per_user"] = int(kw["slowmode"])
-        if "overwrites" in kw:
-            dic["permission_overwrites"] = dict(Overwrites)
-        if "catagory" in kw:
-            dic["parent_id"] = str(kw["catagory"].id)
-        await self.refresh()
+                data["nsfw"] = False
+        if slowmode is not None:
+            data["rate_limit_per_user"] = int(slowmode)
+        if overwrites is not None:
+            data["permission_overwrites"] = dict(overwrites)
+        if catagory is not None:
+            data["parent_id"] = str(catagory.id)
+        if data == {}:
+            return #Sending empty data is useless
+        obj = await self.bot_obj.http.req(
+            m = "/",
+            u = f"/channels/{self.id}",
+            d = data,
+            r = reason
+        )
+        self.__init__(**obj, bot_obj = self.bot_obj)
 
     async def refresh(self):
-        d = await self.bot_obj.http.req(m = "=", u = f"/channels/{self.id}")
-        self.__init__(**d)
+        """
+        DESCRIPTION ---
+            Refreshes this object if you think it is out of date
 
-    async def send(self, text, *, tts = False, embed: Embed = {}, file: Union[File, Files]):
-        d = await self.bot_obj.http.req(m = "+", u = "what")
+        RETURNS ---
+            The updated channel
+        """
+        obj = await self.bot_obj.http.req(m = "=", u = f"/channels/{self.id}")
+        self.__init__(**obj, bot_obj = self.bot_obj)
+        return self
+
+    async def send(self, text, *, tts = False, embed: Embed = {}, files = None):
+        """
+        DESCRIPTION ---
+            Sends a message
+
+        PARAMS ---
+            text [str]
+            - The message content
+
+            NOTE: All of the following params are optional
+
+            tts [bool]
+            - Enable TTS, False by default
+
+            embed [Embed]
+            - The embed object
+
+            files [File, Files]
+            - Not implemented yet, don't use it
+        """
+        data = {"content": text, "tts": tts, "embed": embed}
+        if files is not None:
+            raise NotImplementedError("Files haven't been added yet")
+        obj = await self.bot_obj.http.req(
+            m = "+",
+            u = f"/channels/{self.id}/messages",
+            d = data
+        )
+        return self.bot_obj.raw("messages", **obj, bot_obj = self.bot_obj)

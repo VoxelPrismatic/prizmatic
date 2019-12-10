@@ -256,6 +256,8 @@ class Listener:
                 obj = objs[c](*a, **kw, **raw)
                 self.__getattribute__(c)[int(raw["id"])] = obj
                 ls.append(obj)
+        if len(ls) == 1:
+            return ls[0]
         return ls
 
     def raw_edit(self, c, o, *a, **kw):

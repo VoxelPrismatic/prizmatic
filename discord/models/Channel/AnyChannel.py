@@ -9,6 +9,17 @@ from .GroupDM import GroupDM
 __all__ = ["AnyChannel"]
 
 def AnyChannel(**kw):
+    """
+    DESCRIPTION ---
+        Creates a channel given its JSON object version.
+
+    PARAMS ---
+        **kw
+        - The JSON data that allows the object to be built
+
+    RETURNS ---
+        The respective channel object
+    """
     if "bot_obj" not in kw:
         raise TypeError("Could not find bot object as 'bot_obj' in kw")
     bot = kw["bot_obj"]
