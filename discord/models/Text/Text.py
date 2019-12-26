@@ -9,20 +9,35 @@ __all__ = ["Text"]
 
 class Text:
     """
-    DESCRIPTION ---
-        Represents a message
+    {{cls}} instance = Text(*, too_many_args_to_list_here)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
+    {{desc}} Represents a message
 
-    FUNCTIONS ---
-        None yet
+    {{note}} This class shouldn't be initialized by hand. Don't do that.
+
+    {{param}} id [str, discord.Snow]
+        ID of the message
+
+    {{param}} channel_id [str, disxord.Snow]
+        The Channel ID
+
+    {{param}} guild_id [str, discord.Snow, NoneType]
+        The Guild ID, or None if it is in DMs
+
+    {{param}} content [str]
+        The content of the message
+
+    {{param}} member [discord.Player, discord.User]
+        The player or user that sent the message. If a user, then the user
+        either left the guild or sent the message in DMs.
+
+    {{param}} timestamp [str]
     """
-    def __init__(self, *, id, channel_id, guild_id = None, author, member = None,
+    def __init__(self, *, id, channel_id, author, member = None,
                  content: str, timestamp, edited_timestamp = None, tts: bool,
-                 mention_everyone: bool, mentions = [], pinned: bool,
-                 mention_roles = [], mention_channels = [], attachments, embeds,
-                 reactions = [], nonce, webhook_id = None, type: int,
+                 mention_everyone: bool, pinned: bool, type: int, mentions = [],
+                 guild_id = None, mention_roles = [], mention_channels = [],
+                 attachments, embeds, reactions = [], nonce, webhook_id = None,
                  activity = None, application = None, message_reference = None,
                  flags: int = 0, bot_obj = None):
         self.id = int(id)

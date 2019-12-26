@@ -17,11 +17,28 @@ def typed(thing):
 
 class Error(Exception):
     """
-    DESCRIPTION ---
-        Base class for all exceptions, shows attempts taken, args, and kwargs
+    {{cls}} error = Error(name, attempts, typ, *args, **kwargs)
+
+    {{desc}} Represents the base error class
+
+    {{param}} name [Any]
+        Name of the error, `TypeError: Type 'thing' cannot be converted into
+        type 'thing'`
+
+    {{param}} attempts [Any]
+        Attempted fixes or ways to prevent the error
+
+    {{param}} typ [Any]
+        The type of error eg TypeError or PrizmaticError
+
+    {{param}} *args [args]
+        A list of other info
+
+    {{param}} **kwargs [kwargs]
+        A dict of slightly more specific info
     """
-    def __init__(self, name = "UnknownError", attempts = "None",
-                 typ = "PrizmaticError", *args, **kwargs):
+    def __init__(self, name = "UnknownError", attempts = "None", typ = "PrizmaticError",
+                 *args, **kwargs):
         self.name = name.strip()
         self.attempts = attempts.strip()
         self.other_info = args
@@ -33,7 +50,7 @@ class Error(Exception):
 {self.typ} ---
 {self.name}
 
-ATTEMPTS TAKEN ---
+ATTEMPTED FIXES ---
 {self.attempts}
 
 OTHER INFO ---
@@ -44,10 +61,6 @@ SPECIFIC INFO ---
 """
 
 class ClassError(Error):
-    """
-    DESCRIPTION ---
-        A much more specific TypeError
-    """
     def __init__(self, clsA, clsB, ls):
         tmp = "', '".join(typed(t) for t in ls)
         super.__init__(
@@ -60,10 +73,6 @@ class ClassError(Error):
         )
 
 class URLError(Error):
-    """
-    DESCRIPTION ---
-        Warns about a bad URL
-    """
     def __init__(self, url):
         super.__init__(
             name = "Bad url given",
@@ -72,10 +81,6 @@ class URLError(Error):
         )
 
 class SnowDecodeError(Error):
-    """
-    DESCRIPTION ---
-        Warns about a malformed snowflake
-    """
     def __init__(self, snowflake):
         super.__init__(
             name = "Bad snowflake given",
@@ -85,10 +90,6 @@ class SnowDecodeError(Error):
         )
 
 class LoginError(Error):
-    """
-    DESCRIPTION ---
-        Is thrown upon login failure
-    """
     def __init__(self, code, j):
         super.__init__(
             name = "Bad login info given",
@@ -99,26 +100,19 @@ class LoginError(Error):
         )
 
 class InputError(Error):
-    """
-    DESCRIPTION ---
-        Is thrown when a command gets bad input
-    """
     def __init__(self, obj, reqd):
         super.__init__(
             name = "Bad argument or input",
+            typ = "InputError",
             given = obj,
             allowed = reqd
         )
 
-class ForbiddenError(Error):
-    """
-    DESCRIPTION ---
-        Is thrown upon a 403 response
-    """
-    def __init__(self, code, j):
+class ObjNotFoundError(Error):
+    def __init__(attempts, looking_for):
         super.__init__(
-            name = "Client is forbidden to do an action",
-            typ = "ForbiddenError",
-            response = j,
-            status_code = code
+            name = "Object not found",
+            typ = "ObjNotFoundError",
+            attempts = attempts,
+            looking_for = looking_for
         )

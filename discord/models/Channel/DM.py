@@ -9,14 +9,16 @@ __all__ = ["DM"]
 
 class DM:
     """
-    DESCRIPTION ---
-        Represents a dm channel
+    {{cls}} instance = DM(*, last_message_id, type, id, recipients, bot_obj)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
+    {{desc}} Represents a dm channel
 
-    FUNCTIONS ---
-        None yet
+    {{note}} This class shouldn't be initialized by hand. Don't do that.
+
+    {{param}} last_message_id
     """
-    def __init__(self, *, last_message_id, type, id, recipients):
-        pass
+    def __init__(self, *, last_message_id, type, id, recipients, bot_obj):
+        self.latest_message_id = int(last_message_id)
+        self.type = type
+        self.id = int(id)
+        #self.users =

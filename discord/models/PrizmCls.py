@@ -11,24 +11,77 @@ __all__ = [
 ]
 
 class PrizmList(list):
+    """
+    {{cls}} instance = PrizmList(*args)
+
+    {{desc}} A list, but with more useful stuff
+
+    {{note}} There are some differences when managing your lists when using this
+    class. Be sure to read the docs.
+
+    {{param}} *args [args]
+        Your list, can be left blank
+    """
     def __init__(self, *args):
         self = list(args)
     def __lshift__(self, item):
-        "list << item  ||  list.append(item)"
+        """
+        {{fn}} instance.__lshift__(item)
+
+        {{note}} This function is actually meant to be used as `instance << item`
+
+        {{desc}} Short for `instance.append(item)`
+
+        {{param}} item [Any]
+            The item to append to the list
+        """
         self.append(item)
     def __rshift__(self, item):
-        "list >> item  ||  list.remove(item)"
+        """
+        {{fn}} instance.__rshift__(item)
+
+        {{note}} This function is actually meant to be used as `instance >> item`
+
+        {{desc}} Short for `instance.remove(item)`
+
+        {{param}} item [Any]
+            The item to remove from the list
+        """
         self.remove(item)
     def __invert__(self):
-        "~list | list[::-1]"
+        """
+        {{fn}} instance.__invert__()
+
+        {{note}} This function is actually meant to be used as `~instance`
+
+        {{desc}} Reverses the list
+        """
         self = self[::-1]
     def __isub__(self, data):
-        "list -= data  ||  for item in data: list.remove(item)"
+        """
+        {{fn}} instance.__isub__(data)
+
+        {{note}} This function is actually meant to be used as `instance -= data`
+
+        {{desc}} Removes all items in data from the list
+
+        {{param}} data [List[Any]]
+            The list of things to remove
+        """
         for item in data:
             self >= item
         return self
     def __iadd__(self, data):
-        "list += data  ||  list.extend(data)"
+        """
+        {{fn}} instance.__iadd__(data)
+
+        {{note}} This function is actually meant to be used as `instance += data`
+
+        {{desc}} Short for `instance.extend(data)`
+
+        {{param}} data [List[Any]]
+            The list of things to add to the list
+        """
         self.extend(data)
         return self
     def __or__(self, seperator):
@@ -43,8 +96,17 @@ class PrizmList(list):
         return self.pop(index)
 
 class PrizmDict(dict):
-    def __init__(self, arg = {}, **kw):
-        self = kw or dict(arg)
+    """
+    {{desc}} Like a dict, but more useful
+
+    {{note}} There are some differences when managing your dicts when using this
+    class. Be sure to read the docs.
+
+    {{param}} **kw [kwargs]
+        Your dict data
+    """
+    def __init__(self, **kw):
+        self = kw
     def __lshift__(self, other_dict):
         "dict << other  ||  dict.update(other)"
         self.update(other_dict)

@@ -2,95 +2,131 @@ import json
 import asyncio
 import aiohttp
 import zlib
+import typing
 from .. import ver
 from pprint import pprint as prinf
 from . import Url
 from .PrizmCls import PrizmList, PrizmDict, PrizmInt
 from .Listener import Listener
 import re
+from .Http import Http
 
 __all__ = [
-    "new_cycle",
-    "get_client",
     "get_json",
     "Bot"
 ]
 
-def new_cycle():
-    cycle = asyncio.new_event_loop()
-    return cycle
-
-def get_client():
-    client = aiohttp.ClientSession()
-    return client
-
-def get_json(data):
-    try:
-        data = data.data
-    except AttributeError:
-        pass
-    try:
-        j = json.loads(data) #Raw JSON
-    except json.JSONDecodeError:
-        try:
-            j = json.loads(zlib.decompress(data)) #Compressed JSON
-        except json.JSONDecodeError:
-            j = None #Some other thing that cannot be decoded
-    return j
-
 class Bot:
     """
-    DESCRIPTION ---
-        Your Bot!
+    {{cls}} bot = Bot(prefix, custom_prefix, token, *, thresh, keepalive)
 
-    PARAMS ---
-        prefix [str]
-        - The bot prefix, default is ';]'
-        - This is the default prefix for everything
+    {{desc}} Your Bot!
 
-        custom_prefix [str, dict, function]
-        - Custom prefix, overwrites the prefix when available
-        - If str, then it just overwrites the prefix all the time
-        - If dict, then it must be in {server_id: prefix} format,
-          and will overwrite the prefix if the server id is in that
-          dict
-        - If function, then it will be called. If it raises an error,
-          then it will use the default prefix and raise the error
-          after invoking the command
+    {{param}} prefix [str]
+        The bot prefix, default is ";]". This is the fallback for when
+        custom_prefix fails.
 
-        token [str]
-        - Your token
+    {{param}} custom_prefix [dict, str, function]
+        This is the main prefix. If a dict, then the keys are the guild
+        ids, and the values are their prefixes. If a str, then the prefix
+        applies to all guilds. If a function, then it must return a prefix. The
+        parameters for the function will be an Info object.
+
+    {{param}} token [str]
+        This is the token from your Discord Application.
+
+    {{param}} thresh [int]
+        Timeout threshold. Don't change this if you aren't sure what it does.
+
+    {{param}} keepalive [bool]
+        Whether to reconnect to Discord upon a disconnect. Default is True
+
+    {{prop}} prefix [str]
+        Provided prefix
+
+    {{prop}} custom_prefix [dict, str, function]
+        Provided custom prefix
+
+    {{prop}} commands [dict]
+        Not really a dict, but basically the same.
+        Holds all command data
+
+    {{prop}} shards [dict]
+        Not really a dict, but bascially the same.
+        Holds the shards
+
+    {{prop}} token [str]
+        Provided token. Stripped content because you might want to read the
+        token from another file.
+
+    {{prop}} client [asyncio.ClientSession]
+        HTTP Client for interacting with Discord
+
+    {{prop}} thresh [int]
+        Provided threshold, default is 150
+
+    {{prop}} heartbeat [int]
+        Heartbeat interval in milliseconds
+
+    {{prop}} uri [str]
+        The gateway url
+
+    {{prop}} http_uri [str]
+        The HTTP API url
+
+    {{prop}} ack [int]
+        Number of messages recieved from the gateway
+
+    {{prop}} connected [bool]
+        Whether or not the client is connected
+
+    {{prop}} keepalive [bool]
+        Provided keepalive
+
+    {{prop}} __version__ [str]
+        Version of the module
+
+    {{prop}} listener [discord.Listener]
+        Listeners, for um idk listening to events
+
+    {{prop}} voices [dict]
+        Not really a dict, but basically the same.
+        Holds all VoiceClient objects and IDs
+
+    {{prop}} http [Class]
+        The HTTP client/interface
     """
-    def __init__(self, prefix = ";]", custom_prefix = ";]", token: str = None,
-                 thresh: int = 150):
+    def __init__(self, prefix: str = ";]", custom_prefix = ";]",
+                 token: str = None, *, thresh: int = 150,
+                 keepalive: bool = True):
         self.prefix = prefix
         self.custom_prefix = custom_prefix
         self.commands = PrizmDict()
         self.shards = PrizmDict()
         self.token = token.strip()
-        self.cycle = new_cycle()
-        self.heart_cycle = new_cycle()
-        self.client = get_client()
+        self.client = aiohttp.ClientSession()
         self.thresh = thresh
         self.heartbeat = None
         self.uri = Url.gateway
         self.http_uri = Url.api
+        self.http = Http(self.client, self)
         self.ack = 5
         self.connected = False
-        self.keepalive = None
+        self.keepalive = keepalive
         self.__version__ = ver.__ver__
         self.listener = Listener(self)
         self.voices = PrizmDict()
+        self.ws = None
 
     def run(self, token = None) -> None:
         """
-        DESCRIPTION ---
-            Starts the bot
+        {{fn}} instance.run(token)
 
-        PARAMS ---
-            ?token [str]
-            - The token
-            - Is set to the token provided in the intialized bot if not provided
+        {{desc}} Starts the bot
+
+        {{param}} token [str]
+            The token
+            {{norm}} The token provided upon initialization
         """
         token = token or self.token
         if token is None:
@@ -100,34 +136,44 @@ class Bot:
 
     async def send_beat(self) -> None:
         """
-        NOTE ---
-            This class is used internally, and is not meant to be used by hand
+        {{fn}} await instance.send_beat()
 
-        DESCRIPTION ---
-            Sends a heartbeat to discord
+        {{desc}} Sends a heartbeat to discord
 
-        PARAMS ---
-            None
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
         """
         while self.connected:
             print(".")
             await self.ws.send_json({"op": 1, "d": self.ack})
             await asyncio.sleep(self.heartbeat / 1000)
 
+    async def req(self, **kw):
+        """
+        {{fn}} await instance.req(**kw)
+
+        {{desc}} Short for instance.http.req(**kw)
+
+        {{param}} **kw [kwargs]
+            Kwargs for http.req()
+
+        {{rtn}} [Any] What ever was returned
+        """
+        return await self.http.req(**kw)
+
     async def _gate(self, **payload) -> dict:
         """
-        NOTE ---
-            This class is used internally, and is not meant to be used by hand
+        {{fn}} await instance._gate(**payload)
 
-        DESCRIPTION ---
-            Sends a payload to the Discord Websocket
+        {{desc}} Sends a payload to the Discord Websocket
 
-        PARAMS ---
-            **payload
-            - The payload
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
 
-        RETURNS ---
-            The response from the websocket
+        {{param}} **payload [kwargs]
+            The payload
+
+        {{rtn}} [dict] The response from the websocket
         """
         await self.ws.send_json(payload)
         m = await self.ws.receive()
@@ -136,111 +182,132 @@ class Bot:
     #Shortcuts and helpers for finding stuff
     async def make(self, cl, id, url):
         """
-        NOTE ---
-            This class is used internally, and is not meant to be used by hand
+        {{fn}} await instance.make(cl, id, url)
 
-        DESCRIPTION ---
-            Returns an object or creates it from a URL
+        {{desc}} Returns an object or creates it from a URL
 
-        PARAMS ---
-            cl [str]
-            - Name of the group
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
 
-            id [str, int]
-            - ID of the object
+        {{param}} cl [str]
+            Name of the group
 
-            url [str]
-            - Where to find the object
+        {{param}} id [str, int]
+            ID of the object
 
-        RETURNS ---
-            The object found or made
+        {{param}} url [str]
+            Where to find the object
+
+        {{rtn}} [any] The object found or made
         """
         return await self.listeners.find(cl, id, url)
+
     def raw(self, c, objs, *a, **kw):
         """
-        NOTE ---
-            This class is used internally, and is not meant to be used by hand
+        {{fn}} instance.raw(c, objs, *a, **kw)
 
-        DESCRIPTION ---
-            Returns an object or creates it from provided data
+        {{desc}} Returns an object or creates it from provided data
 
-        PARAMS ---
-            c [str]
-            - Name of the group
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
 
-            objs [dict, list(dict)]
-            - The JSON object
+        {{param}} c [str]
+            Name of the group
 
-            *a, **kw
-            - Global attributes if the object needs to be created
+        {{param}} objs [dict, list(dict)]
+            The JSON object
 
-        RETURNS ---
-            The object found or made
+        {{param}} *a, **kw [args, kwargs]
+            Global attributes if the object needs to be created
+
+        {{rtn}} [any] The object found or made
         """
         return self.listeners.raw_make(c, objs, *a, **kw)
+
     def raw_edit(self, c, obj, *a, **kw):
         """
-        NOTE ---
-            This class is used internally, and is not meant to be used by hand
+        {{fn}} instance.raw_edit(c, obj, *a, **kw)
 
-        DESCRIPTION ---
-            Edits an object with provided data
+        {{edit}} Edits an object with provided data
 
-        PARAMS ---
-            c [str]
-            - Name of the group
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
 
-            obj [str, int]
-            - The ID of the object
+        {{param}} c [str]
+            Name of the group
 
-            *a, **kw
-            - How to edit the object
+        {{param}} obj [str, int]
+            The ID of the object
 
-        RETURNS ---
-            The object found or made
+        {{param}} *a, **kw [args, kwargs]
+            How to edit the object
+
+        {{rtn}} [any] The object found or made
         """
         return self.listeners.raw_edit(c, obj, *a, **kw)
+
     async def await_make(self, c, raw_obj, **kw):
         """
-        NOTE ---
-            This class is used internally, and is not meant to be used by hand
+        {{fn}} await instance.await_make(c, raw_obj, **kw)
 
-        DESCRIPTION ---
-            Similar to raw(), but is awaitable and
+        {{desc}} Similar to raw(), but is awaitable and uses Raw instead
 
-        PARAMS ---
-            c [str]
-            - Name of the group
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
 
-            raw_obj [Raw]
-            - The Raw object
+        {{param}} c [str]
+            Name of the group
 
-            **kw
-            - Global attributes if the object needs to be created
+        {{param}} raw_obj [Raw]
+            The Raw object
 
-        RETURNS ---
-            The object found or made
+        {{param}} **kw [kwargs]
+            Global attributes if the object needs to be created
+
+        {{rtn}} [any] The object found or made
         """
         o = await raw_obj
         return self.bot.raw_make(c, o, **kw)
+
     def find(self, c, id, url = "", fmt = {}, **kw):
+        """
+        {{fn}} instance.find(c, id, url, fmt, **kw)
+
+        {{desc}} Finds an object with a given ID, and returns it. If it doesn't
+        exist, then a Raw object is returned instead.
+
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
+
+        {{param}} c [str]
+            Name of the group
+
+        {{param}} id [str, int]
+            ID of the object
+
+        {{param}} url [str]
+            URL of where to find the object if it doesn't exist
+
+        {{param}} fmt [dict]
+            How to format the URL, it is used in `url.format(**fmt)`
+
+        {{param}} **kw [kwargs]
+            Additional attributes for the object's creation
+
+        {{rtn}} [any] The object found or made
+        """
         return self.listeners.find(c, id, url, fmt, **kw)
-    def find_list(self, c, ids, fmt_url = "", fmt = {}, **kw):
-        ls = []
-        for id in ids:
-            fmt["id"] = id
-            ls.append(c, id, fmt_url.format(**fmt), **kw)
-        return ls
-    def find_existing(self, c, ids):
-        if type(ids) not in [list, tuple]:
-            return self.listeners.__getattribute__(c)(ids)
-        else:
-            ls = []
-            for id in ids:
-                ls.append(self.listeners.__getattribute__(c)(id))
-            return ls
 
     async def login(self):
+        """
+        {{fn}} await instance.login()
+
+        {{desc}} Logs in the bot
+
+        {{note}} Do not use this function. Use `bot.run()` instead. This is
+        because you will need to use `asyncio.run(bot.login)` which is redundant
+        and will prevent the bot from continuing to run properly.
+        """
         print("LOGGING IN")
         data = {
             "token": self.token,
@@ -268,3 +335,113 @@ class Bot:
                     asyncio.ensure_future(self.send_beat())
                 if j["op"] == 0:
                     self.listener.act(j)
+
+    #Named aliases/shortcuts
+    @property
+    def channels(self):
+        return self.listeners.channels
+
+    @property
+    def vcs(self):
+        return self.listeners.vcs
+
+    @property
+    def dms(self):
+        return self.listeners.dms
+
+    @property
+    def group_dms(self):
+        return self.listeners.group_dms
+
+    @property
+    def catagories(self):
+        return self.listeners.catagories
+
+    @property
+    def news_channels(self):
+        return self.listeners.news_channels
+
+    @property
+    def store_channels(self):
+        return self.listeners.store_channels
+
+    @property
+    def texts(self):
+        return self.listeners.texts
+
+    @property
+    def guilds(self):
+        return self.listeners.guilds
+
+    @property
+    def emojis(self):
+        return self.listeners.emojis
+
+    @property
+    def roles(self):
+        return self.listeners.roles
+
+    @property
+    def players(self):
+        return self.listeners.players
+
+    @property
+    def users(self):
+        return self.listeners.users
+
+    @property
+    def reactions(self):
+        return self.listeners.reactions
+
+    @property
+    def webhooks(self):
+        return self.listeners.webhooks
+
+    @property
+    def invites(self):
+        return self.listeners.invites
+
+    @property
+    def integrations(self):
+        return self.listeners.integrations
+
+    @property
+    def widgets(self):
+        return self.listeners.widgets
+
+    @property
+    def audits(self):
+        return self.listeners.audits
+
+    @property
+    def bans(self):
+        return self.listeners.bans
+
+    @property
+    def statuses(self):
+        return self.listeners.statuses
+
+def get_json(data) -> dict:
+    """
+    {{sepfn}} get_json(data)
+
+    {{desc}} Returns the JSON data sent by the discord gateway
+
+    {{param}} data [str, bytes]
+        If str, then it must be raw JSON
+        If bytes, then it must be ZLIB decodable and be JSON
+
+    {{rtn}} [dict] The gateway response
+    """
+    try:
+        data = data.data
+    except AttributeError:
+        pass
+    try:
+        j = json.loads(data) #Raw JSON
+    except json.JSONDecodeError:
+        try:
+            j = json.loads(zlib.decompress(data)) #Compressed JSON
+        except json.JSONDecodeError:
+            raise TypeError("Data cannot be decoded from ZLIB or JSON")
+    return j

@@ -113,6 +113,9 @@ class Perms:
             dic[perm] = None
         return dic
 
+    def __int__(self):
+        return self.allow_int
+
     def update(self, other: dict):
         for key in other:
             key2 = key.upper().replace(" ", "_")

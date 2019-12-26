@@ -2,6 +2,7 @@ import re
 import datetime
 from .Color import Color
 from .PrizmCls import PrizmList, PrizmDict
+from .ClsUtil import from_ts
 
 __all__ = ["https", "typed", "Embed"]
 
@@ -18,180 +19,268 @@ def typed(thing):
 
 class Embed:
     """
-    DESCRIPTION ---
-        Represents a Discord Embed
+    {{cls}} instance = Embed(*, too_many_args_to_list_here)
 
-    PARAMS ---
-        title [str]
-        - The Embed Title, 256 chars max*
+    {{desc}} Represents a Discord Embed
 
-        type [str]
-        - Type of embed, "rich" by default
+    {{param}} title [str]
+        The Embed Title, 256 chars max, %N0%
 
-        desc [str]
-        - The Embed Description, 2048 chars max*
-        - An alias resides under 'description', but this takes priority
+    {{param}} type [str]
+        Type of embed
+        {{norm}} "rich"
 
-        fields [list]
-        - The fields, in [name: str, value: str, inline: bool] format
-        - - name is 256 chars max*
-        - - value is 1024 chars max*
-        - - inline is False by default
-        - Any more than 25 fields will be discarded
-        - Any invalid fields will silently be discarded
+    {{param}} desc [str]
+        The Embed Description, 2048 chars max, %N0%
+        {{alias}} description
 
-        foot [str]
-        - The footer, 2048 chars max*
-        - An alias resides under 'footer', but this takes priority
+    {{param}} fields [List[str, str, bool], List[str, str]]
+        The fields, in [name, value, inline?] format
+        Alternatively, you can use [name, value], where inline is False
+        - name is 256 chars max, %N0%
+        - value is 1024 chars max, %N0%
+        - inline is False by default
+        Any more than 25 fields will be discarded
+        Any invalid fields will silently be discarded
 
-        foot_icon [str]
-        - The http[s] url of the footer icon**
-        - An alias resides under 'footer_icon', but this takes priority
+    {{param}} foot [str]
+        The footer, 2048 chars max, %N0%
+        {{alias}} footer
 
-        foot_proxy_icon [str]
-        - The proxied url of the footer icon
-        - An alias resides under 'footer_proxy_icon', but this takes priority
+    {{param}} foot_icon [str]
+        The http[s] url of the footer icon, %N1%
+        {{alias}} footer_icon
 
-        url [str]
-        - The url of the embed, http[s] only**
+    {{param}} foot_proxy_icon [str]
+        The proxied url of the footer icon
+        {{alias}} footer_proxy_icon
 
-        time [datetime.datetime, str]
-        - The Datetime object of the time you wish to put
-        - Placing "now" will give you the current time in UTC
-        - Placing a VALID ISO8601 timestamp will also work
+    {{param}} url [str]
+        The url of the embed, http[s] only, %N1%
 
-        color [Color, int, str, tuple]
-        - The color of the embed
-        - - if str, must be in hex eg #004466, in that format
-        - - if tuple, then it must be 3 ints with max value 255, RGB
-        - - if int, then no problem
-        - - if Color, then it must be a Color object from this library
+    {{param}} time [datetime.datetime, str]
+        The Datetime object of the time you wish to put
+        Placing "now" will give you the current time in UTC
+        Placing a VALID ISO 8601 timestamp will also work
+        {{alias}} timestamp
 
-        image [str]
-        - The http[s] url of the image**
+    {{param}} color [discord.models.Color, int, str, tuple]
+        The color of the embed
+        - if str, must be in hex eg #004466, in that format
+        - if tuple, then it must be 3 ints with max value 255, RGB
+        - if int, then no problem
+        - if Color, then it must be a Color object from this library
 
-        image_proxy [str]
-        - The proxied url of the image
+    {{param}} image [str]
+        The http[s] url of the image, %N1%
 
-        image_height [int]
-        - How tall the image should be
+    {{param}} image_proxy [str]
+        The proxied url of the image
 
-        image_width [int]
-        - How wide the image should be
+    {{param}} image_height [int]
+        How tall the image should be
 
-        thumb [str]
-        - The http[s] url of the thumbnail**
-        - An alias resides under 'thumbnail', but this takes priority
+    {{param}} image_width [int]
+        How wide the image should be
 
-        thumb_proxy [str]
-        - The proxied url of the thumbnail
-        - An alias resides under 'thumbnail_proxy', but this takes priority
+    {{param}} thumb [str]
+        The http[s] url of the thumbnail, %N1%
+        {{alias}} thumbnail
 
-        thumb_height [int]
-        - How tall the thumbnail should be
-        - An alias resides under 'thumbnail_height', but this takes priority
+    {{param}} thumb_proxy [str]
+        The proxied url of the thumbnail
+        {{alias}} thumbnail_proxy
 
-        thumb_width [int]
-        - How wide the thumbnail should be
-        - An alias resides under 'thumbnail_width', but this takes priority
+    {{param}} thumb_height [int]
+        How tall the thumbnail should be
+        {{alias}} thumbnail_height
 
-        video [str]
-        - The http[s] url of the video**
+    {{param}} thumb_width [int]
+        How wide the thumbnail should be
+        {{alias}} thumbnail_width
 
-        video_height [int]
-        - How tall the video should be
+    {{param}} video [str]
+        The http[s] url of the video %N1%
 
-        video_width [int]
-        - How wide the video should be
+    {{param}} video_height [int]
+        How tall the video should be
 
-        provider [str]
-        - Name of the provider
+    {{param}} video_width [int]
+        How wide the video should be
 
-        provider_url [str]
-        - The url of the provider
+    {{param}} provider [str]
+        Name of the provider
 
-        author [str]
-        - Name of the author, 256 chars max*
+    {{param}} provider_url [str]
+        The url of the provider
 
-        author_url [str]
-        - The url of the author
+    {{param}} author [str]
+        Name of the author, 256 chars max, %N0%
 
-        author_icon [str]
-        - The http[s] url of the author's pfp
+    {{param}} author_url [str]
+        The url of the author
 
-        author_proxy_icon [str]
-        - The proxied url of the author's pfp
+    {{param}} author_icon [str]
+        The http[s] url of the author's pfp, %N1%
 
-        *All text will automatically be stripped to meet
-         length requirements
+    {{param}} author_proxy_icon [str]
+        The proxied url of the author's pfp
 
-        **All non http[s] or urls [not including proxied ones]
-          will be silently discarded, but Discord does allow the
-          `attachment://<file_name>.<type>` scheme, and is supported
-          here too.
+    %n0% All text will automatically be stripped to meet length requirements
 
-    FUNCTIONS ---
-        dict(Embed) -> dict
-        - Returns the Discord readable version
+    %n1% All non http[s] or urls [not including proxied ones] will be silently
+    discarded, but Discord does allow the `attachment://<file_name>.<type>`
+    scheme, and is supported here too.
 
-        thing = Embed(**kwargs_from_above) -> Embed
-        - Creates a new Embed object
+    {{note}} This is the default formatting of an Embed ---
+     ______________
+    /
+    | Author things
+    | Title
+    | -------------
+    | desc...       [thumb]
+    |
+    | Field name
+    | field content
+    |
+    | [   image   ]
+    | [           ]
+    | -------------
+    | Footer things | Timestamp
+    |______________
+    *not to scale ofc but this is the general layout
 
-        repr(Embed) -> str
-        - The repr thing
+    {{prop}} title [str]
+        The title of the embed
 
-        Embed.set(**kwargs_from_above)
-        - Just like creating a new Embed object, but with the
-          old params too
+    {{prop}} type [str]
+        The type of embed
 
-        Embed.add_field(field)
-        - Adds a field
+    {{prop}} desc [str]
+        Description
+        {{alias}} description
 
-        Embed.add_fields(fields)
-        - Adds many fields
+    {{prop}} foot [str]
+        Footer text
+        {{alias}} footer
 
-        Embed.remove_field(index)
-        - Removes field number index
+    {{prop}} foot_icon [str]
+        Footer icon URL
+        {{alias}} footer_icon
 
-        Embed.remove_fields(indexes)
-        - Removes fields at the corresponding indexes
+    {{prop}} foot_proxy_icon [str]
+        Footer proxy icon URL
+        {{alias}} footer_proxy_icon
 
-        Embed.set_field(index, field)
-        - Sets field number index to field
+    {{prop}} url [str]
+        The embed URL
 
-        Embed.fromdict(dict_object)
-        - Sets fields and things from the output template of `dict(embed)`
+    {{prop}} time [None, datetime.datetime]
+        The timestamp of the embed
+        {{alias}} timestamp
 
-        Embed[param] -> Parameter
-        - An alias for Embed.param if you want that
+    {{prop}} color [None, Color]
+        The color of the embed, on the left
 
-        Embed[param] = value
-        - Shortcut for Embed.set(param = value),
+    {{prop}} image [str]
+        Image URL
+        {{alias}} img
+
+    {{prop}} image_proxy [str]
+        Image proxy URL
+        {{alias}} img_proxy
+
+    {{prop}} image_width [int]
+        Width of the image in pixels
+        {{alias}} img_w
+
+    {{prop}} image_height [int]
+        Height of the image in pixels
+        {{alias}} img_h
+
+    {{prop}} thumb [str]
+        The thumbnail URL
+        {{alias}} thumbnail
+
+    {{prop}} thumb_proxy [str]
+        The thumbnail proxy URL
+        {{alias}} thumbnail_proxy
+
+    {{prop}} thumb_width [int]
+        The width of the thumbnail in pixels
+        {{alias}} thumbnail_width
+        {{alias}} thumb_w
+
+    {{prop}} thumb_height [int]
+        Height of the thumbail in pixels
+        {{alias}} thumbnail_height
+        {{alias}} thumb_w
+
+    {{prop}} video [str]
+        The video URL
+        {{alias}} vid
+
+    {{prop}} video_proxy [str]
+        The video proxy URL
+        {{alias}} vid_proxy
+
+    {{prop}} video_width [int]
+        The video width in pixels
+        {{alias}} vid_w
+
+    {{prop}} video_height [int]
+        The height of the video in pixels
+        {{alias}} vid_h
+
+    {{prop}} provider [str]
+        Name of the provider, eg "YouTube"
+
+    {{prop}} provider_url [str]
+        The URL of the provider, eg "https://youtu.be/"
+
+    {{prop}} author [str]
+        Name of the author
+        {{alias}} auth
+
+    {{prop}} author_url [str]
+        The URL of where to locate the author
+        {{alias}} auth_url
+
+    {{prop}} author_icon [str]
+        The URL of the author icon
+        {{alias}} auth_icon
+
+    {{prop}} author_proxy_icon [str]
+        URL of the author proxy icon
+        {{alias}} auth_proxy_icon
+
+    {{prop}} fields [List[List[str, str, bool]]]
+        A list of fields in the [name, val, ?inline] format
     """
 
     def __repr__(self):
+        """
+        {{fn}} instance.__repr__()
+
+        {{note}} This function is actually meant to be used as `repr(self)`
+
+        {{desc}} The correct name, according to python
+
+        {{rtn}} [str] The correct name
+        """
         return f"<Embed object - '{self.title or '[no title]'}'>"
 
-    def __aliases(self):
-        self.thumbnail = self.thumb
-        self.thumbnail_proxy = self.thumb_proxy
-        self.thumbnail_height = self.thumb_height
-        self.thumbnail_width = self.thumbwidth
-        self.footer = self.foot
-        self.footer_icon = self.foot_icon
-        self.footer_proxy_icon = self.foot_proxy_icon
-        self.description = self.desc
-
-    def __init__(self, *, title = "", type = "rich", desc = "", description = "",
-                 fields = [], foot = "", footer = "", foot_icon = "", timestamp = None,
-                 footer_icon = "", foot_proxy_icon = "", footer_proxy_icon = "",
-                 url = "", time = None, color = None, image = "", image_proxy = "",
+    def __init__(self, *, title = "", type = "rich", desc = "",
+                 description = "", fields = [], foot = "", footer = "",
+                 foot_icon = "", timestamp = None, footer_icon = "",
+                 foot_proxy_icon = "", footer_proxy_icon = "", url = "",
+                 time = None, color = None, image = "", image_proxy = "",
                  image_width = 0, image_height = 0, thumb = "", thumbnail = "",
                  thumb_proxy = "", thumbnail_proxy = "", thumb_width = 0,
                  thumbnail_width = 0, thumb_height = 0, thumbnail_height = 0,
                  video = "", video_height = 0, video_width = 0, provider = "",
-                 provider_url = "", author = "", author_url = "", author_icon = "",
-                 author_proxy_icon = ""):
+                 provider_url = "", author = "", author_url = "",
+                 author_icon = "", author_proxy_icon = ""):
         self.title = str(title)[:257]
         self.type = str(type)
         self.desc = str(desc or description)[:2049]
@@ -241,11 +330,16 @@ class Embed:
             else:
                 pass
                 #Invalid fields will silently be discarded
-        self.__aliases()
 
     def __dict__(self):
         """
-        Creates a JSON Embed object according to the Discord API
+        {{fn}} instance.__dict__()
+
+        {{note}} This function is actually meant to be used as `dict(instance)`
+
+        {{desc}} Returns a discord-compatible dict object ready for sending
+
+        {{rtn}} [dict] The send-ready object
         """
         emb = {"type": self.type}
         if self.title:
@@ -265,7 +359,8 @@ class Embed:
             emb["timestamp"] = self.time.isoformat()
         if self.color:
             emb["color"] = self.color.color
-        if self.image or self.image_proxy or self.image_width or self.image_height:
+        if self.image or self.image_proxy or self.image_width or\
+                self.image_height:
             emb["image"] = {}
             if self.image:
                 emb["image"]["url"] = self.image
@@ -275,7 +370,8 @@ class Embed:
                 emb["image"]["width"] = self.image_width
             if self.image_height:
                 emb["image"]["height"] = self.image_height
-        if self.thumb or self.thumb_proxy or self.thumb_width or self.thumb_height:
+        if self.thumb or self.thumb_proxy or self.thumb_width or\
+                self.thumb_height:
             emb["thumbnail"] = {}
             if self.thumb:
                 emb["thumbnail"]["url"] = self.thumb
@@ -299,7 +395,8 @@ class Embed:
                 emb["provider"]["name"] = self.provider
             if self.provider_url:
                 emb["provider"]["url"] = self.provider_url
-        if self.author or self.author_url or self.author_icon or self.author_proxy_icon:
+        if self.author or self.author_url or self.author_icon or\
+                self.author_proxy_icon:
             emb["author"] = {}
             if self.author:
                 emb["author"]["name"] = self.author
@@ -319,16 +416,42 @@ class Embed:
                 })
         return emb
 
-    def set(self, *, title = "", type = "rich", desc = "", description = "",
-            fields = [], foot = "", footer = "", foot_icon = "",
-            footer_icon = "", foot_proxy_icon = "", footer_proxy_icon = "",
-            url = "", time = None, color = None, image = "", image_proxy = "",
+    def clear(self, *args):
+        """
+        {{fn}} instance.clear(*args)
+
+        {{desc}} Clears values
+
+        {{param}} *args [str]
+            What attributes to clear, eg ['title', 'desc']
+
+        {{rtn}} [discord.models.Embed] Itself
+        """
+        for arg in args:
+            self.__setattr__(arg, None)
+        return self
+
+    def set(self, *, title = "", type = "rich", desc = "",
+            description = "", fields = [], foot = "", footer = "",
+            foot_icon = "", timestamp = None, footer_icon = "",
+            foot_proxy_icon = "", footer_proxy_icon = "", url = "",
+            time = None, color = None, image = "", image_proxy = "",
             image_width = 0, image_height = 0, thumb = "", thumbnail = "",
             thumb_proxy = "", thumbnail_proxy = "", thumb_width = 0,
             thumbnail_width = 0, thumb_height = 0, thumbnail_height = 0,
             video = "", video_height = 0, video_width = 0, provider = "",
-            provider_url = "", author = "", author_url = "", author_icon = "",
-            author_proxy_icon = ""):
+            provider_url = "", author = "", author_url = "",
+            author_icon = "", author_proxy_icon = ""):
+        """
+        {{fn}} instance.set(*, too_many_args_to_list_here)
+
+        {{desc}} Similar to creation, but only overrides given params
+
+        {{note}} All parameters are the ones from initialization. That way you
+        can edit all the params in one command
+
+        {{rtn}} [discord.models.Embed] Itself
+        """
         self.title = str(title)[:257] or self.title
         self.type = str(type) or self.type
         self.desc = str(desc or description)[:2049] or self.desc
@@ -341,6 +464,8 @@ class Embed:
             self.time = time
         elif time.lower() == "now":
             self.time = datetime.datetime.utcnow()
+        else:
+            self.time = from_ts(time)
         if type(color) == Color:
             self.color = Color
         elif color:
@@ -350,9 +475,12 @@ class Embed:
         self.image_width = int(image_width) or self.image_width
         self.image_height = int(image_height) or self.image_height
         self.thumb = https(str(thumb or thumbnail)) or self.thumb
-        self.thumb_proxy = str(thumb_proxy or thumbnail_proxy) or self.thumb_proxy
-        self.thumb_width = int(thumb_width or thumbnail_width) or self.thumb_width
-        self.thumb_height = int(thumb_height or thumbnail_height) or self.thumb_height
+        self.thumb_proxy = str(thumb_proxy or thumbnail_proxy) or\
+            self.thumb_proxy
+        self.thumb_width = int(thumb_width or thumbnail_width) or\
+            self.thumb_width
+        self.thumb_height = int(thumb_height or thumbnail_height) or\
+            self.thumb_height
         self.video = https(str(video)) or self.video
         self.video_width = int(video_width) or self.video_width
         self.video_height = int(video_height) or self.video_height
@@ -361,7 +489,8 @@ class Embed:
         self.author = str(author)[:257] or self.author
         self.author_url = str(author_url) or self.author_url
         self.author_icon = https(str(author_icon)) or self.author_icon
-        self.author_proxy_icon = str(author_proxy_icon) or self.author_proxy_icon
+        self.author_proxy_icon = str(author_proxy_icon) or\
+            self.author_proxy_icon
         if fields:
             self.fields = PrizmList([])
         for field in fields:
@@ -376,9 +505,21 @@ class Embed:
             else:
                 pass
                 #Invalid fields will silently be discarded
-        self.__aliases()
+        return self
 
-    def add_fields(self, fields):
+    def append_fields(self, fields):
+        """
+        {{fn}} instance.append_fields(fields)
+
+        {{desc}} Adds fields to the embed
+
+        {{param}} fields [List[List[str, str, bool]], List[str, str, bool]]
+            Either a single field or a list of fields
+
+        {{rtn}} [discord.models.Embed] Itself
+        """
+        if type(fields[0]) != list:
+            fields = [fields]
         for field in fields:
             if len(self.fields) >= 25:
                 break
@@ -389,11 +530,46 @@ class Embed:
             elif typed(field) == [str, str]:
                 self.fields << field + [False]
             #Invalid fields will silently be discarded
+        return self
 
-    def remove_field(self, index: int):
-        del self.fields[index - 1] #Humans don't count from 0
+    def swap_fields(self, fields: dict):
+        """
+        {{fn}} instance.swap_fields(fields)
+
+        {{desc}} Swaps a set of fields
+
+        {{param}} fields [Dict[int: int]]
+            A dict of key-value pairs where the key is the field you want to
+            swap and the value is the new location of the field. This also
+            swaps the field currently occupying that location.
+
+        {{rtn}} [discord.models.Embed] Itself
+        """
+        ls = self.fields
+        for key in fields:
+            val = fields[key]
+            ls[key], ls[val] = ls[val], ls[key]
+        self.fields = ls
+        return self
 
     def edit_field(self, index: int, field):
+        """
+        {{fn}} instance.edit_field(index, field)
+
+        {{desc}} Edits a field at index
+
+        {{param}} index [int]
+            The field number to edit, starts from 0
+
+        {{param}} field [List[str, str, bool], List[str, str]]
+            The fields, in [name, value, inline?] format
+            Alternatively, you can use [name, value], where inline is False
+            - name is 256 chars max, %N0%
+            - value is 1024 chars max, %N0%
+            - inline is False by default
+            Any more than 25 fields will be discarded
+            Any invalid fields will silently be discarded
+        """
         if typed(field) == [str, str, bool]:
             self.fields[index - 1] = field
         elif typed(field) == [str, str, int]:
@@ -402,23 +578,34 @@ class Embed:
             self.fields[index - 1] = field + [False]
         #Invalid fields will silently be discarded
 
-    def add_field(self, index: int, field):
-        if len(self.fields) > 25:
-            return
-        if typed(field) == [str, str, bool]:
-            self.fields << field
-        elif typed(field) == [str, str, int]:
-            self.fields << field[:-1] + [bool(field[-1])]
-        elif typed(field) == [str, str]:
-            self.fields << field + [False]
-        #Invalid fields will silently be discarded
-
     def remove_fields(self, indexes):
-        for index in indexes:
-            del self.fields[int(index) - 1]
+        """
+        {{fn}} instance.remove_fields(indexes)
 
-    def fromdict(self, emb):
-        "Converts a dict to an Embed object"
+        {{desc}} Removes fields, starting from 0
+
+        {{param}} indexes [int, str, List[int]]
+            The indexes to remove. This is 0 based
+
+        {{rtn}} [discord.models.Embed] Itself
+        """
+        if type(indexes) == int:
+            indexes = [indexes]
+        for index in indexes:
+            del self.fields[int(index)]
+        return self
+
+    def from_dict(self, emb):
+        """
+        {{fn}} instance.from_dict(emb)
+
+        {{desc}} Converts a dict embed to an actual embed
+
+        {{param}} emb [dict]
+            A dict compatible object
+
+        {{rtn}} The new embed
+        """
         if "footer" in emb:
             if "text" in emb["footer"]:
                 emb["foot"] = emb["footer"]["text"]
@@ -473,11 +660,134 @@ class Embed:
             if "proxy_icon_url" in emb["auth"]:
                 emb["author_proxy_icon"] = emb["auth"]["proxy_icon_url"]
         if self.fields:
-            emb["fields"] = [(d["name"], d["value"], d["inline"]) for d in emb["fields"]]
+            emb["fields"] = [
+                (d["name"], d["value"], d["inline"]) for d in emb["fields"]
+            ]
         self.set(**emb) #Provides checks too :D
+        return self
 
     def __getitem__(self, key):
+        """
+        {{fn}} instance.__getitem__(key)
+
+        {{note}} This function is meant to be used as `instance[key]`
+
+        {{desc}} Returns an attribute, so you can interact with this class as if
+        it were a dict
+
+        {{param}} key [str]
+            The attribute you want
+
+        {{rtn}} [Any] The attribute
+        """
         return self.__getattribute__(key)
 
     def __setitem__(self, key, val):
+        """
+        {{fn}} instance.__setitem__(key) = val
+
+        {{note}} This function is meant to be used as `instance[key] = val`
+
+        {{desc}} Returns an attribute, so you can interact with this class as if
+        it were a dict
+
+        {{param}} key [str]
+            The attribute to set
+
+        {{param}} val [Any]
+            The value to set the attribute to
+        """
         self.set(**{key: val})
+
+    #Named Aliases
+    @property
+    def thumbnail(self):
+        return self.thumb
+
+    @property
+    def thumbnail_proxy(self):
+        return self.thumb_proxy
+
+    @property
+    def thumbnail_height(self):
+        return self.thumb_height
+
+    @property
+    def thumbnail_width(self):
+        return self.thumbwidth
+
+    @property
+    def footer(self):
+        return self.foot
+
+    @property
+    def footer_icon(self):
+        return self.foot_icon
+
+    @property
+    def footer_proxy_icon(self):
+        return self.foot_proxy_icon
+
+    @property
+    def description(self):
+        return self.desc
+
+    @property
+    def timestamp(self):
+        return self.time
+
+    @property
+    def img(self):
+        return self.image
+
+    @property
+    def img_proxy(self):
+        return self.image_proxy
+
+    @property
+    def img_w(self):
+        return self.image_width
+
+    @property
+    def img_h(self):
+        return self.image_height
+
+    @property
+    def thumb_w(self):
+        return self.thumb_width
+
+    @property
+    def thumb_h(self):
+        return self.thumb_height
+
+    @property
+    def vid(self):
+        return self.video
+
+    @property
+    def vid_proxy(self):
+        return self.video_proxy
+
+    @property
+    def vid_w(self):
+        return self.video_width
+
+    @property
+    def vid_h(self):
+        return self.video_height
+
+    @property
+    def auth(self):
+        return self.author
+
+    @property
+    def auth_url(self):
+        return self.author_url
+
+    @property
+    def auth_icon(self):
+        return self.author_icon
+
+    @property
+    def auth_proxy_icon(self):
+        return self.author_proxy_icon

@@ -11,6 +11,7 @@ from . import PrizmCls
 
 from .Bot import Bot
 from .Role import Role
+from .Info import Info
 from .Http import Http
 from .Snow import Snow
 from .Emoji import Emoji

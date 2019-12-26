@@ -6,17 +6,74 @@ __all__ = ["Role"]
 
 class Role:
     """
-    DESCRIPTION ---
-        Represents a role
+    {{cls}} instance = Role(*, too_many_args_to_list_here)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
+    {{desc}} Depresents a role
 
-    FUNCTIONS ---
-        None yet
+    {{note}} This class shouldn't be initialized by hand. Don't do that.
+
+    {{param}} id [str]
+        The role ID
+
+    {{param}} color [int]
+        The color int, like 0x00ffff being rgb(000, 255, 255)
+
+    {{param}} hoist [bool]
+        Whether or not this role is hoisted. AKA Does it seperate the player
+        list
+
+    {{param}} position [int]
+        Where it is located on the role list in the server menu from the bottom
+
+    {{param}} permissions [int]
+        The permissions integer
+
+    {{param}} managed [bool]
+        Whether or not this role is managed by an integration like twitch
+
+    {{param}} mentionable [bool]
+        Whether or not this role can be pinged
+
+    {{param}} guild_id [str, discord.models.Snow]
+        The guild that owns this role
+
+    {{prop}} id [int]
+        Id of the object
+
+    {{prop}} name [str]
+        Name of the object
+
+    {{prop}} color [discord.models.Color]
+        Color of the object
+
+    {{prop}} hoist [bool]
+        Whether or not this role shows differently on the player board
+
+    {{prop}} position [int]
+        Position on the role list, 0 is @everyone and it counts up
+
+    {{prop}} perms [discord.models.Perms.Perms]
+        The permissions
+
+    {{prop}} managed [bool]
+        Whether or not this role is managed by an integration, eg Patreon or
+        Twitch
+
+    {{prop}} pingable [bool]
+        Whether or not you can ping the object
+
+    {{prop}} guild_id [int]
+        The Guild ID
+
+    {{prop}} guild [discord.models.Guild]
+        The guild that owns this object
+
+    {{prop}} bot_obj [discord.models.Bot]
+        The bot object
     """
-    def __init__(self, id, name, color, hoist, position, permissions, managed,
-                 mentionable, guild_id = 0, bot_obj = None):
+    def __init__(self, *, id: str, name: str, color: int, hoist: bool,
+                 position: int, permissions: int, managed: bool,
+                 mentionable: bool, guild_id: str = 0, bot_obj = None):
         self.id = int(id)
         self.name = name
         self.color = Color(color)
@@ -25,21 +82,53 @@ class Role:
         self.perms = Perms(permissions)
         self.managed = managed
         self.pingable = mentionable
-        self.guild_id = guild_id
-        self.guild = bot_obj.find("guilds", guild_id, bot_obj = bot_obj)
+        self.guild_id = int(guild_id)
         self.bot_obj
-        self.ping = f"<@&{self.id}>"
 
     async def edit(self, *, name = None, perms: Perms = None, color = None,
                    hoist: bool = None, pingable: bool = None, reason = None,
-                   pos = None):
+                   position = None, pos: int = None):
+        """
+        {{fn}} await instance.edit(*, too_many_args_to_list_here)
+
+        {{note}} This function is asyncronous, so it must be awaited
+
+        {{desc}} Edits the object on discord's end
+
+        {{note}} All of these params are optional
+
+        {{param}} name [str]
+            The new name of the role
+
+        {{param}} perms [int, str, discord.models.Perms.Perms]
+            The permissions level for the role
+
+        {{param}} color [str, int, discord.models.Color]
+            The color-compatible color
+
+        {{param}} hoist [bool]
+            Whether or not this role should show up seperately in the player list
+
+        {{param}} pingable [bool]
+            Whether or not this object can be pinged
+
+        {{param}} pos [int]
+            The position of this role
+            {{alias}} position
+
+        {{param}} reason [str]
+            The reason for this change
+
+        {{note}} If no params are passed, no data will actually be sent to
+        discord. This is to prevent wasted data usage and time
+        """
         ops = {}
         if hoist is not None:
             ops["hoist"] = hoist
         if pingable is not None:
             ops["mentionable"] = pingable
         if perms is not None:
-            ops["permissions"] = perms.allow_int
+            ops["permissions"] = int(perms)
         if color is not None:
             ops["color"] = grab_color(color)
         if name is not None:
@@ -49,12 +138,23 @@ class Role:
         if ops:
             o = await self.bot_obj.http.edit_role(self.guild_id, self.id, ops)
             self.__init__(**o)
-        if pos is not None:
-            o = await self.bot_obj.http.edit_roles_pos(self.guild_id, self.id, pos)
-            for obj in o:
-                self.bot_obj.find_existing("roles", obj["id"]).pos = obj["position"]
+        if pos is not None or position is not None:
+            o = await self.bot_obj.http.edit_roles_pos(
+                self.guild_id, self.id, pos or position
+            )
+            #for obj in o:
+            #    self.bot_obj.find_existing("roles", obj["id"]).pos = obj["position"]
 
     def __dict__(self):
+        """
+        {{fn}} instance.__dict__()
+
+        {{note}} This function is actually meant to be used as `dict(instance)`
+
+        {{desc}} Returns the send-ready object
+
+        {{rtn}} [dict] The send-ready object
+        """
         return {
             "id": self.id,
             "name": self.name,
@@ -66,7 +166,16 @@ class Role:
             "mentionable": self.pingable
         }
 
-    async def delete(self, reason = None):
+    async def delete(self, reason = None) -> NonExistentObj:
+        """
+        {{fn}} await instance.delete(reason)
+
+        {{note}} This function is asyncronous, so it must be awaited
+
+        {{desc}} Deletes the object on discord's end
+
+        {{rtn}} [discord.models.NonExistentObj] The deleted object
+        """
         await self.bot_obj.http.delete_role(self.guild_id, self.id, r = reason)
         o = NonExistentObj(
             f"/guilds/{self.guild_id}/roles/{self.id}",
@@ -82,3 +191,11 @@ class Role:
                 "pos": self.pos
             }
         )
+
+    @property
+    def ping(self):
+        return f"<&@{self.id}>"
+
+    @property
+    def guild(self):
+        return self.bot_obj.listeners.guilds(self.guild_id)

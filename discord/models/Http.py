@@ -31,22 +31,40 @@ __all__ = ["Http"]
 
 class Http:
     """
-    DESCRIPTION ---
-        Cleans up code by providing functions instead of so many URLs.
-        Also, that "interface.py" bit is a joke, this is the true interface.
+    {{cls}} instance = Http(client, bot)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
+    {{desc}} Cleans up code by providing functions instead of so many URLs.
 
-    FUNCTIONS ---
-        This class is used internally and should only be used that way.
-        Please, do not even touch this class
+    {{note}} This class is used internally to interact with discord. Do not
+    initialize this class.
+
+    {{param}} client [aiohttp.ClientSession]
+        The client
+
+    {{param}} bot [discord.models.Bot]
+        The bot
+
+    {{prop}} client [aiohttp.ClientSession]
+        The client
+
+    {{prop}} bot [discord.models.Bot]
+        The bot
+
+    {{prop}} token [str]
+        Obtained from the bot object
+
+    {{note}} This class contains many functions to interact with discord easily.
+    Only the main function will be documented and other smaller functions will
+    be documented.
     """
-    def __init__(self, token, client, bot):
+    def __init__(self, client, bot):
         self.client = client
         self.bot = bot
+        self.token = bot.token
+        self.limits = {}
 
     async def get_json(self, data):
+
         try:
             data = await data.data
         except AttributeError:
@@ -59,8 +77,22 @@ class Http:
             except json.JSONDecodeError:
                 j = None #Some other thing that cannot be decoded
         return j
+    def dump_json(self, dic):
+        return json.dumps(dic, separators = [",", ":"], ensure_ascii = True)
+    #async def ratelimit_timeout(timeout, kwargs)
 
-    async def req(self, *, m = "GET", u = "", t = "j", r = None, d = {}, **data):
+    async def req(self, *, m = "GET", u = "", t = "j", r = None, f = None,
+                  d = {}, **data):
+        """
+        {{fn}} await instance.req(*, m, u, t, r, fd, **data)
+
+        {{note}} This function is asyncronous, so it must be awaited
+
+        {{warn}} Using this function is dangerous. Do not use it unless you know
+        what you're doing in relation to the API
+
+        {{desc}} Sends a payload to the API
+        """
         m = m.upper()
         if d == {} and data != {}:
             d = data
@@ -89,19 +121,25 @@ class Http:
             "headers": {
                 "Authorization": f"Bot {self.token}",
                 "User-Agent":
-                    f"DiscordBot ({url}, {self.bot.__version__})"
+                    f"DiscordBot ({url}, {self.bot.__version__})",
             },
-            "data": d
         }
+        if f is not None:
+            if d or data:
+                f.add_field("payload_json", self.dump_json(d or data))
+            payload["data"] = f
+        else:
+            payload["data"] = d or data
         if not u.startswith("https://"):
             u = self.http_uri + u
-        async with self.client.request(u, method = m, reason = r, **payload) as m:
+        async with self.client.request(u, method = m, reason = r, **payload)\
+                as w:
             if t.lower() in ["json", "j"]:
-                return await self.get_json(m)
+                return await self.get_json(w)
             if t.lower() in ["text", "t"]:
-                return await self.text(encoding = "utf-8")
+                return await w.text(encoding = "utf-8")
             if t.lower() in ["byte", "b"]:
-                return await self.read()
+                return await w.read()
     async def payload(self, data, opcode, seq = None, event = None, route = ""):
         payload = {
             "op": opcode,

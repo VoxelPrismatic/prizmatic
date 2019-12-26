@@ -28,6 +28,19 @@ class File:
 
         ?name [str]
         - Filename, default is random garbage
+
+    FUNTIONS ---
+        file = File(file_obj, name)
+        - Create a new File object
+
+        await file.get()
+        - Return the data
+
+        file()
+        - Return the data
+
+        await file.send()
+        - Prepare the data for sending
     """
     def __init__(self, obj, name = rand_name()):
         self.name = name
@@ -46,24 +59,12 @@ class File:
             raise ClassError(obj, RawData, [str, bytes, io.IOBase, RawFile, RawData])
 
     async def get(self):
-        """
-        DESCRIPTION ---
-            Returns the data
-        """
         return await self.data.get()
 
     def __call__(self):
-        """
-        DESCRIPTION ---
-            Returns the current data as is
-        """
         return self.data()
 
     async def send(self):
-        """
-        DESCRIPTION ---
-            Returns the sending-ready object
-        """
         return {
             "file": {
                 "value": await self.get(),
