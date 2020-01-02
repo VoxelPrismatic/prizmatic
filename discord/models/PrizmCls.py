@@ -1,13 +1,8 @@
 import re
 
 __all__ = [
-    "PrizmBool",
     "PrizmDict",
-    "PrizmFloat",
-    "PrizmInt",
-    "PrizmList",
-    "PrizmSet",
-    "PrizmStr"
+    "PrizmList"
 ]
 
 class PrizmList(list):
@@ -87,7 +82,7 @@ class PrizmList(list):
     def __or__(self, seperator):
         "list | ' '  ||  ' '.join([str(item) for item in list])"
         ls = [str(item) for item in self]
-        return PrizmStr(seperator.join(ls))
+        return seperator.join(ls)
     def __and__(self, item):
         "list & item  ||  list.index(item)"
         return self.index(item)
@@ -95,168 +90,132 @@ class PrizmList(list):
         "list @ index  ||  list.pop(index)"
         return self.pop(index)
 
-class PrizmDict(dict):
+class PrizmDict:
     """
-    {{desc}} Like a dict, but more useful
+    {{cls}} instance = PrizmDictList(**pairs)
 
-    {{note}} There are some differences when managing your dicts when using this
-    class. Be sure to read the docs.
+    {{desc}} Allows you to use a dict as a list, and vice versa
 
-    {{param}} **kw [kwargs]
-        Your dict data
     """
-    def __init__(self, **kw):
-        self = kw
-    def __lshift__(self, other_dict):
-        "dict << other  ||  dict.update(other)"
-        self.update(other_dict)
-    def __rshift__(self, key):
-        "dict >> key || item = dict[key]; del dict[key]"
-        item = self[key]
-        del self[key]
-        return item
-    def __isub__(self, keys):
-        "dict -= keys  ||  for key in keys: del dict[key]"
-        for key in keys:
-            del self[key]
-        return self
-    def __invert__(self):
-        "~dict  ||  [(key, dict[key]) for key in dict]"
-        return [(key, self[key]) for key in self]
-    def __floordiv__(self, typ):
-        dic = {}
-        for key in self:
-            dic[key] = typ(dic[key])
-        return dic
-    def __ifloordiv__(self, typ):
-        return self // typ
-    def __call__(self, thing):
-        if thing in self:
-            return self[thing]
-        elif str(thing) in self:
-            return self[int(thing)]
-        elif re.search(r"^\d+$", str(thing)) and int(thing) in self:
-            return self[int(thing)]
-        elif re.search(r"^\d+\.\d+$", str(thing)) and float(thing) in self:
-            return self[float(thing)]
-        else:
-            raise KeyError(
-                f"'{thing}' wasn't found in forms: [{int}, {float}, {str}, {type(thing)}]"
-            )
+    def __init__(self, **pairs):
+        self.pairs = pairs
 
-def PrizmStr(str):
-    def __ge__(self, string):
-        "str >=  other  ||  str = other + str"
-        self = self + str(string)
-    def __isub__(self, string):
-        "str -= chars  ||  str.strip(chars)"
-        return self.strip(string)
-    def __and__(self, string):
-        "str & substr  ||  str.index(substr)"
-        return self.index(string)
-    def __or__(self, seperator):
-        "str | chars  ||  str.split(chars)"
-        return PrizmList(self.split(seperator))
-    def __iadd__(self, string):
-        "str += any  ||  str = str+str(any)"
-        return self + str(string)
-    def __gt__(self, amount: int):
-        "str < num  ||  str.ljust(num)"
-        return self.ljust(amount)
-    def __lt__(self, amount: int):
-        "str > num  ||  str.rjust(num)"
-        return self.rjust(amount)
-    def __xor__(self, amount: int):
-        "str ^ num  ||  f'{str:^literal_num}'"
-        while len(" " + self + " ") < amount:
-            self = " " + self + " "
-        if len(self) < amount:
-            self += " "
-        return self
-    def __delitem__(self, index: int):
-        "del str[x]  ||  impossible"
-        ls = self
-        del ls[index]
-        self = PrizmStr("".join(ls))
-    def __setitem__(self, index: int, char):
-        "str[x] = y  ||  impossible"
-        ls = PrizmList(self)
-        ls[index] = char
-        self = PrizmStr("".join(ls))
+    def __str__(self):
+        return str(self.pairs)
 
-class PrizmFloat(float):
-    def __init__(self, arg = 0.0):
-        self = float(arg)
-    def __xor__(self, num):
-        "float ^ exponent  ||  float ** exponent"
-        return self ** num
-    def __ixor__(self, num):
-        "float ^ exponent  ||  float ** exponent"
-        return self ** num
-    def __rshift__(self, amount: int):
-        "float << amount  ||  float.round(amount)"
-        return self.round(amount)
-    def __getitem__(self, index: int):
-        "float[digit]  ||  str(float)[digit]"
-        return str(self)[index]
+    def __getitem__(self, key):
+        if type(key) == int and key not in self.pairs:
+            return self.pairs[list(self.pairs)[key]]
+        elif key in self.pairs:
+            return self.pairs[key]
+        raise KeyError(key)
 
-class PrizmInt(int):
-    def __init__(self, arg = 0):
-        self = int(arg)
-    def __xor__(self, num):
-        "int ^ exponent  ||  int ** exponent"
-        return self ** num
-    def __ixor__(self, num):
-        "int ^ exponent  ||  int ** exponent"
-        return self ** num
-    def __getitem__(self, index: int):
-        "int[digit]  ||  str(int)[digit]"
-        return str(self)[index]
+    def __setitem__(self, key, val):
+        self.pairs[key] = val
 
-class PrizmSet(set):
-    def __init__(self, *args):
-        self = set(args)
-    def __rshift__(self, num: int):
-        return self[num:] + self[:num]
-    def __irshift__(self, num: int):
-        return self >> num
-    def __lshift__(self, num: int):
-        return self[:num] + self[num:]
-    def __ilshift__(self, num: int):
-        return self << num
+    def __delitem__(self, key):
+        if type(key) == int and key not in self.pairs:
+            del self.pairs[list(self.pairs)[key]]
+        elif key in self.pairs:
+            del self.pairs[key]
+        raise KeyError(key)
 
-class PrizmBool(int):
+    def __dict__(self):
+        return self.pairs
+
+    def __list__(self):
+        return self.pairs.values()
+
+    def pop(self, key):
+        if type(key) == int and key not in self.pairs:
+            val = self.pairs[list(self.pairs)[key]]
+            del self.pairs[list(self.pairs)[key]]
+            return val
+        elif key in self.pairs:
+            val = self.pairs[key]
+            del self.pairs[key]
+            return val
+        raise KeyError(key)
+
+    def __call__(self, mesh):
+        if mesh in self.pairs:
+            return self.pairs[mesh]
+        try:
+            if int(mesh) in self.pairs:
+                return self.pairs[int(mesh)]
+        except Exception:
+            pass
+        try:
+            if str(mesh) in self.pairs:
+                return self.pairs[int(mesh)]
+        except Exception:
+            pass
+        raise KeyError(mesh)
+
+    def __contains__(self, key):
+        try:
+            self(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getslice__(self, start, end, step = 1):
+        return self.pairs.values()[start:end:step]
+
+    def __delslice__(self, start, end, step = 1):
+        for index in range(start, end, step):
+            del self.pairs[index]
+
     def __add__(self, other):
-        return bool(self) or bool(other)
-    def __sub__(self, other):
-        return not(self + other)
-    def __mul__(self, other):
-        return bool(self) and bool(other)
-    def __div__(self, other):
-        return not(self * other)
-    def __or__(self, other):
+        if type(other) == dict:
+            self.pairs.update(other)
+        else:
+            try:
+                for key, val in other:
+                    self.pairs[key] = val
+            except TypeError:
+                if len(other) == 2:
+                    self.pairs[other[0]] = other[1]
+                else:
+                    raise TypeError("Cannot add `" + str(other) + "` to dict")
+        return self
+
+    def __iadd__(self, other):
         return self + other
-    def __and__(self, other):
-        return self * other
-    def __xor__(self, other):
-        return bool(self) != bool(other)
-    def __mod__(self, other):
-        return not(self ^ other)
+
+    def __len__(self):
+        return len(self.pairs)
+
+    def __tuple__(self):
+        return ((key, self.pairs[key]) for key in self.pairs)
+
     def __invert__(self):
-        return not bool(self)
-    def __radd__(self, other):
-        return bool(self) or bool(other)
-    def __rsub__(self, other):
-        return not(self + other)
-    def __rmul__(self, other):
-        return bool(self) and bool(other)
-    def __rdiv__(self, other):
-        return not(self * other)
-    def __ror__(self, other):
-        return self + other
-    def __rand__(self, other):
-        return self * other
-    def __rxor__(self, other):
-        return bool(self) != bool(other)
-    def __rmod__(self, other):
-        return not(self ^ other)
+        return {self.pairs[key]: key for key in self.pairs}
+
+    def __iter__(self):
+        self.___iter_index___ = -1
+        return self
+
+    def __next__(self):
+        self.___iter_index___ += 1
+        if self.___iter_index___ < len(self.pairs):
+            return self.pairs[list(self.pairs)[self.___iter_index___]]
+        raise StopIteration
+
+    def keys(self):
+        return self.pairs.keys()
+
+    def values(self):
+        return self.pairs.values()
+
+    def update(self, other):
+        self.pairs.update(other)
+
+    def clear(self):
+        self.pairs = {}
+
+    def get(self, key, default = None):
+        return self.pairs.get(key, default)
+
+    def items(self):
+        return self.pairs.items()

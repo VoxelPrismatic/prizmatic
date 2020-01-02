@@ -1,31 +1,31 @@
 import re
 import json
 import zlib
-from .Channel import AnyChannel
-from .Text import Text, Crosspost
+import asyncio
+import aiohttp
+from . import Semi
+from . import Url
+from . import Events
+from .Snow import Snow
+from .Role import Role
 from .Emoji import Emoji
 from .Color import Color
 from .Embed import Embed
-from .Perms import Perms, Overwrite, Overwrites
 from .Guild import Guild
-from .Error import LoginError
-from .PrizmCls import PrizmDict, PrizmList
-from .Snow import Snow
-from .Audit import AuditLog
-from .Member import Player, User
-from .Error import ClassError
 from .Invite import Invite
-from .Raw import RawList, Raw, RawObj, RawObjs, RawFile, RawAny
-from . import Events
-from .Voice import VoiceRegion, VoiceClient
-from .Integration import Integration
-from .Webhook import Webhook
-from .Role import Role
 from .Widget import Widget
+from .Audit import AuditLog
+from .Webhook import Webhook
+from .Channel import AnyChannel
+from .Member import Player, User
+from .Text import Text, Crosspost
 from .GuildEmbed import GuildEmbed
-from . import Semi
-from . import Url
-import aiohttp
+from .Integration import Integration
+from .Error import ClassError, LoginError
+from .PrizmCls import PrizmDict, PrizmList
+from .Voice import VoiceRegion, VoiceClient
+from .Perms import Perms, Overwrite, Overwrites
+from .Raw import RawList, Raw, RawObj, RawObjs, RawFile, RawAny
 
 __all__ = ["Http"]
 
@@ -64,7 +64,8 @@ class Http:
         self.limits = {}
 
     async def get_json(self, data):
-
+        if type(data) == dict:
+            return data
         try:
             data = await data.data
         except AttributeError:
@@ -77,6 +78,7 @@ class Http:
             except json.JSONDecodeError:
                 j = None #Some other thing that cannot be decoded
         return j
+
     def dump_json(self, dic):
         return json.dumps(dic, separators = [",", ":"], ensure_ascii = True)
     #async def ratelimit_timeout(timeout, kwargs)
@@ -132,14 +134,16 @@ class Http:
             payload["data"] = d or data
         if not u.startswith("https://"):
             u = self.http_uri + u
-        async with self.client.request(u, method = m, reason = r, **payload)\
-                as w:
+        async with self.client.request(
+                url = u, method = m, reason = r, **payload
+        ) as w:
             if t.lower() in ["json", "j"]:
                 return await self.get_json(w)
             if t.lower() in ["text", "t"]:
                 return await w.text(encoding = "utf-8")
             if t.lower() in ["byte", "b"]:
                 return await w.read()
+
     async def payload(self, data, opcode, seq = None, event = None, route = ""):
         payload = {
             "op": opcode,
@@ -149,15 +153,13 @@ class Http:
             payload["s"] = seq
         if event:
             payload["t"] = event
-        async with self.client.get(self.bot.uri + route, data = payload) as r:
-            if r.status != 200:
-                raise LoginError(r.status, await r.json())
-            try:
-                j = await r.json()
-            except aiohttp.client_exceptions.ContentTypeError:
-                j = await r.text()
-            print(j)
-            return j
+        async with aiohttp.ClientSession() as c:
+            print("here2")
+            async with c.get(route, data = payload) as r:
+                print("here3")
+                if r.status != 200:
+                    raise LoginError(r.status, await r.json())
+                return await r.json()
 
     async def get_audit(self, id, user = None, action = None, before = None,
                         limit: int = 50, **kw):
@@ -255,25 +257,21 @@ class Http:
         )
         return self.bot.await_make("channels", d, **kw)
     async def make_channel(self, id, data, **kw):
-        d = await self.req(
+        return await self.req(
             m = "+",
             u = f"/guilds/{id}/channels",
             d = dict(data)
         )
-        return self.bot.raw_make("channels", d, **kw)
     async def get_channel(self, id, **kw):
-        d = await self.req(
+        return await self.req(
             u = f"/channels/{id}",
-            **kw
         )
-        return self.bot.raw_make("channels", d)
     async def edit_channel(self, id, data, **kw):
-        d = await self.req(
+        return await self.req(
             m = "/",
             u = f"/channels/{id}",
             d = dict(data)
         )
-        return self.bot.raw_edit("channels", d, **kw)
     async def delete_channel(self, id, **kw):
         return await self.req(
             m = "-",
@@ -309,20 +307,21 @@ class Http:
             **kw
         )
         return Text(**j)
-    async def send_text(self, id, data, **kw):
-        o = await self.req(
+    async def send_text(self, id, data, rtn_obj = True, **kw):
+        d = await self.req(
             m = "+",
             u = f"/channels/{id}/messages",
             d = dict(data)
         )
-        return self.bot.raw_make("texts", o, **kw)
+        if rtn_obj:
+            return Text(**d)
+        return d
     async def edit_text(self, cID, tID, data, **kw):
-        obj = await self.req(
+        return await self.req(
             m = "/",
             u = f"/channels/{cID}/messages/{tID}",
             d = dict(data),
         )
-        return self.bot.raw_edit("texts", obj, **kw)
     async def delete_text(self, cID, tID, **kw):
         return await self.req(
             m = "-",
@@ -339,11 +338,10 @@ class Http:
 
     #Reactions
     async def reaction_add(self, cID, tID, emoji, **kw):
-        obj = await self.req(
+        return await self.req(
             m = ">",
             u = f"/channels/{cID}/messages/{tID}/reactions/{emoji}/@me"
         )
-        return self.bot.raw_make("reactions", obj, **kw)
     async def reaction_delete_own(self, cID, tID, emoji, **kw):
         return await self.req(
             m = "-",

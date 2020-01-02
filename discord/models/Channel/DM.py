@@ -21,4 +21,4 @@ class DM:
         self.latest_message_id = int(last_message_id)
         self.type = type
         self.id = int(id)
-        #self.users =
+        self.users = bot_obj.raw("users", recipients, bot_obj = bot_obj)

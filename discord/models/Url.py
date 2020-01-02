@@ -38,47 +38,51 @@ devs = f"{home}/developers"
 oauth2 = f"{home}/api/oauth2"
 webhooks = f"{home}/api/webhooks"
 
-def emoji(id, fmt = 'png'):
+def emoji(id = "{id}", fmt = 'png'):
     global cdn
     return f"{cdn}/emojis/{id}.{fmt}"
 
-def guild_icon(id, hash, fmt = 'png'):
+def guild_icon(id = "{id}", hash = "{hash}", fmt = 'png', size = 4096):
     global cdn
-    return f"{cdn}/icons/{id}/{hash}.{fmt}"
+    return f"{cdn}/icons/{id}/{hash}.{fmt}?size={size}"
 
-def guild_splash(id, hash, fmt = 'png'):
+def guild_splash(id = "{id}", hash = "{hash}", fmt = 'png', size = 4096):
     global cdn
-    return f"{cdn}/splashes/{id}/{hash}.{fmt}"
+    return f"{cdn}/splashes/{id}/{hash}.{fmt}?size={size}"
 
-def guild_banner(id, hash, fmt = 'png'):
+def guild_banner(id = "{id}", hash = "{hash}", fmt = 'png', size = 4096):
     global cdn
-    return f"{cdn}/banners/{id}/{hash}.{fmt}"
+    return f"{cdn}/banners/{id}/{hash}.{fmt}?size={size}"
+
+def guild_discovery(id = "{id}", hash = "{hash}", fmt = 'png', size = 4096):
+    global cdn
+    return f"{cdn}/discovery-splashes/{id}/{hash}.{fmt}?size={size}"
 
 def default_pfp(discrim):
     global cdn
     return f"{cdn}/embed/avatars/{int(discrim) % 5}.png"
 
-def user_pfp(id, hash, fmt = 'png'):
+def user_pfp(id = "{id}", hash = "{hash}", fmt = 'png', size = 1024):
     global cdn
-    return f"{cdn}/avatars/{id}/{hash}.{fmt}"
+    return f"{cdn}/avatars/{id}/{hash}.{fmt}?size={size}"
 
-def app_icon(id, hash, fmt = 'png'):
+def app_icon(id = "{id}", hash = "{hash}", fmt = 'png', size = 1024):
     global cdn
-    return f"{cdn}/app-icons/{id}/{hash}.{fmt}"
+    return f"{cdn}/app-icons/{id}/{hash}.{fmt}?size={size}"
 
-def app_asset(id, hash, fmt = 'png'):
+def app_asset(id = "{id}", hash = "{hash}", fmt = 'png', size = 4096):
     global cdn
-    return f"{cdn}/app-assets/{id}/{hash}.{fmt}"
+    return f"{cdn}/app-assets/{id}/{hash}.{fmt}?size=4096"
 
-def achievement(id, hash, other, fmt = 'png'):
+def achievement(id = "{id}", hash = "{hash}", other = "{other}", fmt = 'png'):
     global cdn
     return f"{cdn}/app-assets/{id}/achievements/{other}/icons/{hash}.{fmt}"
 
-def team_pfp(id, hash, fmt = 'png'):
+def team_pfp(id = "{id}", hash = "{hash}", fmt = 'png', size = 1024):
     global cdn
-    return f"{cdn}/team-icons/{id}/{hash}.{fmt}"
+    return f"{cdn}/team-icons/{id}/{hash}.{fmt}?size={size}"
 
-def webhook(id, token):
+def webhook(id = "{id}", token = "{token}"):
     global webhooks
     return f"{webhooks}/{id}/{token}"
 

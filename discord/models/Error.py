@@ -7,12 +7,15 @@ __all__ = [
     "LoginError",
     "URLError",
     "SnowDecodeError",
-    "InputError"
+    "InputError",
+    "ObjNotFoundError"
 ]
 
 def typed(thing):
     if type(thing) == type:
         return str(thing).split("'")[1]
+    elif type(thing) == str:
+        return thing
     return str(type(thing)).split("'")[1]
 
 class Error(Exception):
@@ -109,7 +112,7 @@ class InputError(Error):
         )
 
 class ObjNotFoundError(Error):
-    def __init__(attempts, looking_for):
+    def __init__(self, attempts, looking_for):
         super.__init__(
             name = "Object not found",
             typ = "ObjNotFoundError",

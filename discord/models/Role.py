@@ -73,7 +73,7 @@ class Role:
     """
     def __init__(self, *, id: str, name: str, color: int, hoist: bool,
                  position: int, permissions: int, managed: bool,
-                 mentionable: bool, guild_id: str = 0, bot_obj = None):
+                 mentionable: bool, guild_id = 0, bot_obj = None):
         self.id = int(id)
         self.name = name
         self.color = Color(color)
@@ -83,7 +83,7 @@ class Role:
         self.managed = managed
         self.pingable = mentionable
         self.guild_id = int(guild_id)
-        self.bot_obj
+        self.bot_obj = bot_obj
 
     async def edit(self, *, name = None, perms: Perms = None, color = None,
                    hoist: bool = None, pingable: bool = None, reason = None,

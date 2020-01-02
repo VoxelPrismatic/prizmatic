@@ -6,51 +6,55 @@ __all__ = ["AuditSearch"]
 
 class AuditSearch:
     """
-    DESCRIPTION ---
-        Represents an audit log search
+    {{loc}} discord.models.Audit
+    {{cls}} instance = AuditSearch(events)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
+    {{desc}} Represents an audit log search
 
-    FUNCTIONS ---
-        search = AuditSearch(entries)
-        - Creates a new AuditSearch object
+    {{noinit}}
 
-        search[index]
-        - Get that item
+    {{param}} events [List[~.AuditEvent]]
+        List of events
 
-        search[event_type]
-        - Get a list of events with that type
-
-        search(user_id)
-        - Get a list of events with that user
+    {{prop}} events [List[~.AuditEvent]]
     """
     def __init__(self, events):
         self.events = events
 
-    def __getitem__(self, i):
-        if type(i) == int:
-            return self.events[i]
-        elif type(i) == str:
-            ls = []
-            for evt in self.events:
-                if evt.action == i:
-                    ls.append(evt)
-            return self.__class__(self.web, self.user, ls, True)
-        else:
-            raise ClassError(i, str, [int, str])
+    def __getitem__(self, key):
+        """
+        {{bltin}} instance.__getitem__(key)
+        {{usage}} instance[key]
 
-    def __call__(self, user):
-        if type(user) == User:
-            id = user.id
-        elif type(user) == int:
-            id = user
-        elif re.search(r"^\d{20}$", str(user)):
-            id = int(user)
+        {{desc}} Either returns a ~.AuditEvent or a ~.AuditSearch object
+
+        {{param}} key [int, str, discord.models.Member.User]
+            If `int`, then it will return that index in `instance.events` or it
+            will filter by user ID if it is a user ID
+            If `str`, then it will filter the events to that event type or by
+            user ID if it is a user ID
+            If `User`, then it will filter by that user
+
+        {{rtn}} [~.AuditSearch] The filtered events if `key`
+        is a User, user ID, or str
+        {{rtn}} [~.AuditEvent] The event if `key` is an index
+        """
+        if type(key) == int:
+            if len(str(key)) < 15:
+                return self.events[key]
+        elif type(key) == str:
+            if not re.search(r"^\d{20}$", str(key)):
+                ls = []
+                for evt in self.events:
+                    if evt.action == key:
+                        ls.append(evt)
+                return AuditSearch(ls)
+        elif type(key) == User:
+            key = int(key)
         else:
-            raise ClassError(user, int, [User, int, str])
+            raise ClassError(key, str, [int, str, User])
         ls = []
         for evt in self.events:
-            if evt.user_id == id:
+            if evt.user_id == key:
                 ls.append(evt)
-        return self.__class__(self.web, self.user, ls, True)
+        return self.__class__(ls)

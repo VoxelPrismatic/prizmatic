@@ -1,5 +1,6 @@
 import typing
 import asyncio
+import traceback
 from . import Url
 from . import Semi
 from . import Events
@@ -66,7 +67,7 @@ class Listener:
     {{prop}} guilds [dict]
     {{prop}} emojis [dict]
     {{prop}} roles [dict]
-    {{prop}} players [dict]
+    {{prop}} players [list]
     {{prop}} users [dict]
     {{prop}} reactions [dict]
     {{prop}} webhooks [dict]
@@ -77,8 +78,13 @@ class Listener:
     {{prop}} audits [dict]
     {{prop}} statuses [dict]
         All of these are self explanitory.
-        They are all in this format: {id: instance}
-        None of these are actually dicts, but they are similar enough
+        They are all in this format: {id: instance} except for players, that one
+        is a list because multiple players can have the same ID, as players are
+        just users that are part of a guild and therefore have more data such as
+        nickname or roles.
+        None of these are actually dicts, but they are similar enough. The main
+        difference is that when iterating through the dict, it iterates through
+        the values, not the keys.
 
     {{prop}} objs [dict]
         A conversion table from catagory to actual object
@@ -207,7 +213,9 @@ class Listener:
         self.guilds = PrizmDict()
         self.emojis = PrizmDict()
         self.roles = PrizmDict()
-        self.players = PrizmDict()
+        self.players = PrizmList()
+        #Players are users that have extra data, so there can be multiple
+        #players with the same ID
         self.users = PrizmDict()
         self.reactions = PrizmDict()
         self.webhooks = PrizmDict()
@@ -249,6 +257,11 @@ class Listener:
             if dic[channel].type == t:
                 ls[channel] = dic[channel]
         return ls
+
+    @property
+    def text_channels(self):
+        return self.channel_type(0)
+
     @property
     def vcs(self):
         return self.channel_type(2)
@@ -345,10 +358,16 @@ class Listener:
         if type(ignorer_type) not in [list, str]:
             a = [ignorer_type]
             ignorer_type = []
-        for l in self.get(listener_type, ignorer_type):
-            asyncio.run(l(*a, **kw))
+        for fn in self.get(listener_type, ignorer_type):
+            try:
+                await fn(*a, **kw)
+            except asyncio.CancelledError:
+                print("Canceled function `" + fn.__name__ + "`")
+            except Exception as ex:
+                print(ex)
+                await self.run("error", args = a, kwargs = kw, ex = ex)
 
-    async def act(self, j):
+    async def act(self, j, **kw):
         """
         {{fn}} instance.act(j)
 
@@ -359,6 +378,7 @@ class Listener:
         """
         d = j["d"]
         t = j["t"]
+        d.update(kw)
         if t == "CHANNEL_CREATE":
             o = AnyChannel(**d)
             self.channels[o.id] = o
@@ -417,11 +437,17 @@ class Listener:
         {{rtn}} [any] The object found or made
         """
         try:
-            return self.__getattribute__(c)(id)
-        except KeyError:
+            if c != "players":
+                return self.__getattribute__(c)(id)
+            else:
+                raise TypeError("Cannot locate a player with an ID only")
+        except (KeyError, IndexError) as ex:
             d = await self.bot_obj.http.req(u = url)
             o = self.objs[c](**d)
-            self.__getattr__(c)[id] = o
+            if c != "players":
+                self.__getattribute__(c)[id] = o
+            else:
+                self.players.append(o)
             return o
 
     def raw_make(self, c, o, *a, **kw):
@@ -450,16 +476,28 @@ class Listener:
         ls = []
         for raw in o:
             try:
-                ls.append(self.__getattribute__(c)(raw["id"]))
-            except KeyError:
+                if c != "players":
+                    ls.append(self.__getattribute__(c)(raw["id"]))
+                else:
+                    for player in self.players:
+                        if player.id == int(raw["id"]) and \
+                                player.guild_id == int(kw["guild_id"]):
+                            ls.append(player)
+                            break
+                    else:
+                        raise IndexError
+            except (KeyError, IndexError) as ex:
                 obj = self.objs[c](*a, **kw, **raw)
-                self.__getattribute__(c)[int(raw["id"])] = obj
+                if c != "players":
+                    self.__getattribute__(c)[int(raw["id"])] = obj
+                else:
+                    self.players.append(obj)
                 ls.append(obj)
         return ls
 
-    def raw_edit(self, c, o, *a, **kw):
+    def raw_edit(self, c, o, **kw):
         """
-        {{fn}} instance.raw_edit(c, obj, *a, **kw)
+        {{fn}} instance.raw_edit(c, obj, **kw)
 
         {{edit}} Edits an object with provided data
 
@@ -472,18 +510,33 @@ class Listener:
         {{param}} obj [str, int]
             The ID of the object
 
-        {{param}} *a, **kw [args, kwargs]
+        {{param}} **kw [kwargs]
             How to edit the object
 
-        {{rtn}} [any] The object found or made
+        {{rtn}} [Any] The object found or made
         """
-        obj = self.objs[c](*a, **o, **kw)
         try:
-            tmp = self.__getattribute__(c)[int(o["id"])]
-            self.__getattribute__(c)[int(o["id"])] = obj
-        except KeyError:
-            self.__getattribute__(c)[o["id"]] = obj
-        return obj
+            if c != "players":
+                tmp = self.__getattribute__(c)[int(o["id"])]
+            else:
+                for player in self.players:
+                    if player.id == int(o["id"]) and \
+                            player.guild_id == int(o["guild_id"]):
+                        tmp = player
+                        break
+                else:
+                    raise IndexError
+            for k in kw:
+                tmp.__setattribute__(k, kw[k])
+            for a in o:
+                tmp.__setattribute__(a. o[a])
+        except (KeyError, IndexError) as ex:
+            tmp = self.objs[c](*a, **o, **kw)
+            if c != "player":
+                self.__getattribute__(c)[o["id"]] = tmp
+            else:
+                self.players.append(tmp)
+        return tmp
 
     def find(self, c, id, url = None, fmt = {}, **kw):
         """
@@ -518,8 +571,15 @@ class Listener:
             "guilds": "/guilds/{id}",
         }
         try:
-            return self.__getattribute__(c)(id)
-        except KeyError:
+            if c != "players":
+                return self.__getattribute__(c)(id)
+            else:
+                for player in self.players:
+                    if player.id == int(id) and \
+                            player.guild_id == int(kw["guild_id"]):
+                        return player
+                raise IndexError
+        except (KeyError, IndexError) as ex:
             if not url and c in urls:
                 url = urls[c].format(**fmt)
             elif url:

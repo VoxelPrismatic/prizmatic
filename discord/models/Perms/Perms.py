@@ -33,7 +33,7 @@ permissions = {
     "ADMINISTRATOR":         0x00000008,
     "BAN_MEMBERS":           0x00000004,
     "KICK_MEMBERS":          0x00000002,
-    "CREATE_INSTANT_INVITE": 0x00000001
+    "CREATE_INSTANT_INVITE": 0x00000001,
 }
 
 def decode_perms(num: int):
@@ -54,54 +54,38 @@ def encode_perms(ls: list):
 
 class Perms:
     """
-    DESCRIPTION ---
-        Represents the permissions of a member, user, or overwrite
+    {{cls}} instance = Perms(*, allow, deny, none)
+    {{desc}} Represents the permissions of a member, user, or overwrite
 
-    PARAMS ---
-        allow [int]
-        - The allowed things, as an int
+    {{param}} allow [int]
+        The allowed things, as an int
 
-        deny [int]
-        - The denied things, as an int
+    {{param}} deny [int]
+        The denied things, as an int
 
-        none [int]
-        - The inherited things, as an int
+    {{note}} Use the encode method to create an int from a list of perms
 
-        *Use the encode method to create an int from a list of perms
-
-    FUNCTIONS ---
-        perms = Perms(allow, deny, none)
-        - Creates a Perms object
-
-        dict(perms)
-        - Creates a dict object and returns it
-
-        perms.update(other_dict)
-        - Updates `perms' with the values of other_dict
-
-        perms.update_int(?allow, ?deny, ?none)
-        - Updates `perms' with the specified ints
-
-        perms.is_empty()
-        - Returns `True' if the perms do absolutely nothing
-
-        perms[perm]
-        - Returns the value of that perm
-
-        perms[perm] = val
-        - Updates perm to be True [allow], False [deny], or None [none]
     """
-    def __init__(self, allow = 0, deny = 0, none = 0):
+    def __init__(self, allow = 0, deny = 0):
         self.override_type = type
-        self.allow = decode_perms(allow)
         self.allow_int = allow
-        self.deny = decode_perms(deny)
         self.deny_int = deny
-        self.none = PrizmList([])
-        for perm in decode_perms(int(0xffffffff)):
-            if perm not in self.allow and perm not in self.deny:
-                self.none <= perm
-        self.none_int = encode_perms(self.none)
+
+    @property
+    def allow(self):
+        return decode_perms(self.allow_int)
+
+    @property
+    def deny(self):
+        return decode_perms(self.deny_int)
+
+    @property
+    def inherit_int(self):
+        return abs(~self.allow_int + 1) & abs(~self.deny_int + 1)
+
+    @property
+    def inherit(self):
+        return decode_perms(self.inherit_int)
 
     def __dict__(self):
         dic = {}
@@ -109,7 +93,7 @@ class Perms:
             dic[perm] = True
         for perm in self.deny:
             dic[perm] = False
-        for perm in self.none:
+        for perm in self.inherit:
             dic[perm] = None
         return dic
 
@@ -117,52 +101,40 @@ class Perms:
         return self.allow_int
 
     def update(self, other: dict):
+        deny = self.deny
+        allow = self.allow
         for key in other:
             key2 = key.upper().replace(" ", "_")
             if other[key] == True:
-                if key2 in self.deny:
-                    self.deny >> key2
-                if key2 in self.none:
-                    self.none >> key2
-                if key2 not in self.allow:
-                    self.allow << key2
+                if key2 in deny:
+                    deny >> key2
+                if key2 not in allow:
+                    allow << key2
             elif other[key] == None:
-                if key2 in self.deny:
-                    self.deny >> key2
-                if key2 not in self.none:
-                    self.none << key2
-                if key2 in self.allow:
-                    self.allow >> key2
+                if key2 in deny:
+                    deny >> key2
+                if key2 in allow:
+                    allow >> key2
             elif other[key] == False:
-                if key2 not in self.deny:
-                    self.deny << key2
-                if key2 in self.none:
-                    self.none >> key2
-                if key2 in self.allow:
-                    self.allow >> key2
-        self.none_int = encode_perms(self.none)
-        self.allow_int = encode_perms(self.allow)
-        self.deny_int = encode_perms(self.deny)
+                if key2 not in deny:
+                    deny << key2
+                if key2 in allow:
+                    allow >> key2
+        self.allow_int = encode_perms(allow)
+        self.deny_int = encode_perms(deny)
 
-    def update_int(self, allow = None, deny = None, none = None):
+    def update_int(self, allow = None, deny = None):
         self.allow_int = allow if allow is not None else self.allow_int
         self.deny_int = deny if deny is not None else self.deny_int
-        self.none_int = none if none is not None else self.none_int
-        self.none = decode_perms(none)
         self.deny = decode_perms(deny)
         self.allow = decode_perms(allow)
 
-    def is_empty(self):
-        return all(all(i == None for i in ls) for ls in [self.none, self.deny, self.allow])
+    @property
+    def empty(self) -> bool:
+        return self.allow_int == 0 and self.deny_int == 0
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> bool:
         return dict(self)[key.upper().replace(" ", "_")]
 
     def __setitem__(self, key, val):
         self.set({key: val})
-
-    def decode(num: int):
-        return decode_perms(num)
-
-    def encode(ls: list):
-        return encode_perms(ls)

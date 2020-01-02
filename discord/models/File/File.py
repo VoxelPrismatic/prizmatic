@@ -64,11 +64,10 @@ class File:
     def __call__(self):
         return self.data()
 
-    async def send(self):
+    async def send(self, index = ""):
         return {
-            "file": {
-                "value": await self.get(),
-                "filename": self.name,
-                "content_type": "application/octet-stream"
-            }
+            "name": "file" + str(index),
+            "value": await self.get(),
+            "filename": self.name,
+            "content_type": "application/octet-stream"
         }

@@ -1,32 +1,63 @@
 __all__ = ["SemiChannel"]
+from ..Channel import Category, Channel, DM, GroupDM, NewsChannel, VC,\
+    StoreChannel
 
 class SemiChannel:
     """
-    DESCRIPTION ---
-        Represents a partial channel object
+    {{cls}} instance = SemiChannel(*, name, typ)
 
-    PARAMS ---
-        Only initialize SemiObjects when the full version shouldn't be
-        initialized by hand.
+    {{desc}} Represents a partial channel object
 
-        name [str]
-        - The name of the channel
+    {{param} name [str]
+        Name of the channel
 
-        type [int]
-        - The channel type
-        - 0: Channel
-          1: DM
-          2: VC
-          3: GroupDM
-          4: Catagory
-          5: NewsChannel
-          6: StoreChannel
+    {{param}} typ [int, str, class]
+        Type of channel
+        0, "text", Channel -------> text channel
+        1, "dm", DM --------------> direct message
+        2, "vc", VC --------------> voice channel
+        3, "group", GroupDM ------> group direct message
+        4, "category", Category --> category channel
+        5, "news", NewsChannel ---> news channel
+        6, "store", StoreChannel -> store channel
 
-    FUNCTIONS ---
-        semi = SemiChannel(name, type)
-        - Creates a new SemiChannel object
+    {{param}} bot_obj [~/Bot]
+        The bot object
 
-        dict(semi)
-        - Used internally for sending to Discord
+    {{prop}} name [str]
+        Name of the channel
+
+    {{prop}} type [int]
+        Type of the channel
     """
-    pass
+    def __init__(self, *, name, typ):
+        if type(typ) == str:
+            typ = typ.lower()
+        if typ in ["text", 0, Channel]:
+            self.type = 0
+        elif typ in ["dm", 1, DM]:
+            self.type = 1
+        elif typ in ["vc", 2, VC]:
+            self.type = 2
+        elif typ in ["group", 3, GroupDM]:
+            self.type = 3
+        elif typ in ["category", 4, Category]:
+            self.type = 4
+        elif typ in ["news", 5, NewsChannel]:
+            self.type = 5
+        elif typ in ["store", 6, StoreChannel]:
+            self.type = 6
+        else:
+            raise TypeError("`" + str(typ) + "` is not a valid channel type")
+        self.name = name
+
+    def __dict__(self):
+        """
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
+
+        {{pydesc}} __dict__
+
+        {{rtn}} [dict]
+        """
+        return {"name": self.name, "type": self.type}

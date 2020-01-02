@@ -2,14 +2,9 @@ import re
 import datetime
 from .Color import Color
 from .PrizmCls import PrizmList, PrizmDict
-from .ClsUtil import from_ts
+from .ClsUtil import from_ts, https
 
-__all__ = ["https", "typed", "Embed"]
-
-def https(thing):
-    if re.search(r"^(https?|attachment)\:\/\/", thing):
-        return thing
-    return ""
+__all__ = ["typed", "Embed"]
 
 def typed(thing):
     ls = []
@@ -256,17 +251,19 @@ class Embed:
 
     {{prop}} fields [List[List[str, str, bool]]]
         A list of fields in the [name, val, ?inline] format
+
+    {{prop}} valid [bool]
+        Whether or not this embed is valid according to the Discord docs
     """
 
     def __repr__(self):
         """
-        {{fn}} instance.__repr__()
+        {{bltin}} instance.__repr__()
+        {{usage}} repr(instance)
 
-        {{note}} This function is actually meant to be used as `repr(self)`
+        {{pydesc}} __repr__
 
-        {{desc}} The correct name, according to python
-
-        {{rtn}} [str] The correct name
+        {{rtn}} [str]
         """
         return f"<Embed object - '{self.title or '[no title]'}'>"
 
@@ -290,12 +287,8 @@ class Embed:
         self.url = https(str(url))
         self.time = None
         self.color = None
-        if type(time) == datetime.datetime:
-            self.time = time
-        elif time.lower() == "now":
-            self.time = datetime.datetime.utcnow()
-        elif re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}+\d{2}:\d{2}"):
-            self.time = datetime.datetime.fromisoformat(time)
+        if time is not None:
+            self.time = from_ts(time)
         if type(color) == Color:
             self.color = Color
         elif color:
@@ -340,7 +333,12 @@ class Embed:
         {{desc}} Returns a discord-compatible dict object ready for sending
 
         {{rtn}} [dict] The send-ready object
+
+        {{err}} [ValueError] If the embed is invalid, this saves time and data
+        usage by checking locally instead of remotely
         """
+        if not self.valid:
+            raise ValueError("This embed is malformed, " + self.why_invalid)
         emb = {"type": self.type}
         if self.title:
             emb["title"] = self.title
@@ -460,11 +458,7 @@ class Embed:
         self.foot_proxy_icon =\
             str(foot_proxy_icon or footer_proxy_icon) or self.foot_proxy_icon
         self.url = https(str(url)) or self.url
-        if type(time) == datetime.datetime:
-            self.time = time
-        elif time.lower() == "now":
-            self.time = datetime.datetime.utcnow()
-        else:
+        if time is not None:
             self.time = from_ts(time)
         if type(color) == Color:
             self.color = Color
@@ -791,3 +785,45 @@ class Embed:
     @property
     def auth_proxy_icon(self):
         return self.author_proxy_icon
+
+    @property
+    def valid(self):
+        self.why_invalid = "Is valid"
+        chars = 0
+        field_n = 0
+        for field in self.fields:
+            name, val, inline = field
+            chars += len(name) + len(val)
+            if len(name) > 256:
+                self.why_invalid = f"title in field {field_n} is too long"
+                return False
+            if len(val) > 1024:
+                self.why_invalid = f"value in field {field_n} is too long"
+                return False
+            if inline not in [True, False]:
+                self.why_invalid = f"inline in field {field_n} is not a bool"
+                return False
+            field_n += 1
+        if len(self.fields) > 25:
+            self.why_invalid = f"too many fields"
+            return False
+        chars += len(self.title)
+        chars += len(self.desc)
+        chars += len(self.foot)
+        chars += len(self.author)
+        if len(self.title) > 256:
+            self.why_invalid = f"title is too long"
+            return False
+        if len(self.desc) > 2048:
+            self.why_invalid = f"description is too long"
+            return False
+        if len(self.foot) > 2048:
+            self.why_invalid = f"footer is too long"
+            return False
+        if len(self.author) > 256:
+            self.why_invalid = f"author is too long"
+            return False
+        if chars > 6000:
+            self.why_invalid = f"too many chars"
+            return False
+        return True

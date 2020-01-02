@@ -23,6 +23,7 @@ from .Webhook import Webhook
 from .Command import Command
 from .Reaction import Reaction
 from .Listener import Listener
+from .CDNAsset import CDNAsset
 from .Member import Player, User
 from .Text import Text, Crosspost
 from .Integration import Integration

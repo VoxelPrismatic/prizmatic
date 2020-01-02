@@ -27,11 +27,17 @@ class Files:
 
     async def send(self):
         self.ls = self.ls[:11] #Discord only allows 10 files at a time iirc
-        dic = {}
-        for i in range(len(self.ls)):
-            dic[f"file{i}"] = {
-                "value": await self.ls[i].get(),
-                "filename": self.ls[i].name,
-                "content_type": "application/octet-stream"
-            }
-        return dic
+        i = 0
+        for f in self.ls:
+            yield await f.send(i)
+            i += 1
+
+    def __iter__(self):
+        self.___iter_index___ = -1
+        return self
+
+    def __next__(self):
+        self.___iter_index___ += 1
+        if self.___iter_index___ < len(self.ls):
+            return self.ls[self.___iter_index___]
+        raise StopIteration

@@ -6,7 +6,7 @@ import typing
 from .. import ver
 from pprint import pprint as prinf
 from . import Url
-from .PrizmCls import PrizmList, PrizmDict, PrizmInt
+from .PrizmCls import PrizmList, PrizmDict
 from .Listener import Listener
 import re
 from .Http import Http
@@ -93,11 +93,15 @@ class Bot:
         Not really a dict, but basically the same.
         Holds all VoiceClient objects and IDs
 
-    {{prop}} http [Class]
+    {{prop}} http [~/Http]
         The HTTP client/interface
+
+    {{prop}} skip_next [bool]
+        Whether or not to skip the next listener, useful for creating objects
+        inside this wrapper to prevent duplicate objects
     """
     def __init__(self, prefix: str = ";]", custom_prefix = ";]",
-                 token: str = None, *, thresh: int = 150,
+                 token: str = "", *, thresh: int = 150,
                  keepalive: bool = True):
         self.prefix = prefix
         self.custom_prefix = custom_prefix
@@ -114,11 +118,12 @@ class Bot:
         self.connected = False
         self.keepalive = keepalive
         self.__version__ = ver.__ver__
-        self.listener = Listener(self)
+        self.listeners = Listener(self)
         self.voices = PrizmDict()
         self.ws = None
+        self.skip_next = False
 
-    def run(self, token = None) -> None:
+    def run(self, token = "") -> None:
         """
         {{fn}} instance.run(token)
 
@@ -129,10 +134,11 @@ class Bot:
             {{norm}} The token provided upon initialization
         """
         token = token or self.token
-        if token is None:
+        if not token:
+            print("No token")
             raise ValueError("No token was provided")
         self.token = token
-        asyncio.ensure_future(self.login)
+        task = asyncio.ensure_future(self.login())
 
     async def send_beat(self) -> None:
         """
@@ -177,7 +183,7 @@ class Bot:
         """
         await self.ws.send_json(payload)
         m = await self.ws.receive()
-        return await get_json(m)
+        return get_json(m)
 
     #Shortcuts and helpers for finding stuff
     async def make(self, cl, id, url):
@@ -220,9 +226,44 @@ class Bot:
         {{param}} *a, **kw [args, kwargs]
             Global attributes if the object needs to be created
 
-        {{rtn}} [any] The object found or made
+        {{rtn}} [Any] The object found or made
         """
         return self.listeners.raw_make(c, objs, *a, **kw)
+
+    def raw_many(self, objs, *args, **kwargs):
+        """
+        {{fn}} instance.raw_many(objs, *args, *kwargs)
+
+        {{desc}} A bunch of `instance.raw()` calls
+
+        {{note}} This function is used internally, and is not meant to be used
+        by hand
+
+        {{param}} objs [list]
+            A list of args and kwargs used for calling `instance.raw()`.
+            `[c, [objs], *args, {kwargs}]`, where `*args` and `{kwargs}` are
+            optional and do NOT need to be included
+
+        {{param}} *args, **kwargs [args, kwargs]
+            These are global
+
+        {{note}} This function does return everything as a tuple
+
+        {{rtn}} [List[Any]] The objects found or made
+        """
+        ls = []
+        for obj in objs:
+            c = obj[0]
+            o = obj[1]
+            a = []
+            kw = {}
+            if len(obj) >= 3:
+                a = obj[2:]
+            if type(obj[-1]) == dict:
+                a = a[:-1]
+                kw = obj[-1]
+            ls.append(self.raw(c, o, *a, *args, **kw, **kwargs))
+        return ls
 
     def raw_edit(self, c, obj, *a, **kw):
         """
@@ -320,26 +361,39 @@ class Bot:
             "large_threshold": self.thresh,
             "guild_subscriptions": True
         }
-        self.uri = (await self.http.payload(self, data, 10))["url"] + "?v=6&encoding=json"
-        async with self.client.ws_connect(self.uri) as ws:
-            self.ws = ws
-            print("FINDING GATEWAY")
-            await self._gate(d = data, op = 2)
-            print("LOGGED IN")
-            self.connected = True
-            async for m in ws:
-                j = get_json(m)
-                if j["op"] == 10:
-                    print("Got Heartbeat")
-                    self.heartbeat = j["d"]["heartbeat_interval"]
-                    asyncio.ensure_future(self.send_beat())
-                if j["op"] == 0:
-                    self.listener.act(j)
+        self.http.token = self.token
+        base_uri = await self.http.payload(self, data, 10, route = self.uri)
+        print("here")
+        self.uri = base_uri["url"] + "?v=6&encoding=json"
+        async with aiohttp.ClientSession() as c:
+            async with c.ws_connect(self.uri) as ws:
+                self.ws = ws
+                print("FINDING GATEWAY")
+                await self._gate(d = data, op = 2)
+                print("LOGGED IN")
+                self.connected = True
+                async for m in ws:
+                    if self.skip_next:
+                        self.skip_next = False
+                        continue
+                    j = get_json(m)
+                    print(j)
+                    if j["op"] == 10:
+                        print("Got Heartbeat")
+                        self.heartbeat = j["d"]["heartbeat_interval"]
+                        asyncio.ensure_future(self.send_beat())
+                    if j["op"] == 0:
+                        await self.listeners.act(j, bot_obj = self)
+        print("\n\n", self.guilds, "\n\n")
 
     #Named aliases/shortcuts
     @property
-    def channels(self):
+    def all_channels(self):
         return self.listeners.channels
+
+    @property
+    def channels(self):
+        return self.listeners.text_channels
 
     @property
     def vcs(self):
@@ -421,6 +475,10 @@ class Bot:
     def statuses(self):
         return self.listeners.statuses
 
+    @property
+    def listener(self):
+        return self.listeners
+
 def get_json(data) -> dict:
     """
     {{sepfn}} get_json(data)
@@ -433,13 +491,15 @@ def get_json(data) -> dict:
 
     {{rtn}} [dict] The gateway response
     """
+    if type(data) == dict:
+        return data
     try:
         data = data.data
     except AttributeError:
         pass
     try:
         j = json.loads(data) #Raw JSON
-    except json.JSONDecodeError:
+    except Exception:
         try:
             j = json.loads(zlib.decompress(data)) #Compressed JSON
         except json.JSONDecodeError:

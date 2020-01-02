@@ -17,6 +17,10 @@ class AuditChange:
     {{param}} key [str]
         The object changed, eg "role"
 
+    {{param}} bot_obj [~/Bot]
+        The Bot object, so you can access the bot anywhere
+        {{optn}}
+
     {{prop}} new [Any]
         Value after the change
 
@@ -25,28 +29,33 @@ class AuditChange:
 
     {{prop}} key [str]
         The object changed
+
+    {{prop}} bot_obj [~/Bot]
+        The Bot object, so you can access the bot anywhere
     """
-    def __init__(self, new_value, old_value, key):
+    def __init__(self, *, new_value, old_value, key, bot_obj = None):
         self.key = key
         self.new = new_value
         self.old = old_value
 
     def __dict__(self):
         """
-        {{fn}} dict(instance)
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
 
-        {{desc}} Returns the send-ready object
+        {{pydesc}} __dict__
 
-        {{rtn}} [dict] The send-ready object
+        {{rtn}} [str]
         """
         return {"new_value": self.new, "old_value": self.old, "key": self.key}
 
     def __repr__(self):
         """
-        {{fn}} repr(instance)
+        {{bltin}} instance.__repr__()
+        {{usage}} repr(instance)
 
-        {{desc}} Returns the proper name, used for printing
+        {{pydesc}} __repr__
 
-        {{rtn}} [str] The proper name
+        {{rtn}} [str]
         """
         return "<AuditChange of " + self.key + ">"
