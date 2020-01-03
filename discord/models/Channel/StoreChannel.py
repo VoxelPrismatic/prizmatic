@@ -4,31 +4,38 @@ from ..Member import User
 from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
+from .Channel import Channel
 
 __all__ = ["StoreChannel"]
 
-class StoreChannel:
+class StoreChannel(Channel):
     """
-    DESCRIPTION ---
-        Represents a store channel
+    {{subcls}} [~.Channel] instance = StoreChannel(*, too_many_args_to_list)
 
-    PARAMS ---
-        This class shouldn't be initalized by hand. Don't do that.
+    {{desc}} Represents a StoreChannel
 
-    FUNCTIONS ---
-        None yet
+    {{noinit}}
+
+    {{note}} All the params and props are the same as in ~.Channel
     """
-    def __init__(self, *, id, guild_id, name, type, position, permission_overwrites,
-                 nsfw, parent_id, bot_obj):
-        self.id = int(id)
-        self.guild_id = int(guild_id)
-        self.guild = bot_obj.listeners.guilds(guild_id)
-        self.name = name
-        self.position = position
-        self.nsfw = nsfw
-        self.overwrites = Overwrites(**permission_overwrites)
-        self.catagory_id = parent_id
-        self.bot_obj = bot_obj
+    def __init__(self, *, id, guild_id, name, type, position,
+                 permission_overwrites, rate_limit_per_user, nsfw, topic,
+                 last_message_id, parent_id = None, last_pin_timestamp,
+                 bot_obj = None, **kw):
+        if kw:
+            print(
+                "Error: Class 'StoreChannel' has extra kwargs added by the"
+                "gateway"
+            )
+            print(kw)
+            exit()
+        super().__init__(
+            id = id, guild_id = guild_id, name = name, type = type,
+            position = position, permission_overwrites = permission_overwrites,
+            rate_limit_per_user = rate_limit_per_user, nsfw = nsfw,
+            topic = topic, last_message_id = last_message_id, bot_obj = bot_obj,
+            last_pin_timestamp = last_pin_timestamp
+        )
 
     #async def edit(self, *, id, catagory,: Catagory, overwrites,
 

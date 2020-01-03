@@ -13,11 +13,13 @@ class DM:
 
     {{desc}} Represents a dm channel
 
-    {{note}} This class shouldn't be initialized by hand. Don't do that.
+    {{noinit}}
 
-    {{param}} last_message_id
+    {{param}} last_message_id []
     """
-    def __init__(self, *, last_message_id, type, id, recipients, bot_obj):
+    def __init__(self, *, last_message_id, type, id, recipients, bot_obj, **kw):
+        print(kw)
+        exit()
         self.latest_message_id = int(last_message_id)
         self.type = type
         self.id = int(id)

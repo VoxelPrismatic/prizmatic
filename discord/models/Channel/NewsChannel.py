@@ -4,55 +4,35 @@ from ..Member import User
 from ..PrizmCls import PrizmList
 from ..Role import Role
 from ..Raw import Raw, RawObj, RawList, RawFile
+from .Channel import Channel
 
 __all__ = ["NewsChannel"]
 
-class NewsChannel:
+class NewsChannel(Channel):
     """
-    DESCRIPTION ---
-        Represents a news/announcements channel
+    {{subcls}} [~.Channel] instance = NewsChannel(*, too_many_args_to_list_here)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
+    {{desc}} Represents a NewsChannel
 
-    FUNCTIONS ---
-        None yet
+    {{noinit}}
+
+    {{note}} All the params and props are the same as in ~.Channel
     """
     def __init__(self, *, id, guild_id, name, type, position,
                  permission_overwrites, rate_limit_per_user, nsfw, topic,
-                 last_message_id, parent_id = None, last_pin_timestamp, bot_obj):
-        self.id = id
-        self.latest_message_id = last_message_id
-        self.latest_pin_time = from_ts(last_pin_timestamp)
-        self.name = name
-        self.overwrites = Overwrites(**permission_overwrites)
-        self.pos = position
-        self.slowmode = rate_limit_per_user
-        self.topic = topic
-        self.guild_id = guild_id
-        self.guild = bot_obj.listener.guilds(guild_id)
-        self.catagory_id = parent_id
-        self.bot_obj = bot_obj
-
-    def __str__(self):
-        return "#" + self.name
-
-    @property
-    def ping(self):
-        return f"<#{self.id}>"
-
-    def __repr__(self):
-        return f"<#NewsChannel '{self.name}'>"
-
-    async def edit(self, **kw):
-        raise NotImplementedError(
-            "This feature hasn't actually been created, only the function"
-        )
-
-    async def load(self):
-        await self.guild.make()
-
-    async def update(self):
-        raise NotImplementedError(
-            "This feature hasn't actually been created, only the function"
+                 last_message_id, parent_id = None, last_pin_timestamp,
+                 bot_obj = None, **kw):
+        if kw:
+            print(
+                "Error: Class 'NewsChannel' has extra kwargs added by the"
+                "gateway"
+            )
+            print(kw)
+            exit()
+        super().__init__(
+            id = id, guild_id = guild_id, name = name, type = type,
+            position = position, permission_overwrites = permission_overwrites,
+            rate_limit_per_user = rate_limit_per_user, nsfw = nsfw,
+            topic = topic, last_message_id = last_message_id, bot_obj = bot_obj,
+            last_pin_timestamp = last_pin_timestamp
         )

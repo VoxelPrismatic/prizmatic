@@ -13,34 +13,22 @@ def rand_name():
 
 class File:
     """
-    DESCRIPTION ---
-        Represnts a file, used for sending files in messages
+    {{cls}} instance = File(obj, [name])
 
-    PARAMS ---
-        loc [str, bytes, file, RawFile, url, RawData]
-        - Some way of getting file data
-        - str: The file name
-        - bytes: Raw Data
-        - file: Must have a read() function
-        - RawFile: A RawFile object from this module
-        - url: A url... duh
-        - RawData: A RawData object from this module
+    {{desc}} Represnts a file, used for sending files in messages
 
-        ?name [str]
-        - Filename, default is random garbage
+    {{param}} obj [str, bytes, file, RawFile, RawData]
+        Just some way to get file data
 
-    FUNTIONS ---
-        file = File(file_obj, name)
-        - Create a new File object
+    {{param}} name [str]
+        The name of the file
+        {{norm}} Random hex
 
-        await file.get()
-        - Return the data
+    {{prop}} data [~/Raw.RawFile]
+        The file data
 
-        file()
-        - Return the data
-
-        await file.send()
-        - Prepare the data for sending
+    {{prop}} name [str]
+        Name of the file
     """
     def __init__(self, obj, name = rand_name()):
         self.name = name
@@ -56,15 +44,28 @@ class File:
         elif type(obj) == RawData or type(obj) == RawFile:
             self.data = obj
         else:
-            raise ClassError(obj, RawData, [str, bytes, io.IOBase, RawFile, RawData])
+            raise ClassError(
+                obj, RawData, [str, bytes, io.IOBase, RawFile, RawData, "url"]
+            )
 
     async def get(self):
+        """
+        {{fn}} await instance.get()
+
+        {{desc}} Gets the data if it was from a URL
+
+        {{rtn}} [bytes] The data
+        """
         return await self.data.get()
 
-    def __call__(self):
-        return self.data()
-
     async def send(self, index = ""):
+        """
+        {{fn}} await instance.send()
+
+        {{pydesc}} __dict__
+
+        {{rtn}} [dict]
+        """
         return {
             "name": "file" + str(index),
             "value": await self.get(),
