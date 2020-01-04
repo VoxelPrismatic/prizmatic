@@ -1,8 +1,8 @@
-from ..ClsUtil import from_ts
-from ..Perms import Perms, Overwrite
+from ..Role import Role
 from ..Member import User
 from ..PrizmCls import PrizmList
-from ..Role import Role
+from ..Perms import Perms, Overwrite
+from ..ClsUtil import from_ts, extra_kw
 from ..Raw import Raw, RawObj, RawList, RawFile
 
 __all__ = ["DM"]
@@ -18,8 +18,7 @@ class DM:
     {{param}} last_message_id []
     """
     def __init__(self, *, last_message_id, type, id, recipients, bot_obj, **kw):
-        print(kw)
-        exit()
+        extra_kw(kw, "DM")
         self.latest_message_id = int(last_message_id)
         self.type = type
         self.id = int(id)

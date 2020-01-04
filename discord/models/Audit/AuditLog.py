@@ -5,6 +5,7 @@ from ..Member import User
 from ..Webhook import Webhook
 from ..Raw import RawObjs
 from ..Error import ClassError
+from ..ClsUtil import extra_kw
 
 __all__ = ["AuditLog"]
 
@@ -53,7 +54,8 @@ class AuditLog:
         The bot object
     """
     def __init__(self, *, webhooks, users, audit_log_entries, integrations,
-                 bot_obj = None):
+                 bot_obj = None, **kw):
+        extra_kw(kw, "AuditLog")
         self.webhooks = webhooks
         self.users = users
         self.events = [AuditEvent(**entry) for entry in audit_log_entries]

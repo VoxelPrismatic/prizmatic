@@ -1,21 +1,17 @@
-from ..ClsUtil import from_ts
 from ..Member import User
+from ..ClsUtil import from_ts, extra_kw
 
 __all__ = ["InviteMetadata"]
 
 class InviteMetadata:
     """
-    DESCRIPTION ---
-        Represents invite metadata
+    {{cls}} instance = InviteMetadata(*, too_many_args_to_list_here)
 
-    PARAMS ---
-        This class shouldn't be initialized by hand. Don't do that.
-
-    FUNCTIONS ---
-        meta = InviteMetadata(inviter, uses, max_uses, max_age, temp, made)
-        - Created a new InviteMetadata object
+    {{desc}} Represents invite metadata
     """
-    def __init__(self, inviter, uses, max_uses, max_age, temporary, created_at):
+    def __init__(self, *, inviter, uses, max_uses, max_age, temporary,
+                 created_at, bot_obj = None, **kw):
+        extra_kw(kw, "InviteMetadata")
         self.inviter = User(**inviter)
         self.uses = uses
         self.max_uses = max_uses

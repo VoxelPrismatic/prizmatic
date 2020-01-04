@@ -19,5 +19,10 @@ class OfflineGuild(Guild):
         - The regular guild class has this too, but this is needed
           for anything to be useful
     """
-    def __init__(self, id, unavailable, bot_obj):
-        pass
+    def __init__(self, **kw):
+        if kw:
+            print(
+                "Error: Class 'Ban' has extra kwargs added by the gateway"
+            )
+            print(kw)
+            exit()

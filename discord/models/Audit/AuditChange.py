@@ -1,3 +1,5 @@
+from ..ClsUtil import extra_kw
+
 __all__ = ["AuditChange"]
 
 class AuditChange:
@@ -33,7 +35,8 @@ class AuditChange:
     {{prop}} bot_obj [~/Bot]
         The Bot object, so you can access the bot anywhere
     """
-    def __init__(self, *, new_value, old_value, key, bot_obj = None):
+    def __init__(self, *, new_value, old_value, key, bot_obj = None, **kw):
+        extra_kw(kw, "AuditChange")
         self.key = key
         self.new = new_value
         self.old = old_value

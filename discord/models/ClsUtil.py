@@ -23,6 +23,8 @@ def from_ts(ts) -> datetime.datetime:
     """
     if type(ts) == str and ts.lower() == "now":
         return datetime.datetime.utcnow()
+    if ts is None:
+        return None
     if type(ts) == datetime.datetime:
         return ts
     elif re.search(
@@ -64,3 +66,13 @@ def id_from_obj(obj, ls = [], cl = ""):
 
 def dump_json(d):
     return json.dumps(d, separators = [",", ":"], ensure_ascii = True)
+
+def extra_kw(kw, cl):
+    if kw:
+        print(
+            f"**WARNING** Class '{cl}' has extra kwargs added by the gateway:"
+        )
+        print("{")
+        for k in kw:
+            print("   ", k, ":", kw[k], type(kw[k]), ",\n")
+        print("}")

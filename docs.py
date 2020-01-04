@@ -46,7 +46,7 @@ for file in dirs:
                         break
                     indent += " "
                 curr = curr[len(indent):].replace("\n" + indent, "\n").strip()
-                st += curr
+                st += curr + "\n"
                 curr = ""
                 continue
             if incom:

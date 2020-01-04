@@ -1,9 +1,10 @@
 from ..Role import Role
-from ..Member import User
-from ..ClsUtil import from_ts
-from ..PrizmCls import PrizmList
-from ..Perms import Perms, Overwrites, Overwrite
 from ..Snow import Snow
+from ..Member import User
+from ..PrizmCls import PrizmList
+from ..ClsUtil import from_ts, extra_kw
+from ..NonExistentObj import NonExistentObj
+from ..Perms import Perms, Overwrites, Overwrite
 
 __all__ = ["Category"]
 
@@ -25,12 +26,6 @@ class Category:
     {{param}} name [str]
         The name of the category
 
-    {{param}} parent_id [int, ~/Snow, str]
-        The catgory's category id, this should normally be None
-
-    {{param}} nsfw [bool]
-        Whether or not the category is NSFW, should normally be False
-
     {{param}} guild_id [int, ~/Snow, str]
         ID of the guild
 
@@ -43,6 +38,12 @@ class Category:
     {{param}} position [int]
         The position of this category
 
+    {{param}} user_limit [int]
+        Number of users, this should be for VCs, idk
+
+    {{param}} bitrate [int]
+        Bitrate for VCs
+
     {{param}} bot_obj [~/Bot]
         The bot object
         {{optn}}
@@ -53,14 +54,8 @@ class Category:
     {{prop}} name [str]
         Name of the category
 
-    {{prop}} nsfw [bool]
-        Whether or not the category is marked as NSFW
-
     {{prop}} category_id [int]
         The ID this category is under
-
-    {{prop}} category [~.Category]
-        The category this category is under
 
     {{prop}} type [int]
         The type of this category, this should always be `4` unless you change
@@ -98,17 +93,31 @@ class Category:
     {{prop}} news [~.NewsChannel]
         All the news channels of this category. Yes, I know it says `news`, but
         `newss` or `newses` would be awkward so I am sticking with this
+
+    {{prop}} limit [int]
+        Number of users, this should be for VCs, idk
+
+    {{prop}} bitrate [int]
+        Bitrate for VCs
+
+    {{prop}} snow [~/Snow]
+        The Snow object
+
+    {{prop}} made_at [datetime.datetime]
+        When this channel was made
+
+    {{prop}} bot_obj [~/Bot]
+        The bot object
     """
-    def __init__(self, *, permission_overwrites, name, parent_id, nsfw,
-                 guild_id, type, id, position, bot_obj = None, **kw):
-        print(kw)
-        exit()
+    def __init__(self, *, permission_overwrites, name, guild_id, type, id,
+                 position, user_limit, bitrate, bot_obj = None, **kw):
+        extra_kw(kw, "Category")
         self.overwrites = Overwrites(permission_overwrites)
         self.name = name
-        self.nsfw = bool(nsfw)
         self.guild_id = int(guild_id)
+        self.limit = user_limit
+        self.bitrate = bitrate
         self.type = type
-        self.category_id = int(parent_id)
         self.id = int(id)
         self.bot_obj = bot_obj
         self.pos = position
@@ -134,10 +143,6 @@ class Category:
     @property
     def position(self):
         return self.pos
-
-    @property
-    def category(self):
-        return self.bot_obj.all_channels(self.category_id)
 
     @property
     def guild(self):
@@ -487,3 +492,31 @@ class Category:
             "type": 4,
             "id": str(self.id)
         }
+
+    async def delete(self):
+        """
+        {{fn}} await instance.delete()
+
+        {{desc}} Deletes the object
+
+        {{rtn}} [~/NonExistentObj] The deleted object that can be undeleted
+        """
+        for text in self.bot_obj.texts:
+            del self.bot_obj.listeners[text.id]
+        id = self.id
+        self = NonExistentObj(
+            f"/guilds/{self.guild_id}/channels",
+            self.__class__,
+            self.bot_obj,
+            {
+                "name": self.name,
+                "type": 4,
+                "position": self.position,
+                "permission_overwrites": [dict(ovw) for ovw in self.overwrites],
+            },
+            {},
+            bot_obj = self.bot_obj,
+            guild_id = self.guild_id
+        )
+        await self.bot_obj.http.delete_channel(id)
+        return self

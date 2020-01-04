@@ -8,4 +8,10 @@ class VoiceClient:
 
     {{note}} This class doesn' actually exist yet
     """
-    pass
+    def __init__(self, *a, **kw):
+        if kw or a:
+            print(
+                "Error: Class 'VoiceClient' has extra kwargs added by the gateway"
+            )
+            print(kw, a)
+            exit()

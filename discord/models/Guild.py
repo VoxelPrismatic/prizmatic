@@ -4,7 +4,6 @@ from .Perms import Perms
 from .Emoji import Emoji
 from .Member import Player
 from .Error import ClassError
-from .Voice import VoiceRegion
 from .Channel import AnyChannel
 from .PrizmCls import PrizmDict
 from .ClsUtil import from_ts, id_from_obj
@@ -230,7 +229,7 @@ class Guild:
         )
 
         #Metadata
-        self.region = VoiceRegion(region)
+        self.region = region[0]
         self.afk_timeout = int(afk_timeout)
         self.has_embed = embed_enabled
         self.features = features
@@ -243,7 +242,7 @@ class Guild:
         #Other
         self.is_owner = owner
         self.owner_id = int(owner_id)
-        self.perms = Perms(permissions, 0, 0)
+        self.perms = Perms(permissions)
         self.verify_level = int(verification_level)
         self.default_message_notifs = default_message_notifications
         self.nsfw_filter = int(explicit_content_filter)

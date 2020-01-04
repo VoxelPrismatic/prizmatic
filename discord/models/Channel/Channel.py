@@ -6,8 +6,9 @@ from ..Snow import Snow
 from ..Embed import Embed
 from ..File import File, Files
 from ..Error import ObjNotFoundError
+from ..NonExistentObj import NonExistentObj
 from ..Perms import Overwrites, Overwrite, Perms
-from ..ClsUtil import from_ts, dump_json, id_from_obj
+from ..ClsUtil import from_ts, dump_json, id_from_obj, extra_kw
 
 __all__ = ["Channel"]
 
@@ -112,12 +113,13 @@ class Channel:
     def __init__(self, *, id, guild_id, name, type, position, topic,
                  permission_overwrites, rate_limit_per_user, nsfw = False,
                  last_message_id = 0, parent_id = 0, last_pin_timestamp = None,
-                 bot_obj):
+                 bot_obj = None, **kw):
+        extra_kw(kw, "Channel")
         self.id = int(id)
         self.latest_text_id = int(last_message_id)
         self.latest_pin_time = from_ts(last_pin_timestamp)
         self.name = name
-        self.overwrites = Overwrites(**permission_overwrites)
+        self.overwrites = Overwrites(permission_overwrites)
         self.pos = position
         self.slowmode = rate_limit_per_user
         self.topic = topic
@@ -514,7 +516,35 @@ class Channel:
         )
         return t
 
-    def __del__(self):
-        for text in self.texts:
-            del self.bot_obj.listener.texts[text.id]
-            del text
+    async def delete(self):
+        """
+        {{fn}} await instance.delete()
+
+        {{desc}} Deletes the object and all corrosponding messages, overwrites,
+        etc
+
+        {{rtn}} [~/NonExistentObj] The deleted object that can be undeleted
+        """
+        for text in self.bot_obj.texts:
+            del self.bot_obj.listeners[text.id]
+        id = self.id
+        self = NonExistentObj(
+            f"/guilds/{self.guild_id}/channels",
+            self.__class__,
+            self.bot_obj,
+            {
+                "name": self.name,
+                "type": 0,
+                "topic": self.topic,
+                "rate_limit_per_user": self.slowmode,
+                "position": self.position,
+                "permission_overwrites": [dict(ovw) for ovw in self.overwrites],
+                "parent_id": self.category_id,
+                "nsfw": self.nsfw
+            },
+            {},
+            bot_obj = self.bot_obj,
+            guild_id = self.guild_id
+        )
+        await self.bot_obj.http.delete_channel(id)
+        return self

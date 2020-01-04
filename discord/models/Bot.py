@@ -1,15 +1,15 @@
+import re
+import zlib
 import json
+import typing
 import asyncio
 import aiohttp
-import zlib
-import typing
-from .. import ver
-from pprint import pprint as prinf
 from . import Url
-from .PrizmCls import PrizmList, PrizmDict
-from .Listener import Listener
-import re
+from .. import ver
 from .Http import Http
+from .Listener import Listener
+from pprint import pprint as prinf
+from .PrizmCls import PrizmList, PrizmDict
 
 __all__ = [
     "get_json",
@@ -110,11 +110,11 @@ class Bot:
         self.token = token.strip()
         self.client = aiohttp.ClientSession()
         self.thresh = thresh
-        self.heartbeat = None
+        self.heartbeat = 45000
         self.uri = Url.gateway
         self.http_uri = Url.api
         self.http = Http(self.client, self)
-        self.ack = 5
+        self.ack = 0
         self.connected = False
         self.keepalive = keepalive
         self.__version__ = ver.__ver__
@@ -152,6 +152,7 @@ class Bot:
         while self.connected:
             print(".")
             await self.ws.send_json({"op": 1, "d": self.ack})
+            print(self.heartbeat / 1000)
             await asyncio.sleep(self.heartbeat / 1000)
 
     async def req(self, **kw):
@@ -372,6 +373,7 @@ class Bot:
                 await self._gate(d = data, op = 2)
                 print("LOGGED IN")
                 self.connected = True
+                asyncio.ensure_future(self.send_beat())
                 async for m in ws:
                     if self.skip_next:
                         self.skip_next = False
@@ -381,10 +383,9 @@ class Bot:
                     if j["op"] == 10:
                         print("Got Heartbeat")
                         self.heartbeat = j["d"]["heartbeat_interval"]
-                        asyncio.ensure_future(self.send_beat())
+                        print(self.heartbeat)
                     if j["op"] == 0:
                         await self.listeners.act(j, bot_obj = self)
-        print("\n\n", self.guilds, "\n\n")
 
     #Named aliases/shortcuts
     @property

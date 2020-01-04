@@ -1,10 +1,11 @@
-from .. import Url
-from ..Raw import RawFile
-from ..PrizmCls import PrizmList
-from ..Error import InputError
-from base64 import b64encode as b64e
 import io
 import re
+from base64 import b64encode as b64e
+from .. import Url
+from ..Raw import RawFile
+from ..Error import InputError
+from ..ClsUtil import extra_kw
+from ..PrizmCls import PrizmList
 
 __all__ = ["User"]
 
@@ -21,7 +22,9 @@ class User:
     """
     def __init__(self, *, id, username, discriminator, avatar, bot = False,
                  mfa_enabled = False, locale = None, verified = None,
-                 email = None, flags = 0, premium_type = 0, bot_obj = None):
+                 email = None, flags = 0, premium_type = 0, bot_obj = None,
+                 **kw):
+        extra_kw(kw, "User")
         self.id = id
         self.name = username
         self.discrim = discriminator
@@ -34,24 +37,20 @@ class User:
         self.flags = []
         bin_flags = f"{flags:011b}"
         self.bot_obj = bot_obj
-        if bin_flags[0] == "1":
-            self.flags.append("Discord Employee")
-        if bin_flags[1] == "1":
-            self.flags.append("Discord Partner")
-        if bin_flags[2] == "1":
-            self.flags.append("HypeSquad Events")
-        if bin_flags[3] == "1":
-            self.flags.append("Bug Hunter")
-        if bin_flags[6] == "1":
-            self.flags.append("HypeSquad house Bravery")
-        if bin_flags[7] == "1":
-            self.flags.append("HypeSquad house Brilliance")
-        if bin_flags[8] == "1":
-            self.flags.append("HypeSquad house Balance")
-        if bin_flags[9] == "1":
-            self.flags.append("Early Supporter")
-        if bin_flags[10] == "1":
-            self.flags.append("Team User")
+        all_flags = [
+            "Discord Employee",
+            "Discord Partner",
+            "HypeSquad Events",
+            "Bug Hunter",
+            "House Bravery",
+            "House Brilliance",
+            "House Balance",
+            "Early Supporter",
+            "Team User"
+        ]
+        for flag in range(len(bin_flags)):
+            if bin_flags[flag] == "1":
+                self.flags.append(all_flags[flag])
 
         self.nitro = ""
         if premium_type == 1:
@@ -88,4 +87,4 @@ class User:
                 "avatar": b64e(bytes(pfp))
             }
         )
-        self.__init__(user)
+        self.__init__(**user, bot_obj = self.bot_obj)

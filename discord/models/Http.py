@@ -3,9 +3,13 @@ import json
 import zlib
 import asyncio
 import aiohttp
+from base64 import b64encode as b64e, b64decode as b64d
+
 from . import Semi
 from . import Url
 from . import Events
+from . import NonExistentObj
+
 from .Snow import Snow
 from .Role import Role
 from .Emoji import Emoji
@@ -14,16 +18,21 @@ from .Embed import Embed
 from .Guild import Guild
 from .Invite import Invite
 from .Widget import Widget
+from .Status import Status
 from .Audit import AuditLog
 from .Webhook import Webhook
+from .ClsUtil import from_ts
+from .Error import LoginError
+from .Error import ClassError
+from .Reaction import Reaction
+from .Semi import OfflineGuild
+from .Voice import VoiceClient
 from .Channel import AnyChannel
 from .Member import Player, User
 from .Text import Text, Crosspost
 from .GuildEmbed import GuildEmbed
 from .Integration import Integration
-from .Error import ClassError, LoginError
 from .PrizmCls import PrizmDict, PrizmList
-from .Voice import VoiceRegion, VoiceClient
 from .Perms import Perms, Overwrite, Overwrites
 from .Raw import RawList, Raw, RawObj, RawObjs, RawFile, RawAny
 
@@ -509,29 +518,25 @@ class Http:
 
 
     def get_emojis(self, gID, **kw):
-        d = self.req(
+        return self.req(
             u = f"/guilds/{gID}/emojis"
         )
-        return self.bot.await_make("emojis", d, **kw)
     async def get_emoji(self, gID, eID, **kw):
-        d = await self.req(
+        return await self.req(
             u = f"/guilds/{gID}/emojis/{eID}",
         )
-        return self.bot.raw_make("emojis", d, **kw)
     async def make_emoji(self, gID, data, **kw):
-        d = await self.req(
+        return await self.req(
             m = "+",
             u = f"/guilds/{gID}/emojis",
             d = data
         )
-        return self.bot.raw_make("emojis", d, **kw)
     async def edit_emoji(self, gID, eID, data, **kw):
-        d = await self.req(
+        return await self.req(
             m = "/",
             u = f"/guilds/{gID}/emojis/{eID}",
             d = data
         )
-        return self.bot.raw_edit("emojis", d, **kw)
     async def delete_emoji(self, gID, eID, **kw):
         return await self.req(
             m = "-",
@@ -651,7 +656,7 @@ class Http:
 
     def get_regions(self, gID, **kw):
         return RawList(
-            VoiceRegion,
+            list,
             f"/guilds/{gID}/regions",
             bot_obj = self.bot,
             **kw

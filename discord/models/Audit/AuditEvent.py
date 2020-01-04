@@ -1,4 +1,5 @@
 from .AuditChange import AuditChange
+from ..ClsUtil import extra_kw
 
 __all__ = ["AuditEvent", "audit_actions"]
 
@@ -116,7 +117,9 @@ class AuditEvent:
         The bot object, so you can access it anywhere
     """
     def __init__(self, *, target_id, changes = [], user_id = 0, id = 0,
-                 action_type = 0, options = {}, reason = "", bot_obj = None):
+                 action_type = 0, options = {}, reason = "", bot_obj = None,
+                 **kw):
+        extra_kw(kw, "AuditEvent")
         self.target_id = int(target_id)
         self.id = int(id)
         self.changes = [AuditChange(**d) for d in changes]

@@ -1,10 +1,10 @@
-from ..ClsUtil import from_ts
-from ..Perms import Perms, Overwrites
-from ..Member import User
-from ..PrizmCls import PrizmList
 from ..Role import Role
-from ..Raw import Raw, RawObj, RawList, RawFile
+from ..Member import User
 from .Channel import Channel
+from ..PrizmCls import PrizmList
+from ..Perms import Perms, Overwrites
+from ..ClsUtil import from_ts, extra_kw
+from ..Raw import Raw, RawObj, RawList, RawFile
 
 __all__ = ["StoreChannel"]
 
@@ -22,13 +22,7 @@ class StoreChannel(Channel):
                  permission_overwrites, rate_limit_per_user, nsfw, topic,
                  last_message_id, parent_id = None, last_pin_timestamp,
                  bot_obj = None, **kw):
-        if kw:
-            print(
-                "Error: Class 'StoreChannel' has extra kwargs added by the"
-                "gateway"
-            )
-            print(kw)
-            exit()
+        extra_kw(kw, "StoreChannel")
         super().__init__(
             id = id, guild_id = guild_id, name = name, type = type,
             position = position, permission_overwrites = permission_overwrites,

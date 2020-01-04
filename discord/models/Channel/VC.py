@@ -1,10 +1,11 @@
-from ..ClsUtil import from_ts
-from ..Perms import Perms
-from ..Member import User
-from ..PrizmCls import PrizmList
+from ..Snow import Snow
 from ..Role import Role
-from ..Raw import Raw, RawObj, RawList, RawFile
+from ..Member import User
+from ..Perms import Perms
+from ..PrizmCls import PrizmList
+from ..ClsUtil import from_ts, extra_kw
 from ..Perms import Overwrite, Overwrites
+from ..Raw import Raw, RawObj, RawList, RawFile
 
 __all__ = ["VC"]
 
@@ -38,6 +39,9 @@ class VC:
     {{param}} guild_id [str, ~/Snow, int]
         The ID of the guild
 
+    {{param}} parent_id [str, ~/Snow, int]
+        The category ID
+
     {{param}} bot_obj [~/Bot]
         The bot object
 
@@ -67,21 +71,35 @@ class VC:
     {{prop}} guild [~/Guild]
         The guild itself
 
+    {{prop}} snow [~/Snow]
+        The snow object corresponding to the ID
+
+    {{prop}} made_at [datetime.datetime]
+        When the channel was made
+
+    {{prop}} category_id [int]
+        ID of the category
+
+    {{prop}} category [~.Category, None]
+        The category, or None if there isn't one
+
     {{prop}} bot_obj [~/Bot]
         The bot object
     """
-    def __init__(self, *, id, name, permission_overwrites, position, type,
-                 user_limit, guild_id, bot_obj = None, **kw):
-        print(kw)
-        exit()
-        self.id = int(id)
-        self.name = name
+    def __init__(self, *, permission_overwrites, name, guild_id, type, id,
+                 position, user_limit, bitrate, parent_id, bot_obj = None,
+                 **kw):
+        extra_kw(kw, "VC")
         self.overwrites = Overwrites(permission_overwrites)
-        self.pos = position
-        self.type = type
-        self.limit = user_limit
+        self.name = name
         self.guild_id = int(guild_id)
+        self.limit = user_limit
+        self.bitrate = bitrate
+        self.type = type
+        self.id = int(id)
         self.bot_obj = bot_obj
+        self.pos = position
+        self.category_id = int(parent_id or 0)
 
     @property
     def permission_overwrites(self):
@@ -94,6 +112,20 @@ class VC:
     @property
     def guild(self):
         return self.bot_obj.guilds(self.guild_id)
+
+    @property
+    def snow(self):
+        return Snow(self.id)
+
+    @property
+    def made_at(self):
+        return self.snow.dt
+
+    @property
+    def category(self):
+        if self.category_id:
+            return self.bot_obj.categories(self.category_id)
+        return None
 
     async def refresh(self):
         """

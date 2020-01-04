@@ -1,10 +1,16 @@
+import re
+import json
+import zlib
 import typing
 import asyncio
-import traceback
-from . import Url
+import aiohttp
+from base64 import b64encode as b64e, b64decode as b64d
+
 from . import Semi
+from . import Url
 from . import Events
 from . import NonExistentObj
+
 from .Snow import Snow
 from .Role import Role
 from .Emoji import Emoji
@@ -21,13 +27,13 @@ from .Error import LoginError
 from .Error import ClassError
 from .Reaction import Reaction
 from .Semi import OfflineGuild
+from .Voice import VoiceClient
 from .Channel import AnyChannel
 from .Member import Player, User
 from .Text import Text, Crosspost
 from .GuildEmbed import GuildEmbed
 from .Integration import Integration
 from .PrizmCls import PrizmDict, PrizmList
-from .Voice import VoiceRegion, VoiceClient
 from .Perms import Perms, Overwrite, Overwrites
 from .Raw import RawList, Raw, RawObj, RawObjs, RawFile, RawAny
 
@@ -378,39 +384,42 @@ class Listener:
         """
         d = j["d"]
         t = j["t"]
-        d.update(kw)
+        try:
+            d.update(kw)
+        except Exception:
+            d = kw
         if t == "CHANNEL_CREATE":
             o = AnyChannel(**d)
             self.channels[o.id] = o
-            asyncio.run(self.run("channel_make", o))
+            asyncio.ensure_future(self.run("channel_make", [], o))
         elif t == "CHANNEL_UPDATE":
             a = AnyChannel(**d)
-            b = self.channels[a.id]
-            asyncio.run(self.run("channel_edit", b, a))
+            b = self.channels(a.id)
+            asyncio.ensure_future(self.run("channel_edit", [], b, a))
             b.__init__(**d)
         elif t == "CHANNEL_DELETE":
             o = AnyChannel(**d)
             if type(self.channels[o.id]) != NonExistentObj:
                 self.channels[o.id].stop_existing()
-            asyncio.run(self.run("channel_delete", o))
+            asyncio.ensure_future(self.run("channel_delete", [], o))
         elif t == "CHANNEL_PINS_UPDATE":
             o = self.channels[int(d["channel_id"])]
             self.channels[o.id].latest_pin_time =\
                 from_ts(d["last_pin_timestamp"])
-            asyncio.run(self.run("text_pinned"), o)
+            asyncio.ensure_future(self.run("text_pinned", [], o))
         elif t == "GUILD_CREATE":
             o = Guild(**d)
             self.guilds[o.id] = o
-            asyncio.run(self.run("guild_make"), o)
+            asyncio.ensure_future(self.run("guild_join", [], o))
         elif t == "GUILD_UPDATE":
             a = Guild(**d)
             b = self.guilds[a.id]
-            asyncio.run(self.run("guild_edit"), b, a)
+            asyncio.ensure_future(self.run("guild_edit", [], b, a))
         elif t == "GUILD_DELETE":
             o = OfflineGuild(**d)
             if type(self.guilds[o.id]) != NonExistentObj:
                 self.guilds[o.id].stop_existing()
-            asyncio.run(self.run("guild_delete"), o)
+            asyncio.ensure_future(self.run("guild_delete", [], o))
         elif t == "GUILD_BAN_ADD":
             g = self.guilds[d["guild_id"]]
             u = User(**d["user"])

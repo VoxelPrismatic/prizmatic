@@ -100,10 +100,10 @@ class Role:
         {{param}} name [str]
             The new name of the role
 
-        {{param}} perms [int, str, discord.models.Perms.Perms]
+        {{param}} perms [int, str, ~/Perms.Perms]
             The permissions level for the role
 
-        {{param}} color [str, int, discord.models.Color]
+        {{param}} color [str, int, ~/Color]
             The color-compatible color
 
         {{param}} hoist [bool]
@@ -174,7 +174,7 @@ class Role:
 
         {{desc}} Deletes the object on discord's end
 
-        {{rtn}} [discord.models.NonExistentObj] The deleted object
+        {{rtn}} [~/NonExistentObj] The deleted object
         """
         await self.bot_obj.http.delete_role(self.guild_id, self.id, r = reason)
         o = NonExistentObj(
@@ -199,3 +199,14 @@ class Role:
     @property
     def guild(self):
         return self.bot_obj.listeners.guilds(self.guild_id)
+
+    def __int__(self):
+        """
+        {{bltin}} instance.__int__()
+        {{usage}} int(instance)
+
+        {{desc}} Returns the role ID
+
+        {{rtn}} [int]
+        """
+        return self.id

@@ -1,3 +1,5 @@
+from ..ClsUtil import extra_kw
+
 __all__ = ["Ban"]
 
 class Ban:
@@ -8,4 +10,5 @@ class Ban:
 
     {{note}} This class doesn't actually exist yet'
     """
-    pass
+    def __init__(self, **kw):
+        extra_kw(kw, "Ban")

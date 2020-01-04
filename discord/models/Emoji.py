@@ -147,3 +147,14 @@ class Emoji:
             "available": self.usable,
             "roles": [dict(role) for role in self.roles]
         }
+
+    async def refresh(self):
+        """
+        {{fn}} await instance.refresh()
+
+        {{desc}} Refreshes the emoji if you think it is out of date
+
+        {{rtn}} [~.Emoji] The edited instance
+        """
+        d = await self.bot_obj.http.get_channel(self.id)
+        self.__init__(**d, bot_obj = self.bot_obj, guild_id = self.guild_id)

@@ -1,4 +1,10 @@
 __all__ = ["SemiInvite"]
 
 class SemiInvite:
-    pass
+    def __init__(self, **kw):
+        if kw:
+            print(
+                "Error: Class 'SemiInvite' has extra kwargs added by the gateway"
+            )
+            print(kw)
+            exit()
