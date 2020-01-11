@@ -24,45 +24,18 @@ modules are the class names.
 
 # DEPENDENCIES
 ```
-1] py3.5 to py3.7, don't use py3.8 because I can't verify if it works there.
+1] py3.6 and up, however py3.8 is a mystery zone because I don't use it myself
 2] Knowledge of code
 >  Basically, I will make this module as easy as possible to understand,
 >  but you still need to actually make your own code
 ```
 Install the requirements:
 ```
-Windows   ] C:\>py -m pip install -U req.txt
-Linux/Mac ] ~$ python -m pip install -U req.txt
+Windows   ] C:\>py -m pip install -r req.txt
+Linux/Mac ] ~$ python -m pip install -r req.txt
 ```
 **This is not a package yet. Do not bug me about that.**
 
 # DOCUMENTATION
-I don't know how to document stuff... so the best I can say is just look at the code.
-
-When I do document stuff, it will generally follow this syntax:
-```
-DESCRIPTION ---
-    Description of the class blah represents blah blah
-
-PARAMS ---
-    param_name [type]
-    - Description of this param
-    
-    Maybe you shouldn't initialize this class.
-
-FUNCTIONS ---
-    await function1(...)
-    - Description
-    
-    function2()
-    - Description 2 
-```
-Please note that classes that shouldn't be initialized will not have their
-params shown, as they are formed according to [the discord docs](https://discordapp.com/developers/docs)
-
-Also, all the documentation will be in those files for now. I will provide
-further examples and info in the wiki of this repo, but only when this thing
-actually starts to work.
-
-# CODE
-To see how I name stuff for little bits of code, go to `ParamNames.md`
+[here ya go m8](https://voxelprismatic.github.io/prizmatic.docs). I've been working hard to make
+it look nice and usable ;]
