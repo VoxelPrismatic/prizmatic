@@ -28,6 +28,14 @@ class Files:
         return [await t.get() for t in self.ls]
 
     def __list__(self):
+        """
+        {{bltin}} instance.__list__()
+        {{usage}} list(instance)
+
+        {{pydesc}} __list__ `file`s
+
+        {{rtn}} [List[~.File]]
+        """
         return self.ls
 
     def __getitem__(self, index: int):
@@ -35,7 +43,7 @@ class Files:
         {{bltin}} instance.__getitem__(index)
         {{usage}} instance[index]
 
-        {{desc}} Treats this as if it were a list
+        {{pydesc}} __getitemL__
 
         {{rtn}} [~.File] The item at that index
         """
@@ -55,10 +63,26 @@ class Files:
             i += 1
 
     def __iter__(self):
+        """
+        {{bltin}} instance.__iter__()
+        {{usage}} iter(instance)
+
+        {{pydesc}} __iter__ of `file`s
+
+        {{rtn}} [generator]
+        """
         self.___iter_index___ = -1
         return self
 
     def __next__(self):
+        """
+        {{bltin}} instance.__next__()
+        {{usage}} for file in instance: #code...
+
+        {{pydesc}} __next__ the files
+
+        {{rtn}} [~.File]
+        """
         self.___iter_index___ += 1
         if self.___iter_index___ < len(self.ls):
             return self.ls[self.___iter_index___]

@@ -15,6 +15,8 @@ class DM:
 
     {{noinit}}
 
+    {{note}} The documentation for this class is not complete yet
+
     {{param}} last_message_id []
     """
     def __init__(self, *, last_message_id, type, id, recipients, bot_obj, **kw):

@@ -55,6 +55,7 @@ def encode_perms(ls: list):
 class Perms:
     """
     {{cls}} instance = Perms(*, allow, deny, none)
+
     {{desc}} Represents the permissions of a member, user, or overwrite
 
     {{param}} allow [int]
@@ -65,6 +66,7 @@ class Perms:
 
     {{note}} Use the encode method to create an int from a list of perms
 
+    {{note}} The documentation for this class is not complete yet
     """
     def __init__(self, allow = 0, deny = 0):
         self.override_type = type

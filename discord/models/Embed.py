@@ -127,24 +127,6 @@ class Embed:
     discarded, but Discord does allow the `attachment://<file_name>.<type>`
     scheme, and is supported here too.
 
-    {{note}} This is the default formatting of an Embed ---
-     ______________
-    /
-    | Author things
-    | Title
-    | -------------
-    | desc...       [thumb]
-    |
-    | Field name
-    | field content
-    |
-    | [   image   ]
-    | [           ]
-    | -------------
-    | Footer things | Timestamp
-    |______________
-    *not to scale ofc but this is the general layout
-
     {{prop}} title [str]
         The title of the embed
 
@@ -326,11 +308,10 @@ class Embed:
 
     def __dict__(self):
         """
-        {{fn}} instance.__dict__()
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
 
-        {{note}} This function is actually meant to be used as `dict(instance)`
-
-        {{desc}} Returns a discord-compatible dict object ready for sending
+        {{pydesc}} __dict__
 
         {{rtn}} [dict] The send-ready object
 
@@ -662,12 +643,10 @@ class Embed:
 
     def __getitem__(self, key):
         """
-        {{fn}} instance.__getitem__(key)
+        {{bltin}} instance.__getitem__(key)
+        {{usage}} instance[key]
 
-        {{note}} This function is meant to be used as `instance[key]`
-
-        {{desc}} Returns an attribute, so you can interact with this class as if
-        it were a dict
+        {{pydesc}} __getitemD__
 
         {{param}} key [str]
             The attribute you want
@@ -678,11 +657,10 @@ class Embed:
 
     def __setitem__(self, key, val):
         """
-        {{fn}} instance.__setitem__(key) = val
+        {{bltin}} instance.__setitem__(key, val)
+        {{usage}} instance[key] = val
 
-        {{note}} This function is meant to be used as `instance[key] = val`
-
-        {{desc}} Returns an attribute, so you can interact with this class as if
+        {{desc}} Sets an attribute, so you can interact with this class as if
         it were a dict
 
         {{param}} key [str]

@@ -4,29 +4,12 @@ __all__ = ["RawAny"]
 
 class RawAny:
     """
-    DESCRIPTION ---
-        Acts like a raw object, until it's created. When it is created, it turns
-        into the object you wanted.
+    {{cls}} instance = RawAny()
 
-    PARAMS ---
-        typ [type]
-        - What to initialize, should be from this class
+    {{desc}} Acts like a raw object, until it's created. When it is created, it
+    turns into the object you wanted.
 
-        url [str]
-        - The url, like in Raw
-
-        bot [Bot]
-        - The bot object, so this class can be transformed properly
-
-        *a, **kw
-        - Other args to initialize with
-
-    FUNCTIONS ---
-        raw_any = RawAny(typ, url, bot)
-        - Create a new RawAny object
-
-        await raw_any.make()
-        - The magical transformation function
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, typ, url, bot = None, *a, **kw):
         if type(bot) != Bot and "bot_obj" not in kw:

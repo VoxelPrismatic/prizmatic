@@ -94,7 +94,6 @@ class Listener:
 
     {{prop}} objs [dict]
         A conversion table from catagory to actual object
-
     """
     def __init__(self, bot_obj):
         self.bot_obj = bot_obj

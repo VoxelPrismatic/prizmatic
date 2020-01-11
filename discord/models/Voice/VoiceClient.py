@@ -6,7 +6,7 @@ class VoiceClient:
 
     {{desc}} Allows connecting to voice channels
 
-    {{note}} This class doesn' actually exist yet
+    {{note}} This class doesn't actually exist yet
     """
     def __init__(self, *a, **kw):
         if kw or a:

@@ -37,15 +37,15 @@ class Assets:
         self.big_txt = large_text
         self.lil_img = small_image
         self.lil_txt = small_text
+
     def __dict__(self):
         """
-        {{fn}} instance.__dict__()
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
 
-        {{note}} This function is actually meant to be used as `dict(instance)`
+        {{pydesc}} __dict__
 
-        {{desc}} Returns the send-ready object
-
-        {{rtn}} [dict] The send-ready object
+        {{rtn}} [dict]
         """
         return {
             "large_image": self.big_img,

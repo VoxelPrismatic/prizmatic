@@ -6,7 +6,6 @@ __all__ = ["AuditSearch"]
 
 class AuditSearch:
     """
-    {{loc}} discord.models.Audit
     {{cls}} instance = AuditSearch(events)
 
     {{desc}} Represents an audit log search
@@ -26,7 +25,7 @@ class AuditSearch:
         {{bltin}} instance.__getitem__(key)
         {{usage}} instance[key]
 
-        {{desc}} Either returns a ~.AuditEvent or a ~.AuditSearch object
+        {{pydesc}} __getitemL__
 
         {{param}} key [int, str, discord.models.Member.User]
             If `int`, then it will return that index in `instance.events` or it
@@ -37,6 +36,7 @@ class AuditSearch:
 
         {{rtn}} [~.AuditSearch] The filtered events if `key`
         is a User, user ID, or str
+
         {{rtn}} [~.AuditEvent] The event if `key` is an index
         """
         if type(key) == int:
@@ -58,3 +58,29 @@ class AuditSearch:
             if evt.user_id == key:
                 ls.append(evt)
         return self.__class__(ls)
+
+    def __iter__(self):
+        """
+        {{bltin}} instance.__iter__()
+        {{usage}} iter(instance)
+
+        {{pydesc}} __iter__
+
+        {{rtn}} [generator]
+        """
+        self.___iter_index___ = -1
+        return self
+
+    def __next__(self):
+        """
+        {{bltin}} instance.__next__()
+        {{usage}} for event in instance: #code...
+
+        {{pydesc}} __next__
+
+        {{rtn}} [~.AuditEvent] The next event
+        """
+        self.___iter_index___ += 1
+        if self.___iter_index___ < len(self.events):
+            return self.events[self.___iter_index___]
+        raise StopIteration("No more events")

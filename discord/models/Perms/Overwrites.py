@@ -62,7 +62,7 @@ class Overwrites:
         {{bltin}} instance.__iter__()
         {{usage}} iter(instance)
 
-        {{desc}} Creates a generator of channels
+        {{pydesc}} __iter__ of `Overwrite`s
 
         {{rtn}} [generator]
         """
@@ -74,12 +74,12 @@ class Overwrites:
         {{bltin}} instance.__next__()
         {{usage}} for overwrite in instance: #... code
 
-        {{desc}} Allows you to iterate through these overwrites
+        {{pydesc}} __next__ the overwrites
 
         {{rtn}} [~.Overwrite]
         """
         self.___iter_index___ += 1
-        if self.___iter_index___ < len(self.sub_channels):
-            return self.sub_channels[self.___iter_index___]
+        if self.___iter_index___ < len(self.overwrites):
+            return self.overwrites[self.___iter_index___]
         else:
             raise StopIteration("No more overwrites")

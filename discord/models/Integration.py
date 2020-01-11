@@ -10,6 +10,10 @@ class Integration:
     {{desc}} Represents an integration, or partial integration if only some
     params are passed
 
+    {{noinit}}
+
+    {{note}} The documentation for this class is not complete yet
+
     {{param}} id [int, discord.models.Snow, str]
         ID of this integration
 

@@ -1,6 +1,10 @@
 import setuptools
 import os
 
+"""
+This file allows me to upload this module to PyPI, nothing else
+"""
+
 with open("README.md", "r") as r:
     ext_desc = r.read()
 
@@ -36,7 +40,7 @@ setuptools.setup(
     install_requires = req,
 
     #Metadata
-    keywords = "discord reddit matrix riot",
+    keywords = "discord reddit matrix riot prizm prizmatic priz",
     classifiers = [
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

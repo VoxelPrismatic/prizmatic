@@ -7,12 +7,12 @@ from ..Raw import RawObjs
 from ..Error import ClassError
 from ..ClsUtil import extra_kw
 
-__all__ = ["AuditLog"]
+__all__ = [
+    "AuditLog"
+]
 
 class AuditLog:
     """
-    {{loc}} discord.models.Audit
-
     {{cls}} instance = AuditLog(*, too_many_args_to_list_here)
 
     {{desc}} Represents an audit log
@@ -73,7 +73,7 @@ class AuditLog:
         {{bltin}} instance.__getitem__(key)
         {{usage}} instance[key]
 
-        {{desc}} Either returns a ~.AuditEvent or a ~.AuditSearch object
+        {{pydesc}} __getitemL__
 
         {{param}} key [int, str, ~/Member.User]
             If `int`, then it will return that index in `instance.events` or it
@@ -84,6 +84,7 @@ class AuditLog:
 
         {{rtn}} [~.AuditSearch] The filtered events if `key` is a User, user ID,
         or str
+
         {{rtn}} [~.AuditEvent] The event if `key` is an index
         """
         if type(key) == int:
@@ -121,3 +122,29 @@ class AuditLog:
             "audit_log_entries": [dict(event) for event in self.events],
             "integrations": [dict(integrate) for integrate in self.integrations]
         }
+
+    def __iter__(self):
+        """
+        {{bltin}} instance.__iter__()
+        {{usage}} iter(instance)
+
+        {{pydesc}} __iter__
+
+        {{rtn}} [generator]
+        """
+        self.___iter_index___ = -1
+        return self
+
+    def __next__(self):
+        """
+        {{bltin}} instance.__next__()
+        {{usage}} for event in instance: #code...
+
+        {{pydesc}} __next__
+
+        {{rtn}} [~.AuditEvent] The next event
+        """
+        self.___iter_index___ += 1
+        if self.___iter_index___ < len(self.events):
+            return self.events[self.___iter_index___]
+        raise StopIteration("No more events")

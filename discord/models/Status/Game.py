@@ -104,3 +104,13 @@ class Game:
         self.assets = Assets(**assets)
         self.secrets = Secrets(**secrets)
         self.bot_obj = bot_obj
+
+    def __dict__(self):
+        """
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
+
+        {{pydesc}} __dict__
+
+        {{rtn}} [dict]
+        """

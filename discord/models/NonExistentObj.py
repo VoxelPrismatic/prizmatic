@@ -22,7 +22,7 @@ class NonExistentObj:
         The object to recreate, eg Text or Channel. This param is only used to
         recreate the object before it was deleted.
 
-    {{param}} bot [discord.Bot]
+    {{param}} bot [~/Bot]
         The bot object
 
     {{param}} data [dict]
@@ -45,7 +45,7 @@ class NonExistentObj:
     {{prop}} typ [class]
         The object's class
 
-    {{prop}} bot [discord.Bot]
+    {{prop}} bot [~/Bot]
         The bot object
 
     {{prop}} dat [dict]
@@ -82,7 +82,7 @@ class NonExistentObj:
         upon a guild's creation, etc. If you must recreate those, use the extras
         upon initialization.
 
-        {{rtn}} The recreated object
+        {{rtn}} [Any] The recreated object
         """
         o = await self.bot.http.req(m = "+", u = self.url, d = self.dat)
         obj = self.typ(**o, **self.kw)

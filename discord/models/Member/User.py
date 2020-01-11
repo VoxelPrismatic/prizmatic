@@ -11,14 +11,11 @@ __all__ = ["User"]
 
 class User:
     """
-    DESCRIPTION ---
-        Represents a non-guild player
+    {{cls}} instance = User()
 
-    PARAMS ---
-        This class shouldn't be initalized by hand. Don't do that.
+    {{desc}} Represents a non-guild player
 
-    FUNCTIONS ---
-        None yet
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, *, id, username, discriminator, avatar, bot = False,
                  mfa_enabled = False, locale = None, verified = None,

@@ -1,7 +1,10 @@
 from .AuditChange import AuditChange
 from ..ClsUtil import extra_kw
 
-__all__ = ["AuditEvent", "audit_actions"]
+__all__ = [
+    "AuditEvent",
+    "audit_actions"
+]
 
 #According to Discord Docs
 audit_actions = {
@@ -52,8 +55,6 @@ audit_actions = {
 
 class AuditEvent:
     """
-    {{loc}} discord.models.Audit
-
     {{cls}} instance = AuditEvent(*, too_many_args_to_list_here)
 
     {{desc}} Represents an audit log event
@@ -150,8 +151,7 @@ class AuditEvent:
         {{bltin}} instance.__getitem__(index)
         {{usage}} instance[index]
 
-        {{desc}} Treats this class as if it were a list of
-        discord.models.Audit.AuditChange objects
+        {{pydesc}} __getitemL__
 
         {{param}} index [int]
             That specific change
@@ -189,3 +189,29 @@ class AuditEvent:
             "options": self.options,
             "reason": self.reason
         }
+
+    def __iter__(self):
+        """
+        {{bltin}} instance.__iter__()
+        {{usage}} iter(instance)
+
+        {{pydesc}} __iter__
+
+        {{rtn}} [generator]
+        """
+        self.___iter_index___ = -1
+        return self
+
+    def __next__(self):
+        """
+        {{bltin}} instance.__next__()
+        {{usage}} for change in instance: #code...
+
+        {{pydesc}} __next__
+
+        {{rtn}} [~.AuditChange] The next event
+        """
+        self.___iter_index___ += 1
+        if self.___iter_index___ < len(self.changes):
+            return self.changes[self.___iter_index___]
+        raise StopIteration("No more changes")

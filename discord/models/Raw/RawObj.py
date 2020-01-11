@@ -2,28 +2,13 @@ __all__ = ["RawObj"]
 
 class RawObj:
     """
-    DESCRIPTION ---
-        Represents an object that hasn't actually been created yet,
-        but unlike the regular Raw, this class already has all the
-        info needed to make the object.
+    {{cls}} instance = RawObj()
 
-    PARAMS ---
-        typ [Class]
-        - The object to create
+    {{desc}} Represents an object that hasn't actually been created yet, but
+    unlike the regular Raw, this class already has all the info needed to make
+    the object.
 
-        *args, **kwargs
-        - As if you were to create the object
-
-    FUNCTIONS ---
-        thing = RawObj(typ, *args, **kwargs)
-        - Creates a new RawObj object
-
-        thing.make()
-        - Makes the object and returns it
-        - Returns the created object if it is already made
-
-        thing()
-        - Returns the object
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, typ, *args, **kwargs):
         self.typ = typ

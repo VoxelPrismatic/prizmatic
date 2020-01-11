@@ -26,11 +26,10 @@ class Party:
 
     def __dict__(self):
         """
-        {{fn}} instance.__dict__()
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
 
-        {{note}} This function is actually meant to be used as `dict(instance)`
-
-        {{desc}} Returns the send-ready object
+        {{pydesc}} __dict__
 
         {{rtn}} [dict] The send-ready object
         """

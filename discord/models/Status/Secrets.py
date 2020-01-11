@@ -30,3 +30,16 @@ class Secrets:
         self.join = join
         self.spectate = spectate
         self.match = match
+
+    def __dict__(self):
+        """
+        {{bltin}} instance.__dict__()
+        {{usage}} dict(instance)
+
+        {{pydesc}} __dict__
+
+        {{rtn}} [dict]
+        """
+        return {
+            "join": self.join, "spectate": self.spectate, "match": self.match
+        }

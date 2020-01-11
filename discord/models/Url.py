@@ -24,6 +24,11 @@ __all__ = [
     "achievement"
 ]
 
+"""
+This file provides easy editable URLs so I don't have to go through every single
+file to make sure the URLs are correct. Only this file and the http file
+"""
+
 global home, cdn, media, api, gateway, wss
 global gg, invite, devs, oauth2, webhooks
 home = "https://discordapp.com"

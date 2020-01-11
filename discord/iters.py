@@ -8,32 +8,18 @@ __all__ = [
     "Option",
     "_Option",
     "Any",
-    "_Any",
-    "Equation",
-    "_Equation"
+    "_Any"
 ]
 
 class _AllOf:
     """
-    DESCRIPTION ---
-        Makes a list of consecutive items that match a class
+    {{cls}} instance = _AllOf()
 
-    PARAMS ---
-       typ [class]
-       - The class in question
+    {{desc}} Makes a list of consecutive items that match a class
 
-    USAGE ---
-        This is not a regular class. It must be used as follows:
-
-            def function(arg1: AllOf[class]):
-                ...
-
-            def fun(arg0, arg1: AllOf[class], ...):
-                ...
-
-        This is a parameter class that forms a list of all consecutive
-        arguments that match its class parameter. It is mainly used with
-        commands for arguments and things.
+    {{warn}} This class is used as an argument type. It is meant to be used as
+    `async def command_name(inf, arg1, arg2: AllOf[data_type]): #code...`,
+    where `data_type` is the type of data, eg `int` or `str`
     """
     def __init__(self, typ = None):
         self.converter = typ
@@ -45,25 +31,15 @@ class _AllOf:
 
 class _Option:
     """
-    DESCRIPTION ---
-        Has a default value but can be changed
+    {{cls}} instance = _Option
 
-    PARAMS ---
-        typ [class]
-        - The class
+    {{desc}} Has a default value but can be changed, will not throw an error if
+    not a valid input
 
-    USAGE ---
-        This is not a regular class. It must be used as follows:
-
-            def function(arg1: Option[class] = default_value):
-                ...
-
-            def fun(arg0, arg1: Option[class] = default_value, ...):
-                ...
-
-        This is a parameter class that forms an optional argument and will not
-        break when an invalid param is passed [when the command is called]. It is
-        mainly used with commands for arguments and things.
+    {{warn}} This class is used as an argument type. It is meant to be used as
+    `async def command_name(inf, arg1: Option[data_type]: norm_val): #code...`,
+    where `data_type` is the type of data, eg `int` or `str` and `norm_val` is
+    the default value
     """
     def __init__(self):
         pass
@@ -75,25 +51,13 @@ class _Option:
 
 class _Any:
     """
-    DESCRIPTION ---
-        Can be any of these values
+    {{cls}} instance = _Any()
 
-    PARAMS ---
-        *typ [class]
-        - The classes, as a list
+    {{desc}} Can be any one of a list of data types
 
-    USAGE ---
-        This is not a regular class. It must be used as follows:
-
-            def function(arg1: Any[class1, class2, ...]):
-                ...
-
-            def fun(arg0, arg1: Any[class1, class2, ...] = default_value, ...):
-                ...
-
-        This is a parameter class that forms an argument that can have multiple
-        forms and will not break as often on a command call. It is mainly used
-        with commands for arguments and things.
+    {{warn}} This class is used as an argument type. It is meant to be used as
+    `async def command_name(inf, arg1, arg2: Any[type1, type2, ...]): #code...`,
+    where `type#` is the type of data, eg `int` or `str`
     """
     def __init__(self):
         pass
@@ -101,36 +65,6 @@ class _Any:
     def __getitem__(self, *, param):
         return typing.Union[param]
 
-class _Equation:
-    """
-    DESCRIPTION ---
-        Allows for equations
-
-    PARAMS ---
-        *fns [str]
-        - Allowed functions, at least one must be specified
-
-    USAGE ---
-        This is not a regular class. It must be used as follows:
-
-            def function(arg1: Equation[operator]):
-                ...
-
-            def fun(arg0, arg1: Any[op1, op2, ...] = default_value, ...):
-                ...
-
-        Operators can be '+', '-', or any operator or function because it is a
-        string. It is mainly used with commands for arguments and things.
-    """
-    def __init__(self):
-        pass
-
-    def __getitem__(self, *, param):
-        return re.compile(
-            r"^(\d+ *(" + "|".join("\\".join(list(p)) for p in param) + r") *\d+)+$"
-        )
-
-Equation = _Equation()
 Any = _Any()
 Option = _Option()
 AllOf = _AllOf()

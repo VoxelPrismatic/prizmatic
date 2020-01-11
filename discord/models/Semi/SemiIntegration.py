@@ -6,7 +6,7 @@ class SemiIntegration:
 
     {{desc}} Represents a partial integration
 
-
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, *, id, name, type, account, bot_obj):
         self.id = int(id)

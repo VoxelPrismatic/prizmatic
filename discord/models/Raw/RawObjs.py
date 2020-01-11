@@ -5,40 +5,11 @@ __all__ = ["RawObjs"]
 
 class RawObjs:
     """
-    DESCRIPTION ---
-        Makes a list of RawObj objects from a list and a class
+    {{cls}} instance = RawObjs()
 
-    PARAMS ---
-        typ [Class]
-        - The object to create
+    {{desc}} Makes a list of RawObj objects from a list and a class
 
-        ls [list(obj)]
-        - The params of the objects
-
-        *args, **kwargs
-        - Universal parameters
-
-    FUNCTIONS ---
-        raw_objs = RawObjs(typ, ls)
-        - Create a RawObjs object
-
-        raw_objs.make()
-        - Create all objects fully, and return it
-
-        raw_objs.raw()
-        - Create only RawObj objects, and return it
-
-        raw_objs()
-        - Return the current list of objects
-
-        raw_objs[index]
-        - Return the object at that index
-
-        raw_objs[index] = val
-        - Set that index to val, effects everything
-
-        del raw_objs[index]
-        - Delete that item, effects everything
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, typ, ls, *args, **kwargs):
         for i in range(len(ls)):

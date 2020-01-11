@@ -13,25 +13,28 @@ class Text:
 
     {{desc}} Represents a message
 
-    {{note}} This class shouldn't be initialized by hand. Don't do that.
+    {{noinit}}
 
-    {{param}} id [str, discord.Snow]
+    {{note}} The documentation for this class is not complete yet
+
+    {{param}} id [str, ~/Snow]
         ID of the message
 
-    {{param}} channel_id [str, disxord.Snow]
+    {{param}} channel_id [str, ~/Snow]
         The Channel ID
 
-    {{param}} guild_id [str, discord.Snow, NoneType]
+    {{param}} guild_id [str, ~/Snow, None]
         The Guild ID, or None if it is in DMs
 
     {{param}} content [str]
         The content of the message
 
-    {{param}} member [discord.Player, discord.User]
+    {{param}} member [~/Member.Player, ~/Member.User]
         The player or user that sent the message. If a user, then the user
         either left the guild or sent the message in DMs.
 
     {{param}} timestamp [str]
+        When this channel was made
     """
     def __init__(self, *, id, channel_id, author, member = None,
                  content: str, timestamp, edited_timestamp = None, tts: bool,

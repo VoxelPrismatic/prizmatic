@@ -1,6 +1,8 @@
 from ..ClsUtil import extra_kw
 
-__all__ = ["AuditChange"]
+__all__ = [
+    "AuditChange"
+]
 
 class AuditChange:
     """

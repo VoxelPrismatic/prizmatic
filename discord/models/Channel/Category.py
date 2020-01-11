@@ -234,10 +234,11 @@ class Category:
     async def make_store(self, name: str, *, topic: str = "", overwrites = [],
                          slowmode: int = 0, nsfw: bool = False):
         """
-        {{fn}} await instance.make_store(name, *, topic, overwrites, slowmode,
-        nsfw)
+        {{fn}} await instance.make_store(name, *, topic, overwrites, ...)
 
         {{desc}} Creates a store channel under this category
+
+        {{note}} Only the `name` param is required
 
         {{param}} name [str]
             The name of the new channel
@@ -277,10 +278,11 @@ class Category:
     async def make_news(self, name: str, *, topic: str = "", overwrites = [],
                         slowmode: int = 0, nsfw: bool = False):
         """
-        {{fn}} await instance.make_news(name, *, topic, overwrites, slowmode,
-        nsfw)
+        {{fn}} await instance.make_news(name, *, topic, overwrites, ...)
 
         {{desc}} Creates a news channel under this category
+
+        {{note}} Only the `name` param is required
 
         {{param}} name [str]
             The name of the new channel
@@ -323,6 +325,8 @@ class Category:
         {{fn}} await instance.make_vc(name, *, bitrate, overwrites, limit)
 
         {{desc}} Creates a voice channel under this category
+
+        {{note}} Only the `name` param is required
 
         {{param}} name [str]
             The name of the new vc
@@ -370,13 +374,13 @@ class Category:
             {{alias}} position
 
         {{param}} overwrites [~/Perms.Overwrites, List[~/Perms.Overwrite], dict]
-            The overwrites. If a dict, then it must be in `{id: perms_instance}`
+            The overwrites. If a dict, then it must be in `id: perms_instance`
             key-value pairs, otherwise, it will not work
             {{alias}} permission_overwrites
 
         {{rtn}} [~.Category] The edited self
 
-        {{err}} [TypeError] If any of the {id: perms_intance} pairs has an ID
+        {{err}} [TypeError] If any of the `id: perms_intance` pairs has an ID
         that doesn't belong to a user or a role
         """
         data = {}
@@ -441,7 +445,7 @@ class Category:
         {{bltin}} instance.__list__()
         {{usage}} list(instance)
 
-        {{desc}} Returns the list of subchannels
+        {{pydesc}} __list__ subchannels
 
         {{rtn}} [List[~.AnyChannel]]
         """
@@ -452,7 +456,7 @@ class Category:
         {{bltin}} instance.__iter__()
         {{usage}} iter(instance)
 
-        {{desc}} Creates a generator of channels
+        {{pydesc}} __iter__ of subchannels
 
         {{rtn}} [generator]
         """
@@ -464,7 +468,7 @@ class Category:
         {{bltin}} instance.__next__()
         {{usage}} for channel in instance: #... code
 
-        {{desc}} Allows you to iterate through this category's sub-channels
+        {{pydesc}} __next__ the subchannels
 
         {{rtn}} [~.AnyChannel]
         """
@@ -520,3 +524,14 @@ class Category:
         )
         await self.bot_obj.http.delete_channel(id)
         return self
+
+    def __repr__(self):
+        """
+        {{bltin}} instance.__repr__()
+        {{usage}} repr(instance)
+
+        {{pydesc}} __repr__
+
+        {{rtn}} [str]
+        """
+        return f"<#Category '{self.name}' {self.id}>"

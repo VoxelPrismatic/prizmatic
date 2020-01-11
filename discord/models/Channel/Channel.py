@@ -20,6 +20,8 @@ class Channel:
 
     {{noinit}}
 
+    {{note}} The documentation for this class is not complete yet
+
     {{param}} id [str, ~/Snow, int]
         The Channel ID
 
@@ -191,7 +193,7 @@ class Channel:
 
         {{rtn}} [str]
         """
-        return f"<#Channel '{self.name}'>"
+        return f"<#Channel '{self.name}' {self.id}>"
 
     async def edit(self, *, name = None, pos: int = None, position: int = None,
                    topic: str = None, nsfw: bool = None, slowmode: int = None,

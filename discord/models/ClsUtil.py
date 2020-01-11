@@ -6,20 +6,21 @@ from .Error import ObjNotFoundError, ClassError
 __all__ = [
     "from_ts",
     "https",
-    "id_from_obj"
+    "id_from_obj",
+    "extra_kw"
 ]
 
 def from_ts(ts) -> datetime.datetime:
     """
-    {{sepfn}} datetime_object = from_ts(ts)
+    {{sepfn}} from_ts(ts)
 
     {{desc}} Instead of writing `datetime.datetime.fromtimestamp(timestamp)`,
     you can just write `from_ts(timestamp)`
 
-    {{param}} ts [str]
+    {{param}} ts [str, datetime.datetime]
         A valid ISO 8601 timestamp
 
-    {{rtn}} [datetime.datetime] The datetime
+    {{rtn}} [datetime.datetime] The datetime object
     """
     if type(ts) == str and ts.lower() == "now":
         return datetime.datetime.utcnow()
@@ -35,6 +36,17 @@ def from_ts(ts) -> datetime.datetime:
     raise TypeError(f"Invalid time format for `{ts}`")
 
 def https(thing):
+    """
+    {{sepfn}} https(thing)
+
+    {{desc}} If `thing` is a valid attachment URL, it returns `thing`, otherwise
+    it returns an empty string
+
+    {{param}} thing [str]
+        The URL to check
+
+    {{rtn}} [str]
+    """
     if re.search(r"^(https?|attachment)\:\/\/", thing):
         return thing
     return ""

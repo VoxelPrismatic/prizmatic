@@ -5,27 +5,11 @@ __all__ = ["RawFile"]
 
 class RawFile:
     """
-    DESCRIPTION ---
-        Represents a file that is awaiting a download
+    {{cls}} instance = RawFile()
 
-    PARAMS ---
-        url [str]
-        - The url to download
+    {{desc}} Represents a file that is awaiting a download
 
-
-    FUNCTIONS ---
-        thing = RawFile(url)
-        - Creates a new RawFile object
-
-        await thing.get()
-        - Download the file, returns the BytesIO object
-        - If already downloaded, just return the file
-
-        thing()
-        - Returns the BytesIO object as is
-
-        await thing.update()
-        - Re downloads the file
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, url, data = {}):
         self.url = url

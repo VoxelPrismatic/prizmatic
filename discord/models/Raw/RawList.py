@@ -4,49 +4,12 @@ __all__ = ["RawList"]
 
 class RawList:
     """
-    DESCRIPTION ---
-        Represents a list of RawObj objects, but is itself raw too!
-        Useful for things that return a list of things that you want to be raw.
+    {{cls}} instance = RawList()
 
-    PARAMS ---
-        typ [Class]
-        - The object to create
+    {{desc}} Represents a list of RawObj objects, but is itself raw too! Useful
+    for things that return a list of things that you want to be raw.
 
-        url [str]
-        - Where to get the data from
-
-        data [dict]
-        - Other data to be sent
-
-        bot [Bot]
-        - The bot object
-
-        **uni
-        - Universal kwargs
-
-    FUNCTIONS ---
-        thing = RawList(url)
-        - Creates a new RawList object
-
-        await thing.make()
-        - Gets all objects and returns them
-
-        await thing.raw()
-        - Returns the list of RawObj objects
-
-        await thing.update()
-        - Updates all data, and returns the list of RawObj objects
-
-        await thing.remake()
-        - Updates all data, and returns the list of actual objects
-
-        thing()
-        - Returns the list as is
-
-        thing[i], thing[i] = v, del thing[i]
-        - Interact like a list
-        - All changes will be deleted when using the update or remake
-          functions
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, typ, url, data: dict = {}, bot = None, **uni):
         self.bot = bot

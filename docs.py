@@ -1,6 +1,6 @@
 """
-{{note}} This file only allows automatic documentation creation. This file will
-#NOT# be included in any of the modules itself
+{{note}} <<md>>This file only allows automatic documentation creation. This file
+will #NOT# be included in any of the modules itself<<md>>
 """
 import os
 def get_files(lvl = "./", end = "py"):

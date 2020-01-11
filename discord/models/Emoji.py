@@ -158,3 +158,4 @@ class Emoji:
         """
         d = await self.bot_obj.http.get_channel(self.id)
         self.__init__(**d, bot_obj = self.bot_obj, guild_id = self.guild_id)
+        return self

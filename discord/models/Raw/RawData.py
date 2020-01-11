@@ -2,23 +2,12 @@ __all__ = ["RawData"]
 
 class RawData:
     """
-    DESCRIPTION ---
-        A container for bytes and things to be interacted
-        similarly to the other Raw classes
+    {{cls}} instance = RawData()
 
-    PARAMS ---
-        data [bytes]
-        - Raw data
+    {{desc}} A container for bytes and things to be interacted similarly to the
+    other Raw classes
 
-    FUNCTIONS ---
-        raw_data = RawData(bytes_obj)
-        - Create a new RawData object
-
-        await raw_data.get()
-        - Return the bytes data
-
-        raw_data()
-        - Return the bytes data
+    {{note}} Documentation for this class is not complete yet
     """
     def __init__(self, data: bytes):
         self.data = data
