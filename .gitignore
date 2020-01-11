@@ -113,3 +113,4 @@ venv.bak/
 
 #private tests
 testing.py
+*.json
