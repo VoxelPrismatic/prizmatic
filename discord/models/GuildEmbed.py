@@ -6,6 +6,6 @@ class GuildEmbed:
 
     {{desc}} Represents a guild embed
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     pass

@@ -1,13 +1,22 @@
 import re
 import typing
 
-__all__ = ["Color", "get_color", "grab_color"]
+__all__ = [
+    "Color",
+    "Colour"
+    "get_color",
+    "grab_color",
+    "get_colour",
+    "grab_colour"
+]
 
 class Color:
     """
     {{cls}} instance = Color(int_color, rgb_color, hex_color)
 
     {{desc}} Represents a color... yes thats it
+
+    {{note}} An alias for this class exists under `Colour`
 
     {{param}} int_color [Optional[int]]
         The integer representation of the number
@@ -97,9 +106,10 @@ def get_color(obj) -> int:
     """
     {{sepfn}} get_color(obj)
 
-    {{desc}} Returns the color value of an object
+    {{desc}} Returns the color value of an object}
 
-    {{note}} An alias for this function lies under `grab_color()`
+    {{note}} Aliases for this function lie under `grab_color()`. `get_colour()`,
+    and `grab_colour()` for my non-fellow brittish m8s
 
     {{param}} obj [tuple, int, str, Color]
         A color object or color compatible object
@@ -125,3 +135,6 @@ def get_color(obj) -> int:
     raise ValueError("Invalid color")
 
 grab_color = get_color
+get_colour = get_color
+grab_colour = get_color
+Colour = Color

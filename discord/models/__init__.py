@@ -1,11 +1,5 @@
-from . import Raw
 from . import Url
-from . import Semi
 from . import Error
-from . import Audit
-from . import Perms
-from . import Status
-from . import Channel
 from . import ClsUtil
 from . import PrizmCls
 
@@ -29,3 +23,17 @@ from .Member import Player, User
 from .Text import Text, Crosspost
 from .Integration import Integration
 from .Invite import Invite, InviteMetadata
+from .Perms import Perms, Overwrite, Overwrites
+from .Audit import AuditChange, AuditEvent, AuditLog, AuditSearch
+from .Status import Assets, Game, Party, Secrets, Status, Timestamps
+
+from .Channel import (
+    AnyChannel, Category, Channel, VC, DM, GroupDM, StoreChannel, NewsChannel
+)
+from .Raw import (
+    Raw, RawAny, RawData, RawFile, RawList, RawObj, RawObjs
+)
+from .Semi import (
+    OfflineGuild, SemiChannel, SemiGuild, SemiIntegration, SemiInvite,
+    SemiStatus, SemiUser, SemiVoiceState
+)

@@ -8,14 +8,16 @@ class Files:
 
     {{desc}} Represents multiple files
 
-    {{param}} file [File, str, bytes, file, RawFile, url, RawData]
+    {{param}} *files [File, str, bytes, file, RawFile, url, RawData]
         The files, see ~.File for more info
 
     {{note}} The name param is unsupported here. Please pass a `File` object if
     you want to have a name
+
+    {{prop}} ls [List[File]]
     """
-    def __init__(self, *objs):
-        self.ls = [File(obj) for obj in objs]
+    def __init__(self, *files):
+        self.ls = [File(file) for file in files]
 
     async def get(self):
         """

@@ -6,6 +6,6 @@ class Widget:
 
     {{desc}} Represents a Guild widget
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     pass

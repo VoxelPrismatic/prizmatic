@@ -14,6 +14,8 @@ class Player:
 
     {{noinit}}
 
+    {{notdone}}
+
     {{param}} deaf [bool]
         Whether or not the player has been deafened
 
@@ -147,7 +149,7 @@ class Player:
 
         {{rtn}} [str]
         """
-        return self.name + "#" + self.discrim
+        return f"{self.name}#{self.discrim:0>4}"
 
     def __repr__(self):
         """

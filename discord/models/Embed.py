@@ -649,7 +649,7 @@ class Embed:
         {{pydesc}} __getitemD__
 
         {{param}} key [str]
-            The attribute you want
+            The attribute to get
 
         {{rtn}} [Any] The attribute
         """
@@ -670,6 +670,19 @@ class Embed:
             The value to set the attribute to
         """
         self.set(**{key: val})
+
+    def __delitem__(self, key):
+        """
+        {{bltin}} instance.__delitem__(key, val)
+        {{usage}} del instance[key]
+
+        {{desc}} Deletes an attribute, so you can interact with this class as if
+        it were a dict
+
+        {{param}} key [str]
+            The attribute to delete
+        """
+        self.set(**{key: None})
 
     #Named Aliases
     @property

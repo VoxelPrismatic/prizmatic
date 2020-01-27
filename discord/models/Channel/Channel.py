@@ -110,7 +110,8 @@ class Channel:
     {{prop}} type [int]
         This should always be 0 unless you change it
 
-    {{}}
+    {{prop}} bot_obj [~/Bot]
+        The bot object
     """
     def __init__(self, *, id, guild_id, name, type, position, topic,
                  permission_overwrites, rate_limit_per_user, nsfw = False,

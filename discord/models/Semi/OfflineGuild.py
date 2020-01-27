@@ -8,12 +8,7 @@ class OfflineGuild(Guild):
 
     {{desc}} Represents a guild, thats offline
 
-    {{note}} Documentation for this class is not complete yet
+    {{noexist}}
     """
     def __init__(self, **kw):
-        if kw:
-            print(
-                "Error: Class 'Ban' has extra kwargs added by the gateway"
-            )
-            print(kw)
-            exit()
+        pass

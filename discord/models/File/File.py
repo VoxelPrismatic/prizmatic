@@ -24,7 +24,7 @@ class File:
         The name of the file
         {{norm}} Random hex
 
-    {{prop}} data [~/Raw.RawFile]
+    {{prop}} data [~/Raw.RawFile, io.BytesIO, bytes, str, io.IOBase]
         The file data
 
     {{prop}} name [str]
@@ -39,7 +39,7 @@ class File:
                 self.data = RawData(bytes(open(obj, "rb").read()))
         elif type(obj) == bytes:
             self.data = RawData(obj)
-        elif type(obj) == io.IOBase:
+        elif type(obj) == io.IOBase or type(obj) == io.BytesIO:
             self.data = RawData(bytes(obj.read()))
         elif type(obj) == RawData or type(obj) == RawFile:
             self.data = obj

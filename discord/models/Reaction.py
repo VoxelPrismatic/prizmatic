@@ -6,6 +6,6 @@ class Reaction:
 
     {{desc}} Represents a reaction on a message
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     pass

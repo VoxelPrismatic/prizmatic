@@ -13,7 +13,7 @@ class GroupDM:
 
     {{desc}} Represents a Group DM
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     def __init__(self, **kw):
         extra_kw(kw, "GroupDM")

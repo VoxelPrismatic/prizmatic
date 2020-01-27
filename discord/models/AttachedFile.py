@@ -6,6 +6,6 @@ class AttachedFile:
 
     {{desc}} Represents an attached file to a message
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     pass

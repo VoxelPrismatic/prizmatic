@@ -17,6 +17,8 @@ class NewsChannel(Channel):
     {{noinit}}
 
     {{note}} All the params and props are the same as in ~.Channel
+
+    {{notdone}}
     """
     def __init__(self, *, id, guild_id, name, type, position,
                  permission_overwrites, rate_limit_per_user, nsfw, topic,

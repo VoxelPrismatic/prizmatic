@@ -6,6 +6,6 @@ class Webhook:
 
     {{desc}} Represents a webhook for a channel
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     pass

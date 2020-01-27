@@ -8,7 +8,7 @@ class Ban:
 
     {{desc}} Represents a ban
 
-    {{note}} This class doesn't actually exist yet
+    {{noexist}}
     """
     def __init__(self, **kw):
         extra_kw(kw, "Ban")

@@ -85,6 +85,8 @@ class VC:
 
     {{prop}} bot_obj [~/Bot]
         The bot object
+
+    {{note}} This class is not done, you may NOT join VCs yet
     """
     def __init__(self, *, permission_overwrites, name, guild_id, type, id,
                  position, user_limit, bitrate, parent_id, bot_obj = None,

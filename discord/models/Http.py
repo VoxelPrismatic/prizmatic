@@ -50,13 +50,13 @@ class Http:
     {{param}} client [aiohttp.ClientSession]
         The client
 
-    {{param}} bot [discord.models.Bot]
+    {{param}} bot [~/Bot]
         The bot
 
     {{prop}} client [aiohttp.ClientSession]
         The client
 
-    {{prop}} bot [discord.models.Bot]
+    {{prop}} bot [~/Bot]
         The bot
 
     {{prop}} token [str]

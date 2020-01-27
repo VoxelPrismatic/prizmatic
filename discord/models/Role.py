@@ -34,7 +34,7 @@ class Role:
     {{param}} mentionable [bool]
         Whether or not this role can be pinged
 
-    {{param}} guild_id [str, discord.models.Snow]
+    {{param}} guild_id [str, ~/Snow]
         The guild that owns this role
 
     {{prop}} id [int]
@@ -43,8 +43,9 @@ class Role:
     {{prop}} name [str]
         Name of the object
 
-    {{prop}} color [discord.models.Color]
+    {{prop}} color [~/Color]
         Color of the object
+        {{alias}} colour
 
     {{prop}} hoist [bool]
         Whether or not this role shows differently on the player board
@@ -52,7 +53,7 @@ class Role:
     {{prop}} position [int]
         Position on the role list, 0 is @everyone and it counts up
 
-    {{prop}} perms [discord.models.Perms.Perms]
+    {{prop}} perms [~/Perms.Perms]
         The permissions
 
     {{prop}} managed [bool]
@@ -65,10 +66,10 @@ class Role:
     {{prop}} guild_id [int]
         The Guild ID
 
-    {{prop}} guild [discord.models.Guild]
+    {{prop}} guild [~/Guild]
         The guild that owns this object
 
-    {{prop}} bot_obj [discord.models.Bot]
+    {{prop}} bot_obj [~/Bot]
         The bot object
     """
     def __init__(self, *, id: str, name: str, color: int, hoist: bool,
@@ -199,6 +200,10 @@ class Role:
     @property
     def guild(self):
         return self.bot_obj.listeners.guilds(self.guild_id)
+
+    @property
+    def colour(self):
+        return self.color
 
     def __int__(self):
         """

@@ -18,7 +18,7 @@ class NonExistentObj:
     {{param}} url [str]
         Where to post the data
 
-    {{param}} typ [class]
+    {{param}} typ [Class]
         The object to recreate, eg Text or Channel. This param is only used to
         recreate the object before it was deleted.
 
@@ -42,7 +42,7 @@ class NonExistentObj:
     {{prop}} url [str]
         The URL provided
 
-    {{prop}} typ [class]
+    {{prop}} typ [Class]
         The object's class
 
     {{prop}} bot [~/Bot]
