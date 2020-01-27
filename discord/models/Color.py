@@ -3,7 +3,7 @@ import typing
 
 __all__ = [
     "Color",
-    "Colour"
+    "Colour",
     "get_color",
     "grab_color",
     "get_colour",
